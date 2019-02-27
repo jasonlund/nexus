@@ -13,7 +13,8 @@
         "laravel/framework": "5.7.*",
         "laravel/tinker": "^1.0",
         "schuppo/password-strength": "~1.5",
-        "spatie/laravel-fractal": "^5.4"
+        "spatie/laravel-fractal": "^5.4",
+        "spatie/laravel-permission": "^2.34"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",

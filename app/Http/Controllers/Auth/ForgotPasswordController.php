@@ -53,7 +53,6 @@ class ForgotPasswordController extends Controller
      */
     protected function sendResetLinkFailedResponse(Request $request, $response)
     {
-
         throw ValidationException::withMessages([
             'email' => 'This is not a valid email address.'
         ]);

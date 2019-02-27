@@ -4,6 +4,10 @@ namespace Tests\Feature\Auth;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Event;
+use Hash;
+use Illuminate\Auth\Events\Registered;
+use App\Models\User;
 
 class RegistrationTest extends TestCase
 {
@@ -24,6 +28,8 @@ class RegistrationTest extends TestCase
     /** @test */
     function a_guest_user_can_register()
     {
+        Event::fake();
+
         $data = make('User')->only(['name', 'username', 'email', 'password']);
         $data = array_merge($data, ['password_confirmation' => $data['password']]);
 
@@ -33,6 +39,11 @@ class RegistrationTest extends TestCase
                 'name' => $data['name'],
                 'username' => $data['username']
             ]);
+
+        $this->assertAuthenticatedAs($user = User::first());
+        Event::assertDispatched(Registered::class, function ($event) use ($user) {
+            return $event->user->id === $user->id;
+        });
     }
 
     /** @test */
@@ -70,6 +81,9 @@ class RegistrationTest extends TestCase
     function a_user_requires_an_email()
     {
         $this->create(['email' => null])
+            ->assertJsonValidationErrors('email');
+
+        $this->create(['email' => 'notanemail'])
             ->assertJsonValidationErrors('email');
     }
 
