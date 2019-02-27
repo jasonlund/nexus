@@ -1,5 +1,5 @@
 <?php
-Route::get('/home', ['as' => 'home', 'uses' => 'HomeController@index']);
+Route::get('/', ['as' => 'home', 'uses' => 'HomeController@index']);
 
 Route::get('/profile', ['as' => 'self.show', 'uses' => 'UsersController@showSelf']);
 Route::patch('/profile', ['as' => 'self.update', 'uses' => 'UsersController@updateSelf']);
