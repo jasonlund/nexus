@@ -24,12 +24,12 @@ Vue.component('home', require('./components/Home.vue').default);
 
 import ChannelList from './components/ChannelList.vue';
 import Channel from './components/Channel.vue';
-import Post from './components/Post.vue';
+import Thread from './components/Thread.vue';
 
 const routes = [
     { path: '/', component: ChannelList },
-    { path: '/:channelSlug', component: Channel },
-    { path: '/:channelSlug/post/:postId', component: Post },
+    { path: '/channel/:channelId', component: Channel },
+    { path: '/channel/:channelId/thread/:threadId', component: Thread },
 ]
 
 // 3. Create the router instance and pass the `routes` option

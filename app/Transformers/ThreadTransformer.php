@@ -25,6 +25,7 @@ class ThreadTransformer extends TransformerAbstract
     public function transform(Thread $thread)
     {
         $data = [
+            'id' => (integer) $thread->id,
             'title' => (string) $thread->title,
             'slug' => (string)$thread->slug,
             'body' => (string)$thread->body,

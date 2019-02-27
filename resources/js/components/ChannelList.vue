@@ -1,7 +1,7 @@
 <template>
     <div class="flex justify-center items-center w-full">
         <div class="flex flex-col justify-center items-center flex-1">
-            <router-link :to="`/${channel.slug}`"
+            <router-link :to="`/channel/${channel.id}`"
                 class="h-24 w-full p-2 |
                     flex justify-between my-2 |
                     text-grey-darker border border-1-grey rounded cursor-pointer |
@@ -31,28 +31,28 @@
                 channels: [
                     {
                         name: 'General',
-                        slug: 'general',
+                        id: 1,
                         description: 'Talk about anything an everything!',
                         post_count: 1,
                         thread_count: 1
                     },
                     {
                         name: 'Protoss',
-                        slug: 'protoss',
+                        id: 2,
                         description: 'Talk about Protoss strategy, how much you hate Zerg and how easy Terran is!',
                         post_count: 1337,
                         thread_count: 69
                     },
                     {
                         name: 'Zerg',
-                        slug: 'zerg',
+                        id: 3,
                         description: 'Talk about Zerg strategy, how much you hate Zerg and how easy Terran is!',
                         post_count: 1337,
                         thread_count: 69
                     },
                     {
                         name: 'Terran',
-                        name: 'terran',
+                        name: 4,
                         description: 'Talk about Terran strategy, how much you hate Zerg and how easy Terran is!',
                         post_count: 1337,
                         thread_count: 69
