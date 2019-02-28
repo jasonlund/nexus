@@ -52,7 +52,7 @@
                     },
                     {
                         name: 'Terran',
-                        name: 4,
+                        id: 4,
                         description: 'Talk about Terran strategy, how much you hate Zerg and how easy Terran is!',
                         post_count: 1337,
                         thread_count: 69

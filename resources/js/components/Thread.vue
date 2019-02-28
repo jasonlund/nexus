@@ -1,6 +1,6 @@
 <template>
     <div class="flex justify-center items-center w-full">
-        <div class="flex flex-col justify-center items-center flex-1">
+        <div class="flex flex-col justify-center items-center flex-1" v-if="thread">
             <div
                 class="h-24 w-full p-2 |
                     flex justify-between my-2 |

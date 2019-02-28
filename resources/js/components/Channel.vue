@@ -17,7 +17,7 @@
                     <div class="text-sm opacity-50">{{ thread.body }}</div>
                 </div>
                 <div class="flex p-2 justify-center items-center w-24 text-center">
-                    {{ thread.replies.length ?? 0 }} Replies
+                    {{  }} Replies
                 </div>
             </router-link>
         </div>

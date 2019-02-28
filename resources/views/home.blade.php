@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
 @section('content')
-    <transition name="fade">
-        <home>
-            <template slot="content">
+    <home>
+        <template slot="content">
+            <transition name="fade" mode="out-in">
                 <router-view></router-view>
-            </template>
-        </home>
-    </transition>
+            </transition>
+        </template>
+    </home>
 @endsection
