@@ -70,5 +70,13 @@ class ThreadTest extends TestCase
         $threads = create('Thread', ['title' => 'FooBar'], 2)->toArray();
 
         $this->assertEquals($threads[0]['slug'], $threads[1]['slug']);
+        $this->assertNotEquals($threads[0]['channel_id'], $threads[1]['channel_id']);
+
+        $threadInChannel = create('Thread', [
+            'title' => 'FooBar',
+            'channel_id' => $threads[0]['channel_id']
+        ])->toArray();
+
+        $this->assertNotEquals($threads[0]['slug'], $threadInChannel['slug']);
     }
 }
