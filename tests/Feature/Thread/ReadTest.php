@@ -18,6 +18,8 @@ class ReadTest extends TestCase
 
         $this->thread = create('Thread');
         $this->replies = create('Reply', ['thread_id' => $this->thread->id], 2);
+
+//        $this->withExceptionHandling();
     }
 
     protected function routeShow($params = [])
@@ -72,7 +74,7 @@ class ReadTest extends TestCase
         $this->json('GET', $this->routeShow([
             'channel' => $thread->channel->slug,
             'thread_id' => $thread->id
-        ]))->assertJson([
+        ]) . '?limit=-2')->assertJson([
             'replies' => [
                 'meta' => [
                     'pagination' => [

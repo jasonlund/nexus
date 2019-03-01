@@ -43,11 +43,18 @@ class ThreadTransformer extends TransformerAbstract
 
     public function includeReplies(Thread $thread)
     {
-        $channels = $thread->replies()->paginate(request()->has('limit') ? request('limit') : 25);
+        $limit = 25;
+        if(request()->has('limit')) {
+            $input = (int)request('limit');
+            if($input < 101 && $input > 9){
+                $limit = $input;
+            }
+        }
+        $replies = $thread->replies()->paginate($limit);
 
         return $this->collection(
-            $channels->getCollection(),
+            $replies->getCollection(),
             new ReplyTransformer()
-        )->setPaginator(new IlluminatePaginatorAdapter($channels));
+        )->setPaginator(new IlluminatePaginatorAdapter($replies));
     }
 }

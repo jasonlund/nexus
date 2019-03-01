@@ -98,7 +98,7 @@ class ReadTest extends TestCase
 
         $this->json('GET', $this->routeShow([
             'channel' => $channel->slug
-        ]))->assertJson([
+        ]) . '?limit=1000')->assertJson([
                 'threads' => [
                     'meta' => [
                         'pagination' => [
