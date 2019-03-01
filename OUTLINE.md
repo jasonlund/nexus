@@ -1,66 +1,82 @@
 ### Users
-- [ ] Users have attributes:
-    - Username
-    - Full Name
-    - Email address
-    - Location
-    - Avatar
-- [ ] Users cans register for accounts
-    - [ ] Users can register/connect with Patreon
-    - [ ] Users can register/connect with Twitch
+- Users have attributes:
+    - [x] Username
+    - [x] Full Name
+    - [x] Email address
+    - [x] Passwords
+    - [ ] Location
+    - [ ] Avatar
+- [x] Users can register for accounts
+    - [ ] Users can connect with Patreon
+    - [ ] Users can connect with Twitch
 - [ ] Users have Roles & Permissions
     - Guest (unauthenticated)
     - User
     - VIP
     - Moderator
     - Admin
- - [ ] Users may be modified by self & Admins
- - [ ] Users may be deleted by self & Admins
+ - Users may be modified
+    - [x] By self
+    - [ ] By admins
+- [x] Guests may request a new password via email
+ - Users may be deleted
+    - [x] By self
+    - [ ] By admins
  - [ ] Users may be temporary or permanently banned by Admins
  - Relationships:
     - [ ] Belong to one Role
-    - [ ] Have many Threads
-    - [ ] Have many Replies
+    - [x] Have many Threads
+    - [x] Have many Replies
     
 ### Threads
-- [ ] Threads have attributes:
+- [x] Threads have attributes:
     - Title
     - Body
     - Creator (User)
     - Timestamps
-- [ ] Anyone can view Threads
-- [ ] Authenticated users can create Threads
-- [ ] The creator, Moderators and Admins can modify Threads
-- [ ] The creator, Moderators and Admins can delete Threads
+- [x] Anyone can view Threads
+- [x] Authenticated users can create Threads
+- Threads may be modified
+    - [x] By creator
+    - [ ] By Mods of the channel
+    - [ ] By Admins
+- Threads may be deleted
+    - [x] By creator
+    - [ ] By Mods of the channel
+    - [ ] By Admins
 - Relationships:
-    - [ ] Have many Replies
-    - [ ] Belong to one Channel
-    - [ ] Belong to one User
+    - [x] Have many Replies
+    - [x] Belong to one Channel
+    - [x] Belong to one User
 
 ### Replies
-- [ ] Replies have attributes:
+- [x] Replies have attributes:
     - Body
     - Creator
     - Timestamps
-- [ ] Anyone can view replies
-- [ ] Authenticated users can create Replies
-- [ ] The creator, Moderators and Admins can modify Replies
-- [ ] The creator, Moderators and Admins can delete Replies
+- [x] Anyone can view replies
+- [x] Authenticated users can create Replies
+- Replies may be modified
+    - [x] By creator
+    - [ ] By Mods of the channel
+    - [ ] By Admins
+- Replies may be deleted
+    - [x] By creator
+    - [ ] By Mods of the channel
+    - [ ] By Admins
 - Relationships:
-    - [ ] Belong to one Thread
-    - [ ] Belong to one User
+    - [x] Belong to one Thread
+    - [x] Belong to one User
 
 ### Channels
-- [ ] Channels have attributes:
+- [x] Channels have attributes:
     - Name
     - Description
-- [ ] Channels have many Threads
 - [ ] Channels have Moderators
-- [ ] Channels may belong to one parent or have many children (Sub-Channels) ?
-- [ ] All Threads and Replies belonging to any Channel may be modified or deleted by Admins
-- [ ] Threads and Replies belonging to a specific Channel may be modified or deleted by Admins & Moderators of that Channels
+- [x] Anyone can view channels
+- [ ] Admins users can create Channels
+- [ ] Admins users can modify Channels
+- [ ] Admins users can delete Channels
 - Relationships:
-    - [ ] Belong to one parent (Channel; optional)
-    - [ ] Have one child (Channel; optional)
-    - [ ] Have many Threads
+    - [x] Have many Threads
     - [ ] Have many Moderators

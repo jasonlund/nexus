@@ -21,6 +21,14 @@ class Thread extends Model
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function channel()
+    {
+        return $this->belongsTo('App\Models\Channel');
+    }
+
+    /**
      * @param $attributes
      * @return \App\Models\Thread
      */

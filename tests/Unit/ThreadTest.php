@@ -48,6 +48,12 @@ class ThreadTest extends TestCase
     }
 
     /** @test */
+    function it_has_a_channel()
+    {
+        $this->assertInstanceOf('App\Models\Channel', $this->thread->channel);
+    }
+
+    /** @test */
     function it_can_add_a_reply()
     {
         $this->thread->addReply([

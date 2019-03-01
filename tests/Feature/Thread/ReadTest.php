@@ -10,40 +10,25 @@ class ReadTest extends TestCase
     use DatabaseMigrations;
 
     protected $thread;
+    protected $replies;
 
     public function setUp()
     {
         parent::setUp();
 
         $this->thread = create('Thread');
+        $this->replies = create('Reply', ['thread_id' => $this->thread->id], 2);
     }
 
-    protected function routeIndex()
-    {
-        return route('threads.index');
-    }
-
-    protected function routeShow($params)
+    protected function routeShow($params = [])
     {
         return route('threads.show', $params);
     }
 
     /** @test */
-    function anyone_can_view_all_threads()
+    function anyone_can_view_a_single_thread_with_replies()
     {
-        $this->json('GET', $this->routeIndex())
-            ->assertStatus(200)
-            ->assertJsonFragment([
-                'id' => $this->thread->id,
-                'title' => $this->thread->title,
-                'body' => $this->thread->body
-            ]);
-    }
-
-    /** @test */
-    function anyone_can_view_a_single_thread()
-    {
-        $this->json('GET', $this->routeShow([$this->thread->id]))
+        $response = $this->json('GET', $this->routeShow([$this->thread->channel->slug, $this->thread->id]))
             ->assertStatus(200)
             ->assertJson([
                 'id' => $this->thread->id,
@@ -54,7 +39,29 @@ class ReadTest extends TestCase
                 'owner' => [
                     'id' => $this->thread->owner->id,
                     'name' => $this->thread->owner->name
+                ],
+                'replies' => [
+                    [
+                        'id' => $this->replies[0]->id,
+                        'body' => $this->replies[0]->body,
+                        'owner' => [
+                            'id' => $this->replies[0]->owner->id,
+                            'name' => $this->replies[0]->owner->name,
+                            'username' => $this->replies[0]->owner->username,
+                        ]
+                    ],
+                    [
+                        'id' => $this->replies[1]->id,
+                        'body' => $this->replies[1]->body,
+                        'owner' => [
+                            'id' => $this->replies[1]->owner->id,
+                            'name' => $this->replies[1]->owner->name,
+                            'username' => $this->replies[1]->owner->username,
+                        ]
+                    ]
                 ]
             ]);
+
+//        dd($response->decodeResponseJson());
     }
 }

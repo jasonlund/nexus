@@ -36,12 +36,12 @@ class UpdateTest extends TestCase
             'body' => 'FooBar'
         ];
 
-        $this->json('PATCH', $this->routeUpdate([$reply->thread->id, $reply->id]), $newData)
+        $this->json('PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->id, $reply->id]), $newData)
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($oldData);
 
-        $this->json('GET', $this->routeShow([$reply->thread->id]))
+        $this->json('GET', $this->routeShow([$reply->channel->slug, $reply->thread->id]))
             ->assertStatus(200)
             ->assertJson([
                 'replies' => [$newData]
@@ -56,7 +56,7 @@ class UpdateTest extends TestCase
     {
         $reply = create('Reply');
 
-        $this->json('PATCH', $this->routeUpdate([$reply->thread->id, $reply->id]), [])
+        $this->json('PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->id, $reply->id]), [])
             ->assertStatus(401);
     }
 
@@ -70,7 +70,7 @@ class UpdateTest extends TestCase
 
         $this->signIn();
 
-        $this->json('PATCH', $this->routeUpdate([$reply->thread->id, $reply->id]), [])
+        $this->json('PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->id, $reply->id]), [])
             ->assertStatus(403);
 
     }
@@ -81,7 +81,7 @@ class UpdateTest extends TestCase
         $user = $this->signIn();
         $reply = create('Reply', ['user_id' => $user->id]);
 
-        $this->json('PATCH', $this->routeUpdate([$reply->thread->id, $reply->id]), ['body' => null])
+        $this->json('PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->id, $reply->id]), ['body' => null])
             ->assertJsonValidationErrors(['body']);
     }
 }

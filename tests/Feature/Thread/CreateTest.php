@@ -9,21 +9,25 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
+    protected $channel;
+
     public function setUp()
     {
         parent::setUp();
 
+        $this->channel = create('Channel');
+
         $this->withExceptionHandling();
     }
 
-    protected function routeStore()
+    protected function routeStore($params = [])
     {
-        return route('threads.store');
+        return route('threads.store', $params);
     }
 
-    protected function routeIndex()
+    protected function routeIndex($params = [])
     {
-        return route('threads.index');
+        return route('channels.show', $params);
     }
 
     /** @test */
@@ -31,9 +35,9 @@ class CreateTest extends TestCase
     {
         $user = $this->signIn();
 
-        $thread = raw('Thread');
+        $thread = raw('Thread', ['channel_id' => $this->channel->id]);
 
-        $this->json('PUT', $this->routeStore(), $thread)
+        $this->json('PUT', $this->routeStore([$this->channel->slug]), $thread)
             ->assertStatus(200)
             ->assertJson([
                 'title' => $thread['title'],
@@ -44,7 +48,7 @@ class CreateTest extends TestCase
                 ]
             ]);
 
-        $this->json('GET', $this->routeIndex())
+        $this->json('GET', $this->routeIndex([$this->channel->slug]))
             ->assertStatus(200)
             ->assertJsonFragment([
                 'title' => $thread['title'],
@@ -60,7 +64,7 @@ class CreateTest extends TestCase
     /** @test */
     function a_guest_can_not_create_new_threads()
     {
-        $this->json('PUT', $this->routeStore(), [])
+        $this->json('PUT', $this->routeStore([$this->channel->slug]), [])
             ->assertStatus(401);
     }
 
@@ -82,8 +86,9 @@ class CreateTest extends TestCase
     {
         $this->signIn();
 
-        $thread = raw('Thread', $overrides);
+        $channel = create('Channel');
+        $thread = raw('Thread', array_merge($overrides, ['channel_id' => $channel->id]));
 
-        return $this->json('PUT', $this->routeStore(), $thread);
+        return $this->json('PUT', $this->routeStore([$channel->slug]), $thread);
     }
 }

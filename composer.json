@@ -14,7 +14,9 @@
         "laravel/tinker": "^1.0",
         "schuppo/password-strength": "~1.5",
         "spatie/laravel-fractal": "^5.4",
-        "spatie/laravel-permission": "^2.34"
+        "spatie/laravel-permission": "^2.34",
+        "spatie/laravel-sluggable": "^2.1",
+        "staudenmeir/belongs-to-through": "^2.4"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",

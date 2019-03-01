@@ -29,4 +29,10 @@ class ReplyTest extends TestCase
     {
         $this->assertInstanceOf('App\Models\Thread', $this->reply->thread);
     }
+
+    /** @test */
+    function it_has_a_channel()
+    {
+        $this->assertInstanceOf('App\Models\Channel', $this->reply->channel);
+    }
 }

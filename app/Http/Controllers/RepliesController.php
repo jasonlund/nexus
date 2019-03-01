@@ -7,6 +7,7 @@ use App\Http\Requests\ReplyDestroyRequest;
 use App\Http\Requests\ReplyUpdateRequest;
 use App\Models\Reply;
 use App\Models\Thread;
+use App\Models\Channel;
 use Illuminate\Http\Request;
 use App\Transformers\ReplyTransformer;
 
@@ -34,10 +35,11 @@ class RepliesController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \App\Http\Requests\ReplyCreateRequest  $request
+     * @param  \App\Models\Channel $channel
      * @param  \App\Models\Thread $thread
      * @return \Illuminate\Http\Response
      */
-    public function store(ReplyCreateRequest $request, Thread $thread)
+    public function store(ReplyCreateRequest $request, Channel $channel, Thread $thread)
     {
         $reply = $thread->addReply([
             'body' => request('body'),
@@ -64,11 +66,12 @@ class RepliesController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \App\Http\Requests\ReplyUpdateRequest $request
+     * @param  \App\Models\Channel $channel
      * @param  \App\Models\Reply  $reply
      * @param  \App\Models\Thread  $thread
      * @return \Illuminate\Http\Response
      */
-    public function update(ReplyUpdateRequest $request, Thread $thread, Reply $reply)
+    public function update(ReplyUpdateRequest $request, Channel $channel, Thread $thread, Reply $reply)
     {
         $reply->update([
             'body' => request('body')
@@ -83,12 +86,13 @@ class RepliesController extends Controller
      * Remove the specified resource from storage.
      *
      * @param \App\Http\Requests\ReplyDestroyRequest $request
+     * @param  \App\Models\Channel $channel
      * @param  \App\Models\Reply  $reply
      * @param  \App\Models\Thread  $thread
      * @return \Illuminate\Http\Response
      * @throws \Exception
      */
-    public function destroy(ReplyDestroyRequest $request, Thread $thread, Reply $reply)
+    public function destroy(ReplyDestroyRequest $request, Channel $channel, Thread $thread, Reply $reply)
     {
         $reply->delete();
 

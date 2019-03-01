@@ -34,7 +34,7 @@ class CreateTest extends TestCase
         $thread = create('Thread');
         $reply = raw('Reply');
 
-        $this->json('PUT', $this->routeStore([$thread->id]), $reply)
+        $this->json('PUT', $this->routeStore([$thread->channel->slug, $thread->id]), $reply)
             ->assertStatus(200)
             ->assertJson([
                 'body' => $reply['body'],
@@ -44,7 +44,7 @@ class CreateTest extends TestCase
                 ]
             ]);
 
-        $this->json('GET', $this->routeShow([$thread->id]))
+        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->id]))
             ->assertStatus(200)
             ->assertJson([
                 'replies' => [[
@@ -62,7 +62,7 @@ class CreateTest extends TestCase
     {
         $thread = create('Thread');
 
-        $this->json('PUT', $this->routeStore([$thread->id]), [])
+        $this->json('PUT', $this->routeStore([$thread->channel->slug, $thread->id]), [])
             ->assertStatus(401);
     }
 
@@ -74,7 +74,7 @@ class CreateTest extends TestCase
         $thread = create('Thread');
         $reply = raw('Reply', ['body' => null]);
 
-        $this->json('PUT', $this->routeStore([$thread->id]), $reply)
+        $this->json('PUT', $this->routeStore([$thread->channel->slug, $thread->id]), $reply)
             ->assertJsonValidationErrors(['body']);
     }
 }

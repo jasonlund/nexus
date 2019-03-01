@@ -33,10 +33,10 @@ class DestroyTest extends TestCase
         $reply = create('Reply', ['user_id' => $user->id]);
         $data = $reply->only('body');
 
-        $this->json('DELETE', $this->routeDestroy([$reply->thread->id, $reply->id]))
+        $this->json('DELETE', $this->routeDestroy([$reply->channel->slug, $reply->thread->id, $reply->id]))
             ->assertStatus(200);
 
-        $this->json('GET', $this->routeShow([$reply->thread->id]))
+        $this->json('GET', $this->routeShow([$reply->channel->slug, $reply->thread->id]))
             ->assertStatus(200)
             ->assertJsonMissing([
                 'replies' => [$data]
@@ -49,10 +49,10 @@ class DestroyTest extends TestCase
         $reply = create('Reply');
         $data = $reply->only('body');
 
-        $this->json('DELETE', $this->routeDestroy([$reply->thread->id, $reply->id]))
+        $this->json('DELETE', $this->routeDestroy([$reply->channel->slug, $reply->thread->id, $reply->id]))
             ->assertStatus(401);
 
-        $this->json('GET', $this->routeShow([$reply->thread->id]))
+        $this->json('GET', $this->routeShow([$reply->channel->slug, $reply->thread->id]))
             ->assertStatus(200)
             ->assertJson([
                 'replies' => [$data]
@@ -70,10 +70,10 @@ class DestroyTest extends TestCase
 
         $this->signIn();
 
-        $this->json('DELETE', $this->routeDestroy([$reply->thread->id, $reply->id]))
+        $this->json('DELETE', $this->routeDestroy([$reply->channel->slug, $reply->thread->id, $reply->id]))
             ->assertStatus(403);
 
-        $this->json('GET', $this->routeShow([$reply->thread->id]))
+        $this->json('GET', $this->routeShow([$reply->channel->slug, $reply->thread->id]))
             ->assertStatus(200)
             ->assertJson([
                 'replies' => [$data]
