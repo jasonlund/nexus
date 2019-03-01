@@ -41,13 +41,7 @@
                         <!-- Authentication Links -->
                         @guest
                             <li class="nav-item">
-                                <form id="login-form" action="{{ route('auth.login') }}" method="POST">
-                                    @csrf
-                                    <div class="flex">
-                                        <input class="form-control | mr-2" placeholder="username"/>
-                                        <input class="form-control" placeholder="password" type="password" />
-                                    </div>
-                                </form>
+                                <login></login>
                             </li>
                             @if (Route::has('auth.register'))
                                 <li class="nav-item">
@@ -83,8 +77,9 @@
         <main class="pb-4">
             @yield('content')
         </main>
-
+        <portal to="main-portal">
+        </portal>
     </div>
-    <script async src="https://unpkg.com/ionicons@4.4.4/dist/ionicons.js"></script>
+    <script src="https://unpkg.com/ionicons@4.4.4/dist/ionicons.js"></script>
 </body>
 </html>

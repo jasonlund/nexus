@@ -29,6 +29,7 @@ class ThreadTransformer extends TransformerAbstract
             'title' => (string) $thread->title,
             'slug' => (string)$thread->slug,
             'body' => (string)$thread->body,
+            'reply_count' => (integer) $thread->replies()->count(),
             'created_at' => (string)$thread->created_at->format('Y-m-d H:i:s'),
             'updated_at' => (string)$thread->updated_at->format('Y-m-d H:i:s')
         ];

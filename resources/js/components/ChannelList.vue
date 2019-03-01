@@ -1,7 +1,7 @@
 <template>
     <div class="flex justify-center items-center w-full">
         <div class="flex flex-col justify-center items-center flex-1">
-            <router-link :to="`/channel/${channel.id}`"
+            <router-link :to="{ name: 'channel', params: { channelSlug: channel.slug }}"
                 class="h-24 w-full p-2 |
                     flex justify-between my-2 |
                     text-grey-darker border border-1-grey rounded cursor-pointer |
@@ -17,7 +17,7 @@
                     <div class="text-sm opacity-50">{{ channel.description }}</div>
                 </div>
                 <div class="flex p-2 justify-center items-center w-24 text-center">
-                    {{ channel.post_count }} Posts
+                    {{ channel.thread_count }} Threads
                 </div>
             </router-link>
         </div>
@@ -28,41 +28,24 @@
     export default {
         data() {
             return {
-                channels: [
-                    {
-                        name: 'General',
-                        id: 1,
-                        description: 'Talk about anything an everything!',
-                        post_count: 1,
-                        thread_count: 1
-                    },
-                    {
-                        name: 'Protoss',
-                        id: 2,
-                        description: 'Talk about Protoss strategy, how much you hate Zerg and how easy Terran is!',
-                        post_count: 1337,
-                        thread_count: 69
-                    },
-                    {
-                        name: 'Zerg',
-                        id: 3,
-                        description: 'Talk about Zerg strategy, how much you hate Zerg and how easy Terran is!',
-                        post_count: 1337,
-                        thread_count: 69
-                    },
-                    {
-                        name: 'Terran',
-                        id: 4,
-                        description: 'Talk about Terran strategy, how much you hate Zerg and how easy Terran is!',
-                        post_count: 1337,
-                        thread_count: 69
-                    },
-                ]
+                channels: []
             };
         },
 
+        methods: {
+            loadChannels() {
+                axios.get('channels')
+                .then((response) => {
+                    this.channels = response.data;
+                })
+                .catch((error) => {
+                      console.log(error);
+                })
+            }
+        },
+
         mounted() {
-            console.log('Component mounted.')
+            this.loadChannels();
         }
     }
 </script>

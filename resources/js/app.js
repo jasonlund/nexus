@@ -9,6 +9,7 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 import VueRouter from 'vue-router';
+import PortalVue from 'portal-vue'
 
 /**
  * The following block of code may be used to automatically register your
@@ -21,15 +22,16 @@ import VueRouter from 'vue-router';
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 Vue.component('home', require('./components/Home.vue').default);
+Vue.component('login', require('./components/Login.vue').default);
 
 import ChannelList from './components/ChannelList.vue';
 import Channel from './components/Channel.vue';
 import Thread from './components/Thread.vue';
 
 const routes = [
-    { path: '/', component: ChannelList },
-    { path: '/channel/:channelId', component: Channel },
-    { path: '/channel/:channelId/thread/:threadId', component: Thread },
+    { name: 'home', path: '/', component: ChannelList },
+    { name: 'channel', path: '/:channelSlug', component: Channel },
+    { name: 'thread', path: '/:channelSlug/:threadId', component: Thread },
 ]
 
 // 3. Create the router instance and pass the `routes` option
@@ -40,6 +42,7 @@ const router = new VueRouter({
 })
 
 Vue.use(VueRouter);
+Vue.use(PortalVue)
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application

@@ -14,9 +14,6 @@
                     <div class="text-lg">{{ thread.title }}</div>
                     <div class="text-sm opacity-50">{{ thread.description }}</div>
                 </div>
-                <div class="flex p-2 justify-center items-center w-24 text-center">
-                    {{ thread.reply_count }} Threads
-                </div>
             </div>
         </div>
     </div>
@@ -33,6 +30,10 @@
         computed: {
             threadId() {
                 return this.$route.params.threadId || null
+            },
+
+            channelSlug() {
+                return this.$route.params.channelSlug || null
             }
         },
 
@@ -47,7 +48,7 @@
 
         methods: {
             fetchThread(threadId) {
-                axios.get(`/thread/${this.threadId}`).then((response) => {
+                axios.get(`channels/${this.channelSlug}/${this.threadId}`).then((response) => {
                     this.thread = response.data;
                 })
                 .catch(() => {
