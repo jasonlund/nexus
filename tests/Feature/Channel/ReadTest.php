@@ -21,7 +21,7 @@ class ReadTest extends TestCase
         create('Reply', ['thread_id' => $this->threads[0]->id], 2);
         create('Reply', ['thread_id' => $this->threads[1]->id], 2);
 
-        $this->withExceptionHandling();
+//        $this->withExceptionHandling();
     }
 
     protected function routeIndex()
@@ -88,5 +88,27 @@ class ReadTest extends TestCase
                     ]
                 ]
             ]);
+    }
+
+    /** @test */
+    function channel_threads_should_be_paginated()
+    {
+        $channel = create('Channel');
+        create('Thread', ['channel_id' => $channel->id], 50);
+
+        $this->json('GET', $this->routeShow([
+            'channel' => $channel->slug
+        ]))->assertJson([
+                'threads' => [
+                    'meta' => [
+                        'pagination' => [
+                            'total' => 50,
+                            "per_page" => 25
+                        ]
+                    ]
+                ]
+            ]);
+
+
     }
 }

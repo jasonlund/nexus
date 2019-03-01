@@ -28,7 +28,7 @@ class ReadTest extends TestCase
     /** @test */
     function anyone_can_view_a_single_thread_with_replies()
     {
-        $response = $this->json('GET', $this->routeShow([$this->thread->channel->slug, $this->thread->id]))
+        $this->json('GET', $this->routeShow([$this->thread->channel->slug, $this->thread->id]))
             ->assertStatus(200)
             ->assertJson([
                 'id' => $this->thread->id,
@@ -61,7 +61,26 @@ class ReadTest extends TestCase
                     ]
                 ]
             ]);
+    }
 
-//        dd($response->decodeResponseJson());
+    /** @test */
+    function a_threads_replies_should_be_paginated()
+    {
+        $thread = create('Thread');
+        create('Reply', ['thread_id' => $thread->id], 50);
+
+        $this->json('GET', $this->routeShow([
+            'channel' => $thread->channel->slug,
+            'thread_id' => $thread->id
+        ]))->assertJson([
+            'replies' => [
+                'meta' => [
+                    'pagination' => [
+                        'total' => 50,
+                        "per_page" => 25
+                    ]
+                ]
+            ]
+        ]);
     }
 }

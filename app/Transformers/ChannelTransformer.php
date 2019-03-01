@@ -4,6 +4,7 @@ namespace App\Transformers;
 
 use League\Fractal\TransformerAbstract;
 use App\Models\Channel;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 
 class ChannelTransformer extends TransformerAbstract
 {
@@ -34,6 +35,11 @@ class ChannelTransformer extends TransformerAbstract
 
     public function includeThreads(Channel $channel)
     {
-        return $this->collection($channel->threads, new ThreadTransformer);
+        $channels = $channel->threads()->paginate(request()->has('limit') ? request('limit') : 25);
+
+        return $this->collection(
+            $channels->getCollection(),
+            new ThreadTransformer()
+        )->setPaginator(new IlluminatePaginatorAdapter($channels));
     }
 }

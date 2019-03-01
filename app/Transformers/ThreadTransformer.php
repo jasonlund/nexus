@@ -4,6 +4,7 @@ namespace App\Transformers;
 
 use League\Fractal\TransformerAbstract;
 use App\Models\Thread;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 
 class ThreadTransformer extends TransformerAbstract
 {
@@ -42,6 +43,11 @@ class ThreadTransformer extends TransformerAbstract
 
     public function includeReplies(Thread $thread)
     {
-        return $this->collection($thread->replies, new ReplyTransformer);
+        $channels = $thread->replies()->paginate(request()->has('limit') ? request('limit') : 25);
+
+        return $this->collection(
+            $channels->getCollection(),
+            new ReplyTransformer()
+        )->setPaginator(new IlluminatePaginatorAdapter($channels));
     }
 }
