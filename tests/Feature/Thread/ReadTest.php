@@ -30,10 +30,11 @@ class ReadTest extends TestCase
     /** @test */
     function anyone_can_view_a_single_thread_with_replies()
     {
-        $this->json('GET', $this->routeShow([$this->thread->channel->slug, $this->thread->id]))
+        $this->json('GET', $this->routeShow([$this->thread->channel->slug, $this->thread->slug]))
             ->assertStatus(200)
             ->assertJson([
                 'id' => $this->thread->id,
+                'slug' => $this->thread->slug,
                 'title' => $this->thread->title,
                 'body' => $this->thread->body,
                 'created_at' => $this->thread->created_at->format('Y-m-d H:i:s'),
@@ -73,7 +74,7 @@ class ReadTest extends TestCase
 
         $this->json('GET', $this->routeShow([
             'channel' => $thread->channel->slug,
-            'thread_id' => $thread->id
+            'thread_id' => $thread->slug
         ]) . '?limit=-2')->assertJson([
             'replies' => [
                 'meta' => [

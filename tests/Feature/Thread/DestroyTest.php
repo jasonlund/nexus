@@ -32,10 +32,10 @@ class DestroyTest extends TestCase
         $user = $this->signIn();
         $thread = create('Thread', ['user_id' => $user->id]);
 
-        $this->json('DELETE', $this->routeDestroy([$thread->channel->slug, $thread->id]))
+        $this->json('DELETE', $this->routeDestroy([$thread->channel->slug, $thread->slug]))
             ->assertStatus(200);
 
-        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->id]))
+        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->slug]))
             ->assertStatus(404);
     }
 
@@ -44,10 +44,10 @@ class DestroyTest extends TestCase
     {
         $thread = create('Thread');
 
-        $this->json('DELETE', $this->routeDestroy([$thread->channel->slug, $thread->id]))
+        $this->json('DELETE', $this->routeDestroy([$thread->channel->slug, $thread->slug]))
             ->assertStatus(401);
 
-        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->id]))
+        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->slug]))
             ->assertStatus(200)
             ->assertJson($thread->only(['title', 'body']));
     }
@@ -61,10 +61,10 @@ class DestroyTest extends TestCase
 
         $this->signIn();
 
-        $this->json('DELETE', $this->routeDestroy([$thread->channel->slug, $thread->id]))
+        $this->json('DELETE', $this->routeDestroy([$thread->channel->slug, $thread->slug]))
             ->assertStatus(403);
 
-        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->id]))
+        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->slug]))
             ->assertStatus(200)
             ->assertJson($thread->only(['title', 'body']));
     }

@@ -63,4 +63,12 @@ class ThreadTest extends TestCase
 
         $this->assertCount(1, $this->thread->replies);
     }
+
+    /** @test */
+    function its_slug_is_unique_to_its_channel()
+    {
+        $threads = create('Thread', ['title' => 'FooBar'], 2)->toArray();
+
+        $this->assertEquals($threads[0]['slug'], $threads[1]['slug']);
+    }
 }

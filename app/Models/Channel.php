@@ -2,22 +2,24 @@
 
 namespace App\Models;
 
-use Spatie\Sluggable\HasSlug;
-use Spatie\Sluggable\SlugOptions;
+use Cviebrock\EloquentSluggable\Sluggable;
 
 class Channel extends Model
 {
-    use HasSlug;
+    use Sluggable;
 
     /**
-     * Get the options for generating the slug.
+     * Return the sluggable configuration array for this model.
+     *
+     * @return array
      */
-    public function getSlugOptions() : SlugOptions
+    public function sluggable()
     {
-        return SlugOptions::create()
-            ->generateSlugsFrom('name')
-            ->saveSlugsTo('slug')
-            ->slugsShouldBeNoLongerThan(50);
+        return [
+            'slug' => [
+                'source' => 'name'
+            ]
+        ];
     }
 
     /**

@@ -39,12 +39,12 @@ class UpdateTest extends TestCase
             'body' => 'Bar'
         ];
 
-        $this->json('PATCH', $this->routeUpdate([$thread->channel->slug, $thread->id]), $newData)
+        $this->json('PATCH', $this->routeUpdate([$thread->channel->slug, $thread->slug]), $newData)
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($oldData);
 
-        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->id]))
+        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->fresh()->slug]))
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($oldData);
@@ -55,7 +55,7 @@ class UpdateTest extends TestCase
     {
         $thread = create('Thread');
 
-        $this->json('PATCH', $this->routeUpdate([$thread->channel->slug, $thread->id]), [])
+        $this->json('PATCH', $this->routeUpdate([$thread->channel->slug, $thread->slug]), [])
             ->assertStatus(401);
     }
 
@@ -69,7 +69,7 @@ class UpdateTest extends TestCase
 
         $this->signIn();
 
-        $this->json('PATCH', $this->routeUpdate([$thread->channel->slug, $thread->id]), [])
+        $this->json('PATCH', $this->routeUpdate([$thread->channel->slug, $thread->slug]), [])
             ->assertStatus(403);
     }
 
@@ -93,6 +93,6 @@ class UpdateTest extends TestCase
 
         $thread = create('Thread', ['user_id' => $user->id]);
 
-        return $this->json('PATCH', $this->routeUpdate([$thread->channel->slug, $thread->id]), $attributes);
+        return $this->json('PATCH', $this->routeUpdate([$thread->channel->slug, $thread->slug]), $attributes);
     }
 }
