@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use App\Models\Reply;
+use App\Models\Thread;
 
 class ThreadTest extends TestCase
 {
@@ -30,13 +31,23 @@ class ThreadTest extends TestCase
     }
 
     /** @test */
+    function it_soft_deletes()
+    {
+        $data = $this->thread->toArray();
+
+        $this->thread->delete();
+
+        $this->assertNull(Thread::find($data['id']));
+        $this->assertNotNull(Thread::withTrashed()->find($data['id']));
+    }
+
+    /** @test */
     function it_cascades_deletes_to_replies()
     {
-        $thread = create('Thread');
-        $id = $thread->id;
+        $id = $this->thread->id;
         create('Reply', ['thread_id' => $id], 4);
 
-        $thread->delete();
+        $this->thread->delete();
 
         $this->assertCount(0, Reply::where('thread_id', $id)->get());
     }

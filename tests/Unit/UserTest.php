@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use App\Models\User;
 
 class UserTest extends TestCase
 {
@@ -36,5 +37,16 @@ class UserTest extends TestCase
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $this->user->replies);
 
         $this->assertInstanceOf('App\Models\Reply', $this->user->replies->first());
+    }
+
+    /** @test */
+    function it_soft_deletes()
+    {
+        $data = $this->user->toArray();
+
+        $this->user->delete();
+
+        $this->assertNull(User::find($data['id']));
+        $this->assertNotNull(User::withTrashed()->find($data['id']));
     }
 }

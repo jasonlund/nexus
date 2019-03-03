@@ -4,6 +4,8 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use App\Models\Channel;
+use App\Models\Thread;
 
 class ChannelTest extends TestCase
 {
@@ -37,6 +39,28 @@ class ChannelTest extends TestCase
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $this->channel->replies);
 
         $this->assertInstanceOf('App\Models\Reply', $this->channel->replies->first());
+    }
+
+    /** @test */
+    function it_soft_deletes()
+    {
+        $data = $this->channel->toArray();
+
+        $this->channel->delete();
+
+        $this->assertNull(Channel::find($data['id']));
+        $this->assertNotNull(Channel::withTrashed()->find($data['id']));
+    }
+
+    /** @test */
+    function it_cascades_deletes_to_threads()
+    {
+        $id = $this->channel->id;
+        create('Thread', ['channel_id' => $id], 4);
+
+        $this->channel->delete();
+
+        $this->assertCount(0, Thread::where('channel_id', $id)->get());
     }
 
     /** @test */

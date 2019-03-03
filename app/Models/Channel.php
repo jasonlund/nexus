@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use Cviebrock\EloquentSluggable\Sluggable;
+use Askedio\SoftCascade\Traits\SoftCascadeTrait;
 
 class Channel extends Model
 {
-    use Sluggable;
+    use Sluggable, SoftCascadeTrait;
+
+    protected $softCascade = ['threads'];
 
     /**
      * Return the sluggable configuration array for this model.

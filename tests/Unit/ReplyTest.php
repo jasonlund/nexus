@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use App\Models\Reply;
 
 class ReplyTest extends TestCase
 {
@@ -34,5 +35,16 @@ class ReplyTest extends TestCase
     function it_has_a_channel()
     {
         $this->assertInstanceOf('App\Models\Channel', $this->reply->channel);
+    }
+
+    /** @test */
+    function it_soft_deletes()
+    {
+        $data = $this->reply->toArray();
+
+        $this->reply->delete();
+
+        $this->assertNull(Reply::find($data['id']));
+        $this->assertNotNull(Reply::withTrashed()->find($data['id']));
     }
 }

@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Builder;
+use Askedio\SoftCascade\Traits\SoftCascadeTrait;
 
 class Thread extends Model
 {
-    use Sluggable;
+    use Sluggable, SoftCascadeTrait;
+
+    protected $softCascade = ['replies'];
 
     /**
      * Return the sluggable configuration array for this model.
