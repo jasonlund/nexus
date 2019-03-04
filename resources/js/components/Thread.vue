@@ -8,7 +8,7 @@
                     hover:bg-blue-light hover:text-white"
             >
                 <div class="flex justify-center items-center p-2">
-                    <ion-icon class="opacity-25 text-3xl" title="chatbubbles"></ion-icon>
+                    <span class="far fa-comments | opacity-25 text-3xl"></span>
                 </div>
                 <div class="flex flex-col justify-center flex-1 p-2">
                     <div class="text-lg">{{ thread.title }}</div>
@@ -16,6 +16,9 @@
                 </div>
             </div>
         </div>
+        <portal to="banner-portal">
+            This is the header for {{ thread.title || '' }}
+        </portal>
     </div>
 </template>
 
@@ -23,13 +26,13 @@
     export default {
         data() {
             return {
-                thread: null,
+                thread: {},
             }
         },
 
         computed: {
-            threadId() {
-                return this.$route.params.threadId || null
+            threadSlug() {
+                return this.$route.params.threadSlug || null
             },
 
             channelSlug() {
@@ -38,7 +41,7 @@
         },
 
         watch: {
-            threadId: {
+            threadSlug: {
                 immediate:true,
                 handler(newValue) {
                     this.fetchThread(newValue);
@@ -47,8 +50,8 @@
         },
 
         methods: {
-            fetchThread(threadId) {
-                axios.get(`channels/${this.channelSlug}/${this.threadId}`).then((response) => {
+            fetchThread(threadSlug) {
+                axios.get(`channels/${this.channelSlug}/${this.threadSlug}`).then((response) => {
                     this.thread = response.data;
                 })
                 .catch(() => {

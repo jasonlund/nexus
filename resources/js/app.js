@@ -31,7 +31,7 @@ import Thread from './components/Thread.vue';
 const routes = [
     { name: 'home', path: '/', component: ChannelList },
     { name: 'channel', path: '/:channelSlug', component: Channel },
-    { name: 'thread', path: '/:channelSlug/:threadId', component: Thread },
+    { name: 'thread', path: '/:channelSlug/:threadSlug', component: Thread },
 ]
 
 // 3. Create the router instance and pass the `routes` option
@@ -42,7 +42,8 @@ const router = new VueRouter({
 })
 
 Vue.use(VueRouter);
-Vue.use(PortalVue)
+Vue.use(PortalVue);
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application

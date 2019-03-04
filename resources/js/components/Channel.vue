@@ -2,7 +2,7 @@
     <div class="flex justify-center items-center w-full">
         <div class="flex flex-col justify-center items-center flex-1">
             <router-link
-                :to="{ name: 'thread', params: { channelSlug, threadId: thread.id }}"
+                :to="{ name: 'thread', params: { channelSlug, threadSlug: thread.slug }}"
                  class="h-24 w-full p-2 |
                     flex justify-between my-2 |
                     text-grey-darker border border-1-grey rounded cursor-pointer |
@@ -11,7 +11,7 @@
                  v-for="thread in channel.threads"
             >
                 <div class="flex justify-center items-center p-2">
-                    <ion-icon class="opacity-25 text-3xl" title="chatbubbles"></ion-icon>
+                    <span class="far fa-comments | opacity-25 text-3xl"></span>
                 </div>
                 <div class="flex flex-col justify-center flex-1 p-2">
                     <div class="text-lg">{{ thread.title }}</div>
@@ -22,6 +22,9 @@
                 </div>
             </router-link>
         </div>
+        <portal to="banner-portal">
+           This is the header for {{ channel.name }}
+        </portal>
     </div>
 </template>
 
@@ -29,7 +32,7 @@
     export default {
         data() {
             return {
-                channel: []
+                channel: {}
             };
         },
 

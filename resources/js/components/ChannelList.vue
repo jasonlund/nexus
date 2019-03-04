@@ -10,7 +10,7 @@
                 v-for="channel in channels"
             >
                 <div class="flex justify-center items-center p-2">
-                    <ion-icon class="opacity-25 text-3xl" name="chatbubbles"></ion-icon>
+                    <span class="far fa-comments | opacity-25 text-3xl"></span>
                 </div>
                 <div class="flex flex-col justify-center flex-1 p-2">
                     <div class="text-lg">{{ channel.name }}</div>
@@ -21,6 +21,9 @@
                 </div>
             </router-link>
         </div>
+        <portal to="banner-portal">
+            This is the header for the main page
+        </portal>
     </div>
 </template>
 

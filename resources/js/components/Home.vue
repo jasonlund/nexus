@@ -1,7 +1,8 @@
 <template>
     <div class="flex justify-center items-center flex-col">
         <header class="flex justify-center items-center bg-grey-lighter w-full h-32">
-            this is a header, will put images here
+            <portal-target name="banner-portal">
+            </portal-target>
         </header>
         <div class="flex justify-center items-center w-4/5 mt-8">
             <slot name="content"></slot>
