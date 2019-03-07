@@ -59,5 +59,9 @@ class DatabaseSeeder extends Seeder
         factory(\App\Models\Thread::class, 111)->create([
             'channel_id' => 4,
         ]);
+
+        factory(\App\Models\Reply::class, 10)->create([
+            'thread_id' => 1,
+        ]);
     }
 }

@@ -22,7 +22,7 @@ import PortalVue from 'portal-vue'
 // const files = require.context('./', true, /\.vue$/i)
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
 Vue.component('home', require('./components/Home.vue').default);
-Vue.component('login', require('./components/Login.vue').default);
+Vue.component('auth', require('./components/Auth.vue').default);
 
 import ChannelList from './components/ChannelList.vue';
 import Channel from './components/Channel.vue';

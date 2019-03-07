@@ -1,18 +1,28 @@
 <template>
-    <div class="flex justify-center items-center w-full">
-        <div class="flex flex-col justify-center items-center flex-1" v-if="thread">
+    <div class="flex justify-center items-center w-inherit pb-8">
+        <div class="flex flex-col justify-center items-center w-full" v-if="thread">
             <div
-                class="h-24 w-full p-2 |
+                class="w-full p-2 |
                     flex justify-between my-2 |
-                    text-grey-darker border border-1-grey rounded cursor-pointer |
-                    hover:bg-blue-light hover:text-white"
+                    text-grey-darker border border-1-grey rounded"
             >
-                <div class="flex justify-center items-center p-2">
-                    <span class="far fa-comments | opacity-25 text-3xl"></span>
-                </div>
                 <div class="flex flex-col justify-center flex-1 p-2">
-                    <div class="text-lg">{{ thread.title }}</div>
-                    <div class="text-sm opacity-50">{{ thread.description }}</div>
+                    <div class="flex items-end">
+                        <div class="font-bold text-sm text-grey">{{ thread.owner.name }}</div>
+                        <div class="font-normal text-xs text-grey ml-2">{{ thread.created_at }}</div>
+                    </div>
+                    <p class="text-xl mb-4">{{ thread.title }}</p>
+                    <p>{{ thread.body }}</p>
+                </div>
+            </div>
+            <div class="flex justify-end w-full">reply</div>
+            <div class="flex flex-col mt-8">
+                <div class="border-l border-1-grey rounded p-4 mt-2" v-for="reply in thread.replies">
+                    <div class="flex items-end">
+                        <div class="font-bold text-sm text-grey">{{ reply.owner.username }}</div>
+                        <div class="font-normal text-xs text-grey">{{ reply.created_at }}</div>
+                    </div>
+                    <p class="text-lg">{{ reply.body }}</p>
                 </div>
             </div>
         </div>
@@ -27,6 +37,7 @@
         data() {
             return {
                 thread: {},
+                meta: {},
             }
         },
 
@@ -37,7 +48,8 @@
 
             channelSlug() {
                 return this.$route.params.channelSlug || null
-            }
+            },
+
         },
 
         watch: {
@@ -52,6 +64,8 @@
         methods: {
             fetchThread(threadSlug) {
                 axios.get(`channels/${this.channelSlug}/${this.threadSlug}`).then((response) => {
+                    this.meta = response.data.replies.meta;
+                    delete response.data.replies.meta;
                     this.thread = response.data;
                 })
                 .catch(() => {

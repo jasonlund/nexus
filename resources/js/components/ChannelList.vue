@@ -1,11 +1,11 @@
 <template>
-    <div class="flex justify-center items-center w-full">
-        <div class="flex flex-col justify-center items-center flex-1">
+    <div class="flex justify-center items-center w-inherit pb-8">
+        <div class="flex flex-col justify-center items-center w-full">
             <router-link :to="{ name: 'channel', params: { channelSlug: channel.slug }}"
                 class="h-24 w-full p-2 |
                     flex justify-between my-2 |
                     text-grey-darker border border-1-grey rounded cursor-pointer |
-                    hover:bg-blue-light hover:text-white"
+                    hover:bg-blue hover:text-white"
                 :key="channel.name"
                 v-for="channel in channels"
             >
@@ -16,7 +16,7 @@
                     <div class="text-lg">{{ channel.name }}</div>
                     <div class="text-sm opacity-50">{{ channel.description }}</div>
                 </div>
-                <div class="flex p-2 justify-center items-center w-24 text-center">
+                <div class="flex p-2 justify-center items-center text-center text-uppercase text-grey text-xs">
                     {{ channel.thread_count }} Threads
                 </div>
             </router-link>

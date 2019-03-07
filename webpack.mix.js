@@ -20,6 +20,10 @@ mix.js('resources/js/app.js', 'public/js')
         postCss: [tailwindcss('./tailwind.js')],
     });
 
+mix.browserSync({
+    proxy: 'nexus.ap'
+});
+
 if (mix.inProduction()) {
     mix.version();
 }

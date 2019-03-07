@@ -481,6 +481,7 @@ module.exports = {
 
   width: {
     'auto': 'auto',
+    'inherit': 'inherit',
     'px': '1px',
     '1': '0.25rem',
     '2': '0.5rem',
