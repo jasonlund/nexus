@@ -139,7 +139,13 @@ class UpdateTest extends TestCase
         $this->updateSelf(['username' => $user->username], $user)
             ->assertStatus(200);
 
+        $this->updateSelf(['username' => strtoupper($user->username)], $user)
+            ->assertStatus(200);
+
         $this->update(['username' => $otherUser->username], $otherUser)
+            ->assertStatus(200);
+
+        $this->update(['username' => strtoupper($otherUser->username)], $otherUser)
             ->assertStatus(200);
     }
 
