@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Cviebrock\EloquentSluggable\Sluggable;
 use Askedio\SoftCascade\Traits\SoftCascadeTrait;
+use Bouncer;
 
 class Channel extends Model
 {
@@ -52,5 +53,13 @@ class Channel extends Model
     public function addThread($attributes)
     {
         return $this->threads()->create($attributes);
+    }
+
+    public function moderators()
+    {
+        return $this->belongsToMany('App\Models\User',
+            'channel_moderator',
+            'user_id',
+            'channel_id');
     }
 }

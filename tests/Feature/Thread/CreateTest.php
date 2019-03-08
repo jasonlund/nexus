@@ -43,8 +43,9 @@ class CreateTest extends TestCase
                 'title' => $thread['title'],
                 'body' => $thread['body'],
                 'owner' => [
-                    'id' => $user->id,
-                    'name' => $user->name
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'email' => $user->email
                 ]
             ]);
 
@@ -54,9 +55,9 @@ class CreateTest extends TestCase
                 'title' => $thread['title'],
                 'body' => $thread['body'],
                 'owner' => [
-                    'id' => $user->id,
                     'name' => $user->name,
-                    'username' => $user->username
+                    'username' => $user->username,
+                    'email' => $user->email
                 ]
             ]);
     }

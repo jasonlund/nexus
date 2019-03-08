@@ -5,12 +5,17 @@ namespace App\Models;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Silber\Bouncer\Database\HasRolesAndAbilities;
+use Bouncer;
+use App\Models\Channel;
+use Illuminate\Validation\Rule;
+use Cog\Contracts\Ban\Bannable as BannableContract;
+use Cog\Laravel\Ban\Traits\Bannable;
 
-class User extends Authenticatable
+class User extends Authenticatable implements BannableContract
 {
-    use Notifiable, HasRoles, SoftDeletes;
+    use Notifiable, SoftDeletes, HasRolesAndAbilities, Bannable;
 
     /**
      * The attributes that are mass assignable.
@@ -41,6 +46,16 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * Get the route key for the model.
+     *
+     * @return string
+     */
+    public function getRouteKeyName()
+    {
+        return 'username';
+    }
+
     public function threads()
     {
         return $this->hasMany('App\Models\Thread');
@@ -49,5 +64,44 @@ class User extends Authenticatable
     public function replies()
     {
         return $this->hasMany('App\Models\Reply');
+    }
+
+    public function channels()
+    {
+        return $this->belongsToMany('App\Models\Channel')
+            ->withPivot('ability_id');
+    }
+
+    public function moderatedChannels()
+    {
+        return $this->belongsToMany('App\Models\Channel',
+            'channel_moderator',
+            'channel_id',
+            'user_id');
+    }
+
+    public static function validationRules()
+    {
+        return [
+            'name' => 'required|string|max:255',
+            'username' => [
+                'required',
+                'min:3',
+                'max:16',
+                'regex:/^[a-zA-Z0-9_]+((\.(-\.)*-?|-(\.-)*\.?)[a-zA-Z0-9_]+)*$/i',
+                // alphanumeric, hyphens, underscores and periods.
+                Rule::unique('users')->ignore(
+                    request()->route('user') ?
+                        request()->route('user')->username :
+                        auth()->user()->username, 'username')
+            ],
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')->ignore(request()->route('user') ?
+                    request()->route('user')->email :
+                    auth()->user()->email, 'email')
+            ]
+        ];
     }
 }

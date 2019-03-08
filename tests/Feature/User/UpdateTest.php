@@ -4,6 +4,7 @@ namespace Tests\Feature\User;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Bouncer;
 
 class UpdateTest extends TestCase
 {
@@ -14,6 +15,11 @@ class UpdateTest extends TestCase
         parent::setUp();
 
         $this->withExceptionHandling();
+    }
+
+    protected function routeUpdate($params = [])
+    {
+        return route('users.update', $params);
     }
 
     protected function routeUpdateSelf()
@@ -33,7 +39,45 @@ class UpdateTest extends TestCase
             'email' => 'john@email.com'
         ])->assertStatus(200)
         ->assertJsonMissing($oldData)
-        ->assertJson($user->fresh()->only(['id', 'name', 'username']));
+        ->assertJson($user->fresh()->only(['name', 'username', 'email']));
+    }
+
+    /** @test */
+    function an_authorized_user_can_update_users()
+    {
+        $user = $this->signIn();
+        Bouncer::allow($user)->to('update-users');
+
+        $otherUser = create('User');
+        $oldData = $otherUser->only(['name', 'username']);
+
+        $this->json('PATCH', $this->routeUpdate($otherUser->username), [
+            'name' => 'John Doe',
+            'username' => 'johndoe',
+            'email' => 'john@email.com'
+        ])->assertStatus(200)
+            ->assertJsonMissing($oldData)
+            ->assertJson($otherUser->fresh()->only(['name', 'username']));
+    }
+
+    /** @test */
+    function a_guest_and_an_unauthorized_user_can_not_update_users()
+    {
+        $otherUser = create('User');
+
+        $this->json('PATCH', $this->routeUpdate($otherUser->username), [
+            'name' => 'John Doe',
+            'username' => 'johndoe',
+            'email' => 'john@email.com'
+        ])->assertStatus(401);
+
+        $this->signIn();
+
+        $this->json('PATCH', $this->routeUpdate($otherUser->username), [
+            'name' => 'John Doe',
+            'username' => 'johndoe',
+            'email' => 'john@email.com'
+        ])->assertStatus(403);
     }
 
     /** @test */
@@ -46,17 +90,30 @@ class UpdateTest extends TestCase
     /** @test */
     function a_user_requires_a_name()
     {
-        $this->update(['name' => null])
+        $user = create('User');
+
+        $this->updateSelf(['name' => null])
+            ->assertJsonValidationErrors(['name']);
+
+        $this->update(['name' => null], $user)
             ->assertJsonValidationErrors(['name']);
     }
 
     /** @test */
     function a_user_requires_a_valid_username()
     {
-        $this->update(['username' => null])
+        $user = create('User');
+
+        $this->updateSelf(['username' => null])
             ->assertJsonValidationErrors(['username']);
 
-        $this->update(['username' => 'invalid-slug@#$'])
+        $this->update(['username' => null], $user)
+            ->assertJsonValidationErrors(['username']);
+
+        $this->updateSelf(['username' => 'invalid-slug@#$'])
+            ->assertJsonValidationErrors(['username']);
+
+        $this->update(['username' => 'invalid-slug@#$'], $user)
             ->assertJsonValidationErrors(['username']);
     }
 
@@ -65,21 +122,36 @@ class UpdateTest extends TestCase
     {
         $user = create('User');
         $otherUser = create('User');
+        $anotherUser = create('User');
 
-        $this->update(['username' => $otherUser->username])
+        $this->updateSelf(['username' => $otherUser->username])
             ->assertJsonValidationErrors(['username']);
 
-        $this->update(['username' => $user->username], $user)
+        $this->update(['username' => $anotherUser->username], $otherUser)
+            ->assertJsonValidationErrors(['username']);
+
+        $this->updateSelf(['username' => $user->username], $user)
+            ->assertStatus(200);
+
+        $this->update(['username' => $otherUser->username], $otherUser)
             ->assertStatus(200);
     }
 
     /** @test */
     function a_user_requires_an_email()
     {
-        $this->update(['email' => null])
+        $user = create('User');
+
+        $this->updateSelf(['email' => null])
             ->assertJsonValidationErrors(['email']);
 
-        $this->update(['email' => 'invalidemail'])
+        $this->update(['email' => null], $user)
+            ->assertJsonValidationErrors(['email']);
+
+        $this->updateSelf(['email' => 'invalidemail'])
+            ->assertJsonValidationErrors(['email']);
+
+        $this->update(['email' => 'invalidemail'], $user)
             ->assertJsonValidationErrors(['email']);
     }
 
@@ -88,20 +160,37 @@ class UpdateTest extends TestCase
     {
         $user = create('User', ['email' => 'user@email.com']);
         $otherUser = create('User', ['email' => 'user2@email.com']);
+        $anotherUser = create('User', ['email' => 'user3@email.com']);
 
-        $this->update(['email' => $otherUser->email])
+        $this->updateSelf(['email' => $otherUser->email])
             ->assertJsonValidationErrors(['email']);
 
-        $this->update(['email' => $user->email], $user)
+        $this->update(['email' => $anotherUser->email], $otherUser)
+            ->assertJsonValidationErrors(['email']);
+
+        $this->updateSelf(['email' => $user->email], $user)
+            ->assertStatus(200);
+
+        $this->update(['email' => $otherUser->email], $otherUser)
             ->assertStatus(200);
     }
 
-    private function update($data, $user = null)
+    private function updateSelf($data, $user = null)
     {
         $user = $this->signIn($user);
 
         $data = array_merge($user->only(['name', 'username', 'email']), $data);
 
         return $this->json('PATCH', $this->routeUpdateSelf(), $data);
+    }
+
+    private function update($data, $user = null)
+    {
+        $user = $this->signIn($user);
+        Bouncer::allow($user)->to('update-users');
+
+        $data = array_merge($user->only(['name', 'username', 'email']), $data);
+
+        return $this->json('PATCH', $this->routeUpdate($user), $data);
     }
 }

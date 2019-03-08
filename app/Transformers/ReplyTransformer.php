@@ -24,10 +24,9 @@ class ReplyTransformer extends TransformerAbstract
     public function transform(Reply $reply)
     {
         $data = [
+            'id' => $reply->id,
             'body' => $reply->body
         ];
-
-        if(app()->environment() === 'testing') $data['id'] = $reply->id;
 
         return $data;
     }

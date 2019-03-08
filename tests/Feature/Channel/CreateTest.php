@@ -4,6 +4,7 @@ namespace Tests\Feature\Channel;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Bouncer;
 
 class CreateTest extends TestCase
 {
@@ -26,12 +27,11 @@ class CreateTest extends TestCase
         return route('channels.index');
     }
 
-    // TODO -- scope to admin role
-
     /** @test */
-    function a_user_can_create_new_channels()
+    function an_authorized_user_user_can_create_new_channels()
     {
-        $this->signIn();
+        $user = $this->signIn();
+        Bouncer::allow($user)->to('create-channels');
 
         $channel = raw('Channel', ['name' => 'FooBar']);
 
@@ -51,13 +51,18 @@ class CreateTest extends TestCase
             ]);
     }
 
-    // TODO -- scope to guest and non-admin users
-
     /** @test */
-    function a_guest_can_not_create_new_channels()
+    function a_guest_and_an_unauthorized_user_can_not_create_a_channel()
     {
         $this->json('PUT', $this->routeStore(), [])
             ->assertStatus(401);
+
+        $this->signIn();
+
+        $channel = raw('Channel', ['name' => 'FooBar']);
+
+        $this->json('PUT', $this->routeStore(), $channel)
+            ->assertStatus(403);
     }
 
     /** @test */
@@ -76,7 +81,8 @@ class CreateTest extends TestCase
 
     private function publish($overrides)
     {
-        $this->signIn();
+        $user = $this->signIn();
+        Bouncer::allow($user)->to('create-channels');
 
         $channel = raw('Channel', $overrides);
 

@@ -4,6 +4,8 @@ namespace Tests\Feature\Reply;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Bouncer;
+use App\Models\Channel;
 
 class DestroyTest extends TestCase
 {
@@ -41,6 +43,54 @@ class DestroyTest extends TestCase
             ->assertJsonMissing([
                 'replies' => [$data]
             ]);;
+    }
+
+    /** @test */
+    function an_authorized_user_can_destroy_any_reply()
+    {
+        $user = $this->signIn();
+        Bouncer::allow($user)->to('moderate-channels');
+
+        $reply = create('Reply');
+        $data = $reply->only('body');
+
+        $this->json('DELETE', $this->routeDestroy([$reply->channel->slug, $reply->thread->slug, $reply->id]))
+            ->assertStatus(200);
+
+        $this->json('GET', $this->routeShow([$reply->channel->slug, $reply->thread->slug]))
+            ->assertStatus(200)
+            ->assertJsonMissing([
+                'replies' => [$data]
+            ]);
+    }
+
+    /** @test */
+    function an_authorized_user_can_destroy_replies_in_channels_they_moderate()
+    {
+        $user = $this->signIn();
+        Bouncer::allow($user)->toOwn(Channel::class)->to('moderate-channels');
+
+        $inChannel = create('Reply');
+        $notInChannel = create('Reply');
+        $inChannel->thread->channel->moderators()->attach($user);
+
+        $this->json('DELETE', $this->routeDestroy([$inChannel->channel->slug, $inChannel->thread->slug, $inChannel->id]))
+            ->assertStatus(200);
+
+        $this->json('GET', $this->routeShow([$inChannel->channel->slug, $inChannel->thread->slug]))
+            ->assertStatus(200)
+            ->assertJsonMissing([
+                'replies' => [$inChannel->only('body')]
+            ]);
+
+        $this->json('DELETE', $this->routeDestroy([$notInChannel->channel->slug, $notInChannel->thread->slug, $notInChannel->id]))
+            ->assertStatus(403);
+
+        $this->json('GET', $this->routeShow([$notInChannel->channel->slug, $notInChannel->thread->slug]))
+            ->assertStatus(200)
+            ->assertJsonMissing([
+                'replies' => [$notInChannel->only('body')]
+            ]);
     }
 
     /** @test */

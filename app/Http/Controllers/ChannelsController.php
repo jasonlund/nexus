@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ChannelCreateRequest;
+use App\Http\Requests\ChannelDestroyRequest;
 use App\Http\Requests\ChannelUpdateRequest;
 use App\Models\Channel;
 use Illuminate\Http\Request;
@@ -107,7 +108,7 @@ class ChannelsController extends Controller
      * @param  \App\Channel  $channel
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Channel $channel)
+    public function destroy(ChannelDestroyRequest $request, Channel $channel)
     {
         $channel->delete();
 

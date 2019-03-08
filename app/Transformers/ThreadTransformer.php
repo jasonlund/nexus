@@ -27,12 +27,10 @@ class ThreadTransformer extends TransformerAbstract
         $data = [
             'title' => (string) $thread->title,
             'slug' => (string)$thread->slug,
-            'body' => (string) $thread->body,
-            'created_at' => $thread->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => $thread->updated_at->format('Y-m-d H:i:s')
+            'body' => (string)$thread->body,
+            'created_at' => (string)$thread->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => (string)$thread->updated_at->format('Y-m-d H:i:s')
         ];
-
-        if(app()->environment() === 'testing') $data['id'] = $thread->id;
 
         return $data;
     }

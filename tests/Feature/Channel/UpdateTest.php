@@ -4,7 +4,7 @@ namespace Tests\Feature\Channel;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Carbon\Carbon;
+use Bouncer;
 
 class UpdateTest extends TestCase
 {
@@ -27,12 +27,12 @@ class UpdateTest extends TestCase
         return route('channels.show', $params);
     }
 
-    // TODO -- scope to admin role
-
     /** @test */
-    function a_user_can_update_a_channel()
+    function an_authorized_user_can_update_a_channel()
     {
-        $this->signIn();
+        $user = $this->signIn();
+        Bouncer::allow($user)->to('update-channels');
+
         $channel = create('Channel');
         $oldData = $channel->only(['name', 'description', 'slug']);
         $newData = [
@@ -55,12 +55,15 @@ class UpdateTest extends TestCase
     }
 
     /** @test */
-    function a_guest_can_not_update_a_channel()
+    function a_guest_and_an_unauthorized_user_can_not_delete_a_channel()
     {
         $channel = create('Channel');
-
         $this->json('PATCH', $this->routeUpdate([$channel->slug]), [])
             ->assertStatus(401);
+
+        $this->signIn();
+        $this->json('PATCH', $this->routeUpdate([$channel->slug]), [])
+            ->assertStatus(403);
     }
 
     /** @test */
@@ -79,7 +82,8 @@ class UpdateTest extends TestCase
 
     function update($attributes)
     {
-        $this->signIn();
+        $user = $this->signIn();
+        Bouncer::allow($user)->to('update-channels');
 
         $channel = create('Channel');
 

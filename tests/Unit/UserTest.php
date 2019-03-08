@@ -5,6 +5,8 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use App\Models\User;
+use Carbon\Carbon;
+use Cog\Contracts\Ban\BanService;
 
 class UserTest extends TestCase
 {
@@ -48,5 +50,40 @@ class UserTest extends TestCase
 
         $this->assertNull(User::find($data['id']));
         $this->assertNotNull(User::withTrashed()->find($data['id']));
+    }
+
+    /** @test */
+    function it_can_be_permanently_banned()
+    {
+        $this->user->ban();
+        $this->user = $this->user->fresh();
+
+        $this->assertTrue($this->user->isBanned());
+        $this->assertFalse($this->user->isNotBanned());
+
+        $this->user->unban();
+        $this->user = $this->user->fresh();
+
+        $this->assertFalse($this->user->isBanned());
+        $this->assertTrue($this->user->isNotBanned());
+    }
+
+    /** @test */
+    function it_can_be_temporarily_banned()
+    {
+        $this->user->ban([
+            'expired_at' => Carbon::now()->addDays(7)
+        ]);
+        $this->user = $this->user->fresh();
+
+        $this->assertTrue($this->user->isBanned());
+        $this->assertFalse($this->user->isNotBanned());
+
+        Carbon::setTestNow(Carbon::now()->addDays(7)->addMinute(1));
+        app(BanService::class)->deleteExpiredBans();
+        $this->user = $this->user->fresh();
+
+        $this->assertFalse($this->user->isBanned());
+        $this->assertTrue($this->user->isNotBanned());
     }
 }

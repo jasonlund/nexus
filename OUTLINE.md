@@ -9,22 +9,23 @@
 - [x] Users can register for accounts
     - [ ] Users can connect with Patreon
     - [ ] Users can connect with Twitch
-- [ ] Users have Roles & Permissions
+- [x] Users have Roles & Permissions
     - Guest (unauthenticated)
     - User
     - VIP
     - Moderator
+    - Super Moderator
     - Admin
  - Users may be modified
     - [x] By self
-    - [ ] By admins
+    - [x] By admins
 - [x] Guests may request a new password via email
  - Users may be deleted
     - [x] By self
-    - [ ] By admins
- - [ ] Users may be temporary or permanently banned by Admins
+    - [x] By admins
+ - [x] Users may be temporary or permanently banned by Admins & Super Moderators
  - Relationships:
-    - [ ] Belong to one Role
+    - [x] Belong to one Role
     - [x] Have many Threads
     - [x] Have many Replies
     
@@ -38,12 +39,14 @@
 - [x] Authenticated users can create Threads
 - Threads may be modified
     - [x] By creator
-    - [ ] By Mods of the channel
-    - [ ] By Admins
+    - [x] By Mods of the channel
+    - [x] By Super Moderators
+    - [x] By Admins
 - Threads may be deleted
     - [x] By creator
-    - [ ] By Mods of the channel
-    - [ ] By Admins
+    - [x] By Mods of the channel
+    - [x] By Super Moderators
+    - [x] By Admins
 - Relationships:
     - [x] Have many Replies
     - [x] Belong to one Channel
@@ -58,12 +61,14 @@
 - [x] Authenticated users can create Replies
 - Replies may be modified
     - [x] By creator
-    - [ ] By Mods of the channel
-    - [ ] By Admins
+    - [x] By Mods of the channel
+    - [x] Super Moderators
+    - [x] By Admins
 - Replies may be deleted
     - [x] By creator
-    - [ ] By Mods of the channel
-    - [ ] By Admins
+    - [x] By Mods of the channel
+    - [x] Super Moderators
+    - [x] By Admins
 - Relationships:
     - [x] Belong to one Thread
     - [x] Belong to one User
@@ -72,11 +77,11 @@
 - [x] Channels have attributes:
     - Name
     - Description
-- [ ] Channels have Moderators
+- [x] Channels have Moderators
 - [x] Anyone can view channels
-- [ ] Admins users can create Channels
-- [ ] Admins users can modify Channels
-- [ ] Admins users can delete Channels
+- [x] Admins users can create Channels
+- [x] Admins users can modify Channels
+- [x] Admins users can delete Channels
 - Relationships:
     - [x] Have many Threads
-    - [ ] Have many Moderators
+    - [x] Have many Moderators

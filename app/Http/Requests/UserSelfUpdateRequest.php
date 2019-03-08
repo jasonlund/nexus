@@ -3,7 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+use App\Models\User;
 
 class UserSelfUpdateRequest extends FormRequest
 {
@@ -24,21 +24,6 @@ class UserSelfUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'name' => 'required|string|max:255',
-            'username' => [
-                'required',
-                'min:3',
-                'max:16',
-                'regex:/^^[a-zA-Z0-9_]+((\.(-\.)*-?|-(\.-)*\.?)[a-zA-Z0-9_]+)*$/i',
-                                        // alphanumeric, hyphens, underscores and periods.
-                Rule::unique('users')->ignore(auth()->user()->username, 'username')
-            ],
-            'email' => [
-                'required',
-                'email',
-                Rule::unique('users')->ignore(auth()->user()->email, 'email')
-            ],
-        ];
+        return User::validationRules();
     }
 }

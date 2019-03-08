@@ -33,22 +33,20 @@ class ReadTest extends TestCase
         $this->json('GET', $this->routeShow([$this->thread->channel->slug, $this->thread->slug]))
             ->assertStatus(200)
             ->assertJson([
-                'id' => $this->thread->id,
                 'slug' => $this->thread->slug,
                 'title' => $this->thread->title,
                 'body' => $this->thread->body,
                 'created_at' => $this->thread->created_at->format('Y-m-d H:i:s'),
                 'updated_at' => $this->thread->updated_at->format('Y-m-d H:i:s'),
                 'owner' => [
-                    'id' => $this->thread->owner->id,
-                    'name' => $this->thread->owner->name
+                    'name' => $this->thread->owner->name,
+                    'username' => $this->thread->owner->username,
                 ],
                 'replies' => [
                     [
                         'id' => $this->replies[0]->id,
                         'body' => $this->replies[0]->body,
                         'owner' => [
-                            'id' => $this->replies[0]->owner->id,
                             'name' => $this->replies[0]->owner->name,
                             'username' => $this->replies[0]->owner->username,
                         ]
@@ -57,7 +55,6 @@ class ReadTest extends TestCase
                         'id' => $this->replies[1]->id,
                         'body' => $this->replies[1]->body,
                         'owner' => [
-                            'id' => $this->replies[1]->owner->id,
                             'name' => $this->replies[1]->owner->name,
                             'username' => $this->replies[1]->owner->username,
                         ]

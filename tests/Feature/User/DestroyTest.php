@@ -4,6 +4,7 @@ namespace Tests\Feature\User;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Bouncer;
 
 class DestroyTest extends TestCase
 {
@@ -14,6 +15,11 @@ class DestroyTest extends TestCase
         parent::setUp();
 
         $this->withExceptionHandling();
+    }
+
+    protected function routeDestroy($params = [])
+    {
+        return route('users.destroy', $params);
     }
 
     protected function routeDestroySelf()
@@ -37,5 +43,32 @@ class DestroyTest extends TestCase
     {
         $this->json('DELETE', $this->routeDestroySelf())
             ->assertStatus(401);
+    }
+
+    /** @test */
+    function an_authorized_user_can_destroy_users()
+    {
+        $user = $this->signIn();
+        Bouncer::allow($user)->to('delete-users');
+
+        $otherUser = create('User');
+
+        $this->json('DELETE', $this->routeDestroy($otherUser->username))
+            ->assertStatus(200);
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    /** @test */
+    function a_guest_and_an_unauthorized_user_can_not_destroy_users()
+    {
+        $otherUser = create('User');
+
+        $this->json('DELETE', $this->routeDestroy($otherUser->username))
+            ->assertStatus(401);
+
+        $this->signIn();
+        $this->json('DELETE', $this->routeDestroy($otherUser->username))
+            ->assertStatus(403);
     }
 }

@@ -11,7 +11,6 @@ class LoginTest extends TestCase
     use DatabaseMigrations;
 
     protected $user;
-    protected $password = 'FooBar123';
 
     protected function routeLogin()
     {

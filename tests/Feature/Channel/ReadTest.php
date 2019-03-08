@@ -21,7 +21,7 @@ class ReadTest extends TestCase
         create('Reply', ['thread_id' => $this->threads[0]->id], 2);
         create('Reply', ['thread_id' => $this->threads[1]->id], 2);
 
-//        $this->withExceptionHandling();
+        $this->withExceptionHandling();
     }
 
     protected function routeIndex()
@@ -65,25 +65,25 @@ class ReadTest extends TestCase
                 'reply_count' => 4,
                 'threads' => [
                     [
-                        'id' => $this->threads[0]->id,
                         'title' => $this->threads[0]->title,
+                        'slug' => $this->threads[0]->slug,
                         'body' => $this->threads[0]->body,
                         'created_at' => $this->threads[0]->created_at->format('Y-m-d H:i:s'),
                         'updated_at' => $this->threads[0]->updated_at->format('Y-m-d H:i:s'),
                         'owner' => [
-                            'id' => $this->threads[0]->owner->id,
-                            'name' => $this->threads[0]->owner->name
+                            'name' => $this->threads[0]->owner->name,
+                            'username' => $this->threads[0]->owner->username
                         ]
                     ],
                     [
-                        'id' => $this->threads[1]->id,
                         'title' => $this->threads[1]->title,
+                        'slug' => $this->threads[1]->slug,
                         'body' => $this->threads[1]->body,
                         'created_at' => $this->threads[1]->created_at->format('Y-m-d H:i:s'),
                         'updated_at' => $this->threads[1]->updated_at->format('Y-m-d H:i:s'),
                         'owner' => [
-                            'id' => $this->threads[1]->owner->id,
-                            'name' => $this->threads[1]->owner->name
+                            'name' => $this->threads[1]->owner->name,
+                            'username' => $this->threads[1]->owner->username
                         ]
                     ]
                 ]
@@ -108,7 +108,5 @@ class ReadTest extends TestCase
                     ]
                 ]
             ]);
-
-
     }
 }

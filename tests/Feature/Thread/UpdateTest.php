@@ -4,6 +4,8 @@ namespace Tests\Feature\Thread;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Bouncer;
+use App\Models\Channel;
 
 class UpdateTest extends TestCase
 {
@@ -48,6 +50,59 @@ class UpdateTest extends TestCase
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($oldData);
+    }
+
+    /** @test */
+    function an_authorized_user_can_update_any_thread()
+    {
+        $user = $this->signIn();
+        Bouncer::allow($user)->to('moderate-channels');
+
+        $thread = create('Thread');
+        $oldData = $thread->only(['title', 'body']);
+        $newData = [
+            'title' => 'Foo',
+            'body' => 'Bar'
+        ];
+
+        $this->json('PATCH', $this->routeUpdate([$thread->channel->slug, $thread->slug]), $newData)
+            ->assertStatus(200)
+            ->assertJson($newData)
+            ->assertJsonMissing($oldData);
+
+        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->fresh()->slug]))
+            ->assertStatus(200)
+            ->assertJson($newData)
+            ->assertJsonMissing($oldData);
+    }
+
+    /** @test */
+    function an_authorized_user_can_update_threads_in_channels_they_moderate()
+    {
+        $user = $this->signIn();
+        Bouncer::allow($user)->toOwn(Channel::class)->to('moderate-channels');
+
+        $inChannel = create('Thread');
+        $notInChannel = create('Thread');
+        $inChannel->channel->moderators()->attach($user);
+        $newData = [
+            'title' => 'Foo',
+            'body' => 'Bar'
+        ];
+
+        $this->json('PATCH', $this->routeUpdate([$inChannel->channel->slug, $inChannel->slug]), $newData)
+            ->assertStatus(200)
+            ->assertJson($newData)
+            ->assertJsonMissing($inChannel->only(['title', 'body']));
+
+        $this->json('GET', $this->routeShow([$inChannel->channel->slug, $inChannel->fresh()->slug]))
+            ->assertStatus(200)
+            ->assertJson($newData)
+            ->assertJsonMissing($inChannel->only(['title', 'body']));
+
+        $this->json('PATCH', $this->routeUpdate([$notInChannel->channel->slug, $notInChannel->slug]), $newData)
+            ->assertStatus(403);
+
     }
 
     /** @test */

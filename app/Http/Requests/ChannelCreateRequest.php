@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Bouncer;
 
 class ChannelCreateRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class ChannelCreateRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check();
+        return auth()->check() && Bouncer::can('create-channels');
     }
 
     /**

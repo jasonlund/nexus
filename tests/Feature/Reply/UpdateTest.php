@@ -4,6 +4,8 @@ namespace Tests\Feature\Reply;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Bouncer;
+use App\Models\Channel;
 
 class UpdateTest extends TestCase
 {
@@ -49,6 +51,64 @@ class UpdateTest extends TestCase
             ->assertJsonMissing([
                 'replies' => [$oldData]
             ]);
+    }
+
+    /** @test */
+    function an_authorized_user_can_update_any_reply()
+    {
+        $user = $this->signIn();
+        Bouncer::allow($user)->to('moderate-channels');
+
+        $reply = create('Reply');
+        $oldData = $reply->only('body');
+        $newData = [
+            'body' => 'FooBar'
+        ];
+
+        $this->json('PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), $newData)
+            ->assertStatus(200)
+            ->assertJson($newData)
+            ->assertJsonMissing($oldData);
+
+        $this->json('GET', $this->routeShow([$reply->channel->slug, $reply->thread->slug]))
+            ->assertStatus(200)
+            ->assertJson([
+                'replies' => [$newData]
+            ])
+            ->assertJsonMissing([
+                'replies' => [$oldData]
+            ]);
+    }
+
+    /** @test */
+    function an_authorized_user_can_update_replies_in_channels_they_moderate()
+    {
+        $user = $this->signIn();
+        Bouncer::allow($user)->toOwn(Channel::class)->to('moderate-channels');
+
+        $inChannel = create('Reply');
+        $notInChannel = create('Reply');
+        $inChannel->thread->channel->moderators()->attach($user);
+        $newData = [
+            'body' => 'FooBar'
+        ];
+
+        $this->json('PATCH', $this->routeUpdate([$inChannel->channel->slug, $inChannel->thread->slug, $inChannel->id]), $newData)
+            ->assertStatus(200)
+            ->assertJson($newData)
+            ->assertJsonMissing($inChannel->only('body'));
+
+        $this->json('GET', $this->routeShow([$inChannel->channel->slug, $inChannel->thread->slug]))
+            ->assertStatus(200)
+            ->assertJson([
+                'replies' => [$newData]
+            ])
+            ->assertJsonMissing([
+                'replies' => [$inChannel->only('body')]
+            ]);
+
+        $this->json('PATCH', $this->routeUpdate([$notInChannel->channel->slug, $notInChannel->thread->slug, $notInChannel->id]), $newData)
+            ->assertStatus(403);
     }
 
     /** @test */

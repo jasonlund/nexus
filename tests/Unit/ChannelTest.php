@@ -6,6 +6,7 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use App\Models\Channel;
 use App\Models\Thread;
+use Bouncer;
 
 class ChannelTest extends TestCase
 {
@@ -39,6 +40,15 @@ class ChannelTest extends TestCase
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $this->channel->replies);
 
         $this->assertInstanceOf('App\Models\Reply', $this->channel->replies->first());
+    }
+
+    /** @test */
+    function it_has_moderators()
+    {
+        $user = create('User');
+        $this->channel->moderators()->attach($user);
+
+        $this->assertEquals($user->id, $this->channel->moderators->first()->id);
     }
 
     /** @test */

@@ -1,10 +1,16 @@
 <?php
-
 Route::get('/home', ['as' => 'home', 'uses' => 'HomeController@index']);
 
 Route::get('/profile', ['as' => 'self.show', 'uses' => 'UsersController@showSelf']);
 Route::patch('/profile', ['as' => 'self.update', 'uses' => 'UsersController@updateSelf']);
 Route::delete('/profile', ['as' => 'self.destroy', 'uses' => 'UsersController@destroySelf']);
+
+Route::get('/users', ['as' => 'users.index', 'uses' => 'UsersController@index']);
+Route::get('/users/{user}', ['as' => 'users.show', 'uses' => 'UsersController@show']);
+Route::delete('/users/{user}', ['as' => 'users.destroy', 'uses' => 'UsersController@destroy']);
+Route::patch('/users/{user}', ['as' => 'users.update', 'uses' => 'UsersController@update']);
+Route::patch('/users/{user}/ban', ['as' => 'users.ban', 'uses' => 'UsersController@ban']);
+Route::patch('/users/{user}/unban', ['as' => 'users.unban', 'uses' => 'UsersController@unban']);
 
 Route::put('/register', ['as' => 'auth.register', 'uses' => 'Auth\RegisterController@register']);
 Route::post('/login', ['as' => 'auth.login', 'uses' => 'Auth\LoginController@login']);

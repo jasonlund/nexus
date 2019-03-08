@@ -39,8 +39,8 @@ class CreateTest extends TestCase
             ->assertJson([
                 'body' => $reply['body'],
                 'owner' => [
-                    'id' => $user->id,
-                    'name' => $user->name
+                    'name' => $user->name,
+                    'username' => $user->username
                 ]
             ]);
 
@@ -50,8 +50,8 @@ class CreateTest extends TestCase
                 'replies' => [[
                     'body' => $reply['body'],
                     'owner' => [
-                        'id' => $user->id,
-                        'name' => $user->name
+                        'name' => $user->name,
+                        'username' => $user->username
                     ]
                 ]]
             ]);

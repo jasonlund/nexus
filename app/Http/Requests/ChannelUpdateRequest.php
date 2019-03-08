@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Bouncer;
 
 class ChannelUpdateRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class ChannelUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check();
+        return auth()->check() && Bouncer::can('update-channels');
     }
 
     /**

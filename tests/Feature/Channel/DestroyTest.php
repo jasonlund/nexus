@@ -1,9 +1,10 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Feature\Channel;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Bouncer;
 
 class DestroyTest extends TestCase
 {
@@ -26,18 +27,32 @@ class DestroyTest extends TestCase
         return route('channels.show', $params);
     }
 
-    // TODO -- scope to admin role
-
     /** @test */
-    function a_user_can_destroy_a_thread()
+    function an_authorized_user_can_destroy_a_channel()
     {
         $user = $this->signIn();
-        $thread = create('Thread', ['user_id' => $user->id]);
+        Bouncer::allow($user)->to('delete-channels');
+
+        $thread = create('Thread');
 
         $this->json('DELETE', $this->routeDestroy([$thread->channel->slug]))
             ->assertStatus(200);
 
         $this->json('GET', $this->routeShow([$thread->channel->slug]))
             ->assertStatus(404);
+    }
+
+    /** @test */
+    function a_guest_and_an_unauthorized_user_can_not_destroy_a_channel()
+    {
+        $thread = create('Thread');
+
+        $this->json('DELETE', $this->routeDestroy([$thread->channel->slug]))
+            ->assertStatus(401);
+
+        $this->signIn();
+
+        $this->json('DELETE', $this->routeDestroy([$thread->channel->slug]))
+            ->assertStatus(403);
     }
 }

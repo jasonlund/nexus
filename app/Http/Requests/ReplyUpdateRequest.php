@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Bouncer;
 
 class ReplyUpdateRequest extends FormRequest
 {
@@ -13,7 +14,10 @@ class ReplyUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth() && request()->route('reply')->user_id == auth()->user()->id;
+        return auth() &&
+            (request()->route('reply')->user_id == auth()->user()->id ||
+                Bouncer::can('moderate-channels') ||
+                Bouncer::can('moderate-channels', request()->route('channel')));
     }
 
     /**
