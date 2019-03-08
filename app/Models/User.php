@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Rules\UniqueCaseInsensitive;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -90,10 +91,9 @@ class User extends Authenticatable implements BannableContract
                 'max:16',
                 'regex:/^[a-zA-Z0-9_]+((\.(-\.)*-?|-(\.-)*\.?)[a-zA-Z0-9_]+)*$/i',
                 // alphanumeric, hyphens, underscores and periods.
-                Rule::unique('users')->ignore(
-                    request()->route('user') ?
-                        request()->route('user')->username :
-                        auth()->user()->username, 'username')
+                new UniqueCaseInsensitive(self::class, request()->route('user') ?
+                    request()->route('user')->username :
+                    auth()->user()->username)
             ],
             'email' => [
                 'required',

@@ -118,16 +118,22 @@ class UpdateTest extends TestCase
     }
 
     /** @test */
-    function a_user_requires_a_unique_username()
+    function a_user_requires_a_unique_case_insensitive_username()
     {
-        $user = create('User');
-        $otherUser = create('User');
-        $anotherUser = create('User');
+        $user = create('User', ['username' => 'FooBar']);
+        $otherUser = create('User', ['username' => 'FooBaz']);
+        $anotherUser = create('User', ['username' => 'FooBarBaz']);
 
         $this->updateSelf(['username' => $otherUser->username])
             ->assertJsonValidationErrors(['username']);
 
+        $this->updateSelf(['username' => strtoupper($otherUser->username)])
+            ->assertJsonValidationErrors(['username']);
+
         $this->update(['username' => $anotherUser->username], $otherUser)
+            ->assertJsonValidationErrors(['username']);
+
+        $this->update(['username' => strtoupper($anotherUser->username)], $otherUser)
             ->assertJsonValidationErrors(['username']);
 
         $this->updateSelf(['username' => $user->username], $user)

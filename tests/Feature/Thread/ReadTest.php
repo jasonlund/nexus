@@ -19,7 +19,7 @@ class ReadTest extends TestCase
         $this->thread = create('Thread');
         $this->replies = create('Reply', ['thread_id' => $this->thread->id], 2);
 
-//        $this->withExceptionHandling();
+        $this->withExceptionHandling();
     }
 
     protected function routeShow($params = [])
