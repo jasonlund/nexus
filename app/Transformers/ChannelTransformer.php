@@ -32,21 +32,4 @@ class ChannelTransformer extends TransformerAbstract
 
         return $data;
     }
-
-    public function includeThreads(Channel $channel)
-    {
-        $limit = 25;
-        if(request()->has('limit')) {
-            $input = (int)request('limit');
-            if($input < 101 && $input > 9){
-                $limit = $input;
-            }
-        }
-        $channels = $channel->threads()->paginate($limit);
-
-        return $this->collection(
-            $channels->getCollection(),
-            new ThreadTransformer()
-        )->setPaginator(new IlluminatePaginatorAdapter($channels));
-    }
 }

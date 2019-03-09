@@ -27,7 +27,7 @@ class CreateTest extends TestCase
 
     protected function routeIndex($params = [])
     {
-        return route('channels.show', $params);
+        return route('threads.index', $params);
     }
 
     /** @test */

@@ -25,7 +25,9 @@ class ReplyTransformer extends TransformerAbstract
     {
         $data = [
             'id' => $reply->id,
-            'body' => $reply->body
+            'body' => $reply->body,
+            'created_at' => (string)$reply->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => (string)$reply->updated_at->format('Y-m-d H:i:s')
         ];
 
         return $data;

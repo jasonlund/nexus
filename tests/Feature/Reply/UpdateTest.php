@@ -23,9 +23,9 @@ class UpdateTest extends TestCase
         return route('replies.update', $params);
     }
 
-    protected function routeShow($params)
+    protected function routeIndex($params)
     {
-        return route('threads.show', $params);
+        return route('replies.index', $params);
     }
 
     /** @test */
@@ -43,13 +43,13 @@ class UpdateTest extends TestCase
             ->assertJson($newData)
             ->assertJsonMissing($oldData);
 
-        $this->json('GET', $this->routeShow([$reply->channel->slug, $reply->thread->slug]))
+        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
             ->assertStatus(200)
             ->assertJson([
-                'replies' => [$newData]
+                'data' => [$newData]
             ])
             ->assertJsonMissing([
-                'replies' => [$oldData]
+                'data' => [$oldData]
             ]);
     }
 
@@ -70,13 +70,13 @@ class UpdateTest extends TestCase
             ->assertJson($newData)
             ->assertJsonMissing($oldData);
 
-        $this->json('GET', $this->routeShow([$reply->channel->slug, $reply->thread->slug]))
+        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
             ->assertStatus(200)
             ->assertJson([
-                'replies' => [$newData]
+                'data' => [$newData]
             ])
             ->assertJsonMissing([
-                'replies' => [$oldData]
+                'data' => [$oldData]
             ]);
     }
 
@@ -98,13 +98,13 @@ class UpdateTest extends TestCase
             ->assertJson($newData)
             ->assertJsonMissing($inChannel->only('body'));
 
-        $this->json('GET', $this->routeShow([$inChannel->channel->slug, $inChannel->thread->slug]))
+        $this->json('GET', $this->routeIndex([$inChannel->channel->slug, $inChannel->thread->slug]))
             ->assertStatus(200)
             ->assertJson([
-                'replies' => [$newData]
+                'data' => [$newData]
             ])
             ->assertJsonMissing([
-                'replies' => [$inChannel->only('body')]
+                'data' => [$inChannel->only('body')]
             ]);
 
         $this->json('PATCH', $this->routeUpdate([$notInChannel->channel->slug, $notInChannel->thread->slug, $notInChannel->id]), $newData)

@@ -23,9 +23,9 @@ class DestroyTest extends TestCase
         return route('replies.destroy', $params);
     }
 
-    protected function routeShow($params)
+    protected function routeIndex($params)
     {
-        return route('threads.show', $params);
+        return route('replies.index', $params);
     }
 
     /** @test */
@@ -38,10 +38,10 @@ class DestroyTest extends TestCase
         $this->json('DELETE', $this->routeDestroy([$reply->channel->slug, $reply->thread->slug, $reply->id]))
             ->assertStatus(200);
 
-        $this->json('GET', $this->routeShow([$reply->channel->slug, $reply->thread->slug]))
+        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
             ->assertStatus(200)
             ->assertJsonMissing([
-                'replies' => [$data]
+                'data' => [$data]
             ]);;
     }
 
@@ -57,10 +57,10 @@ class DestroyTest extends TestCase
         $this->json('DELETE', $this->routeDestroy([$reply->channel->slug, $reply->thread->slug, $reply->id]))
             ->assertStatus(200);
 
-        $this->json('GET', $this->routeShow([$reply->channel->slug, $reply->thread->slug]))
+        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
             ->assertStatus(200)
             ->assertJsonMissing([
-                'replies' => [$data]
+                'data' => [$data]
             ]);
     }
 
@@ -77,19 +77,19 @@ class DestroyTest extends TestCase
         $this->json('DELETE', $this->routeDestroy([$inChannel->channel->slug, $inChannel->thread->slug, $inChannel->id]))
             ->assertStatus(200);
 
-        $this->json('GET', $this->routeShow([$inChannel->channel->slug, $inChannel->thread->slug]))
+        $this->json('GET', $this->routeIndex([$inChannel->channel->slug, $inChannel->thread->slug]))
             ->assertStatus(200)
             ->assertJsonMissing([
-                'replies' => [$inChannel->only('body')]
+                'data' => [$inChannel->only('body')]
             ]);
 
         $this->json('DELETE', $this->routeDestroy([$notInChannel->channel->slug, $notInChannel->thread->slug, $notInChannel->id]))
             ->assertStatus(403);
 
-        $this->json('GET', $this->routeShow([$notInChannel->channel->slug, $notInChannel->thread->slug]))
+        $this->json('GET', $this->routeIndex([$notInChannel->channel->slug, $notInChannel->thread->slug]))
             ->assertStatus(200)
             ->assertJsonMissing([
-                'replies' => [$notInChannel->only('body')]
+                'data' => [$notInChannel->only('body')]
             ]);
     }
 
@@ -97,16 +97,9 @@ class DestroyTest extends TestCase
     function a_guest_can_not_destroy_a_reply()
     {
         $reply = create('Reply');
-        $data = $reply->only('body');
 
         $this->json('DELETE', $this->routeDestroy([$reply->channel->slug, $reply->thread->slug, $reply->id]))
             ->assertStatus(401);
-
-        $this->json('GET', $this->routeShow([$reply->channel->slug, $reply->thread->slug]))
-            ->assertStatus(200)
-            ->assertJson([
-                'replies' => [$data]
-            ]);
     }
 
     /** @test */
@@ -123,10 +116,10 @@ class DestroyTest extends TestCase
         $this->json('DELETE', $this->routeDestroy([$reply->channel->slug, $reply->thread->slug, $reply->id]))
             ->assertStatus(403);
 
-        $this->json('GET', $this->routeShow([$reply->channel->slug, $reply->thread->slug]))
+        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
             ->assertStatus(200)
             ->assertJson([
-                'replies' => [$data]
+                'data' => [$data]
             ]);
     }
 }

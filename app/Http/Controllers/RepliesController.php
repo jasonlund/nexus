@@ -18,7 +18,14 @@ class RepliesController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth')->except(['index']);
+    }
+
+    public function index(Channel $channel, Thread $thread)
+    {
+        $data = $thread->replies();
+
+        return paginated_response($data, 'ReplyTransformer', ['owner']);
     }
 
     /**

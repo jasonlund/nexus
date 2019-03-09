@@ -21,9 +21,9 @@ class CreateTest extends TestCase
         return route('replies.store', $params);
     }
 
-    protected function routeShow($params)
+    protected function routeIndex($params)
     {
-        return route('threads.show', $params);
+        return route('replies.index', $params);
     }
 
     /** @test */
@@ -44,16 +44,18 @@ class CreateTest extends TestCase
                 ]
             ]);
 
-        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->slug]))
+        $this->json('GET', $this->routeIndex([$thread->channel->slug, $thread->slug]))
             ->assertStatus(200)
             ->assertJson([
-                'replies' => [[
-                    'body' => $reply['body'],
-                    'owner' => [
-                        'name' => $user->name,
-                        'username' => $user->username
+                'data' => [
+                    [
+                        'body' => $reply['body'],
+                        'owner' => [
+                            'name' => $user->name,
+                            'username' => $user->username
+                        ]
                     ]
-                ]]
+                ]
             ]);
     }
 

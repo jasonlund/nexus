@@ -50,7 +50,7 @@ class ReadTest extends TestCase
     }
 
     /** @test */
-    function anyone_can_view_a_channel_with_threads()
+    function anyone_can_view_a_channel()
     {
 
         $this->json('GET', $this->routeShow([$this->channel->slug]))
@@ -62,51 +62,7 @@ class ReadTest extends TestCase
                 'created_at' => $this->channel->created_at->format('Y-m-d H:i:s'),
                 'updated_at' => $this->channel->updated_at->format('Y-m-d H:i:s'),
                 'thread_count' => 2,
-                'reply_count' => 4,
-                'threads' => [
-                    [
-                        'title' => $this->threads[0]->title,
-                        'slug' => $this->threads[0]->slug,
-                        'body' => $this->threads[0]->body,
-                        'created_at' => $this->threads[0]->created_at->format('Y-m-d H:i:s'),
-                        'updated_at' => $this->threads[0]->updated_at->format('Y-m-d H:i:s'),
-                        'owner' => [
-                            'name' => $this->threads[0]->owner->name,
-                            'username' => $this->threads[0]->owner->username
-                        ]
-                    ],
-                    [
-                        'title' => $this->threads[1]->title,
-                        'slug' => $this->threads[1]->slug,
-                        'body' => $this->threads[1]->body,
-                        'created_at' => $this->threads[1]->created_at->format('Y-m-d H:i:s'),
-                        'updated_at' => $this->threads[1]->updated_at->format('Y-m-d H:i:s'),
-                        'owner' => [
-                            'name' => $this->threads[1]->owner->name,
-                            'username' => $this->threads[1]->owner->username
-                        ]
-                    ]
-                ]
-            ]);
-    }
-
-    /** @test */
-    function channel_threads_should_be_paginated()
-    {
-        $channel = create('Channel');
-        create('Thread', ['channel_id' => $channel->id], 50);
-
-        $this->json('GET', $this->routeShow([
-            'channel' => $channel->slug
-        ]) . '?limit=1000')->assertJson([
-                'threads' => [
-                    'meta' => [
-                        'pagination' => [
-                            'total' => 50,
-                            "per_page" => 25
-                        ]
-                    ]
-                ]
+                'reply_count' => 4
             ]);
     }
 }

@@ -28,7 +28,9 @@ class ThreadsController extends Controller
      */
     public function index(Channel $channel)
     {
-        //
+        $data = $channel->threads();
+
+        return paginated_response($data, 'ThreadTransformer', ['owner']);
     }
 
     /**
@@ -59,8 +61,7 @@ class ThreadsController extends Controller
         return response()->json(fractal()
             ->item($thread)
             ->transformWith(new ThreadTransformer())
-            ->includeOwner()
-            ->includeReplies());
+            ->includeOwner());
     }
 
     /**
@@ -75,8 +76,7 @@ class ThreadsController extends Controller
         return response()->json(fractal()
             ->item($thread)
             ->transformWith(new ThreadTransformer())
-            ->includeOwner()
-            ->includeReplies());
+            ->includeOwner());
     }
 
     /**
@@ -108,8 +108,7 @@ class ThreadsController extends Controller
         return response()->json(fractal()
             ->item($thread)
             ->transformWith(new ThreadTransformer())
-            ->includeOwner()
-            ->includeReplies());
+            ->includeOwner());
     }
 
     /**

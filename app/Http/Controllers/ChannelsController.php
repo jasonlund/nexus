@@ -68,8 +68,7 @@ class ChannelsController extends Controller
     {
         return response()->json(fractal()
             ->item($channel)
-            ->transformWith(new ChannelTransformer())
-            ->includeThreads());
+            ->transformWith(new ChannelTransformer()));
     }
 
     /**

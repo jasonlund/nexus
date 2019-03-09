@@ -29,11 +29,14 @@ Route::patch('/channels/{channel}', ['as' => 'channels.update', 'uses' => 'Chann
 Route::delete('/channels/{channel}', ['as' => 'channels.destroy', 'uses' => 'ChannelsController@destroy']);
 
 Route::put('/channels/{channel}', ['as' => 'threads.store', 'uses' => 'ThreadsController@store']);
+Route::get('/channels/{channel}/threads', ['as' => 'threads.index', 'uses' => 'ThreadsController@index']);
 Route::get('/channels/{channel}/{thread}', ['as' => 'threads.show', 'uses' => 'ThreadsController@show']);
 Route::patch('/channels/{channel}/{thread}', ['as' => 'threads.update', 'uses' => 'ThreadsController@update']);
 Route::delete('/channels/{channel}/{thread}', ['as' => 'threads.destroy', 'uses' => 'ThreadsController@destroy']);
 
 Route::put('/channels/{channel}/{thread}/replies', ['as' => 'replies.store', 'uses' => 'RepliesController@store']);
+Route::get('/channels/{channel}/{thread}/replies', ['as' => 'replies.index', 'uses' => 'RepliesController@index']);
+Route::get('/channels/{channel}/{thread}/replies', ['as' => 'replies.index', 'uses' => 'RepliesController@index']);
 Route::patch('/channels/{channel}/{thread}/replies/{reply}', ['as' => 'replies.update', 'uses' => 'RepliesController@update']);
 Route::delete('/channels/{channel}/{thread}/replies/{reply}', ['as' => 'replies.destroy', 'uses' => 'RepliesController@destroy']);
 

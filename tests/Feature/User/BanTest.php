@@ -46,7 +46,6 @@ class BanTest extends TestCase
             ->assertStatus(200)
             ->assertJson(array_merge($bannedUser->only(['username', 'name', 'email']), [
                 'banned' => true,
-                'banned_at' => $nowDate->format('Y-m-d H:i:s'),
                 'banned_until' => $expiryDate->format('Y-m-d H:i:s'),
                 'ban_comment' => 'FooBar'
             ]));
@@ -66,7 +65,6 @@ class BanTest extends TestCase
             ->assertStatus(200)
             ->assertJson(array_merge($bannedUser->only(['username', 'name', 'email']), [
                 'banned' => true,
-                'banned_at' => $nowDate->format('Y-m-d H:i:s'),
                 'banned_until' => null,
                 'ban_comment' => null
             ]));
