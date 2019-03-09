@@ -89,8 +89,7 @@ class User extends Authenticatable implements BannableContract
                 'required',
                 'min:3',
                 'max:16',
-                'regex:/^[a-zA-Z0-9_]+((\.(-\.)*-?|-(\.-)*\.?)[a-zA-Z0-9_]+)*$/i',
-                // alphanumeric, hyphens, underscores and periods.
+                'alpha_dash',
                 new UniqueCaseInsensitive(self::class, request()->route('user') ?
                     request()->route('user')->username :
                     auth()->user()->username)
