@@ -30,12 +30,12 @@ class DestroyTest extends TestCase
     /** @test */
     function an_authorized_user_can_destroy_a_channel()
     {
-        $user = $this->signIn();
+        $user = create('User');
         Bouncer::allow($user)->to('delete-channels');
 
         $thread = create('Thread');
 
-        $this->json('DELETE', $this->routeDestroy([$thread->channel->slug]))
+        $this->apiAs($user,'DELETE', $this->routeDestroy([$thread->channel->slug]))
             ->assertStatus(200);
 
         $this->json('GET', $this->routeShow([$thread->channel->slug]))
@@ -50,9 +50,9 @@ class DestroyTest extends TestCase
         $this->json('DELETE', $this->routeDestroy([$thread->channel->slug]))
             ->assertStatus(401);
 
-        $this->signIn();
+        $user = create('User');
 
-        $this->json('DELETE', $this->routeDestroy([$thread->channel->slug]))
+        $this->apiAs($user,'DELETE', $this->routeDestroy([$thread->channel->slug]))
             ->assertStatus(403);
     }
 }

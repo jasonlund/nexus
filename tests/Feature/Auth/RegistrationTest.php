@@ -33,14 +33,17 @@ class RegistrationTest extends TestCase
         $data = make('User')->only(['name', 'username', 'email', 'password']);
         $data = array_merge($data, ['password_confirmation' => $data['password']]);
 
-        $this->json('put', $this->routeRegister(), $data)
+        $this->json('post', $this->routeRegister(), $data)
             ->assertStatus(200)
+            ->assertJsonStructure([
+                'access_token'
+            ])
             ->assertJson([
-                'name' => $data['name'],
-                'username' => $data['username']
+                'token_type' => 'bearer',
+                'expires_in' => (int)config('jwt.ttl') * 60
             ]);
 
-        $this->assertAuthenticatedAs($user = User::first());
+        $user = User::first();
         Event::assertDispatched(Registered::class, function ($event) use ($user) {
             return $event->user->id === $user->id;
         });
@@ -49,9 +52,9 @@ class RegistrationTest extends TestCase
     /** @test */
     function a_user_can_not_register()
     {
-        $this->signIn();
+        $user = create('User');
 
-        $this->json('put', $this->routeRegister(), [])
+        $this->apiAs($user,'post', $this->routeRegister(), [])
             ->assertStatus(403);
     }
 
@@ -131,7 +134,7 @@ class RegistrationTest extends TestCase
             $user['password_confirmation'] = $user['password'];
         }
 
-        return $this->json('PUT', $this->routeRegister(), $user);
+        return $this->json('post', $this->routeRegister(), $user);
     }
 
     private function validatePasswordStrength($pw)

@@ -56,24 +56,17 @@ class BanTest extends TestCase
     /** @test */
     function a_banned_user_can_not_participate()
     {
-        $this->signIn($this->user);
-
         $channel = create('Channel');
 
-        $this->json('PUT', $this->routeStoreThread([$channel->slug]), [])
+        $this->apiAs($this->user, 'PUT', $this->routeStoreThread([$channel->slug]), [])
             ->assertStatus(403);
-
-        $this->assertGuest();
     }
 
     /** @test */
     function a_banned_user_can_not_login()
     {
         $this->post($this->routeLogin(), ['email' => $this->user->email, 'password' => 'secret'])
-            ->assertSessionHasErrors('login')
-            ->assertRedirect($this->routeRedirect());
-
-        $this->assertGuest();
+            ->assertStatus(403);
     }
 
     /** @test */
@@ -94,7 +87,5 @@ class BanTest extends TestCase
             'password' => 'FooBaz123',
             'password_confirmation' => 'FooBaz123',
         ])->assertStatus(403);
-
-        $this->assertGuest();
     }
 }

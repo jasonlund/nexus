@@ -15,27 +15,9 @@ use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 
 class UsersController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth')->except('index');
-    }
-
     public function index()
     {
-        $limit = 25;
-        if(request()->has('limit')) {
-            $input = (int)request('limit');
-            if($input < 101 && $input > 9){
-                $limit = $input;
-            }
-        }
-
-        $data = User::paginate($limit);
-
-        return response()->json(fractal()
-            ->collection($data)
-            ->paginateWith(new IlluminatePaginatorAdapter($data))
-            ->transformWith(new UserTransformer()));
+        return paginated_response(User::query(), 'UserTransformer');
     }
 
     public function show(UserShowRequest $request, User $user)

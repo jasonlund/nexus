@@ -19,20 +19,23 @@ class ForbidBannedUser
         if ($user && $user->isBanned()) {
             $ban = $user->bans()->latest()->first();
 
-            auth()->logout();
+            if(auth()->checK()) auth()->logout();
 
-            $message = 'Account ' . $ban->isPermanent() ? 'permanently banned' : ' temporarily banned until ' .
-                $ban->expires_at->diffForHumans() . $ban->comment ? '. Reason: ' . $ban->comment . '.' : '.';
-
-            if($request->expectsJson()) {
-                abort(403, $message);
+            if($ban->isPermanent()){
+                $message = 'Account permanently banned.';
             }else{
-                \Session::put('ban-reason', $message);
-
-                return redirect()->route('home')->withInput()->withErrors([
-                    'login' => $message,
-                ]);
+                $message = 'Account temporarily banned until ' . $ban->expired_at->diffForHumans() . '.';
             }
+
+            if($ban->comment) {
+                $message .= ' Reason: ' . $ban->comment;
+            }
+
+
+//            $message = 'Account ' . $ban->isPermanent() ? 'permanently banned' : ' temporarily banned until ' .
+//                $ban->expires_at->diffForHumans() . $ban->comment ? '. Reason: ' . $ban->comment . '.' : '.';
+
+            abort(403, $message);
         }
 
         return $next($request);

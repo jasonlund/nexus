@@ -33,11 +33,11 @@ class CreateTest extends TestCase
     /** @test */
     function a_user_can_create_new_threads()
     {
-        $user = $this->signIn();
+        $user = create('User');
 
         $thread = raw('Thread', ['channel_id' => $this->channel->id]);
 
-        $this->json('PUT', $this->routeStore([$this->channel->slug]), $thread)
+        $this->apiAs($user,'PUT', $this->routeStore([$this->channel->slug]), $thread)
             ->assertStatus(200)
             ->assertJson([
                 'title' => $thread['title'],
@@ -85,11 +85,11 @@ class CreateTest extends TestCase
 
     private function publish($overrides)
     {
-        $this->signIn();
+        $user = create('User');
 
         $channel = create('Channel');
         $thread = raw('Thread', array_merge($overrides, ['channel_id' => $channel->id]));
 
-        return $this->json('PUT', $this->routeStore([$channel->slug]), $thread);
+        return $this->apiAs($user,'PUT', $this->routeStore([$channel->slug]), $thread);
     }
 }

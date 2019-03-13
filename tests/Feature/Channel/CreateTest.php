@@ -30,12 +30,12 @@ class CreateTest extends TestCase
     /** @test */
     function an_authorized_user_user_can_create_new_channels()
     {
-        $user = $this->signIn();
+        $user = create('User');
         Bouncer::allow($user)->to('create-channels');
 
         $channel = raw('Channel', ['name' => 'FooBar']);
 
-        $this->json('PUT', $this->routeStore(), $channel)
+        $this->apiAs($user, 'PUT', $this->routeStore(), $channel)
             ->assertStatus(200)
             ->assertJson([
                 'name' => $channel['name'],
@@ -57,11 +57,11 @@ class CreateTest extends TestCase
         $this->json('PUT', $this->routeStore(), [])
             ->assertStatus(401);
 
-        $this->signIn();
+        $user = create('User');
 
         $channel = raw('Channel', ['name' => 'FooBar']);
 
-        $this->json('PUT', $this->routeStore(), $channel)
+        $this->apiAs($user, 'PUT', $this->routeStore(), $channel)
             ->assertStatus(403);
     }
 
@@ -81,11 +81,11 @@ class CreateTest extends TestCase
 
     private function publish($overrides)
     {
-        $user = $this->signIn();
+        $user = create('User');
         Bouncer::allow($user)->to('create-channels');
 
         $channel = raw('Channel', $overrides);
 
-        return $this->json('PUT', $this->routeStore(), $channel);
+        return $this->apiAs($user,'PUT', $this->routeStore(), $channel);
     }
 }

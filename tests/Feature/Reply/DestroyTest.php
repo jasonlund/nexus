@@ -31,11 +31,11 @@ class DestroyTest extends TestCase
     /** @test */
     function the_creator_can_destroy_a_reply()
     {
-        $user = $this->signIn();
+        $user = create('User');
         $reply = create('Reply', ['user_id' => $user->id]);
         $data = $reply->only('body');
 
-        $this->json('DELETE', $this->routeDestroy([$reply->channel->slug, $reply->thread->slug, $reply->id]))
+        $this->apiAs($user,'DELETE', $this->routeDestroy([$reply->channel->slug, $reply->thread->slug, $reply->id]))
             ->assertStatus(200);
 
         $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
@@ -48,13 +48,13 @@ class DestroyTest extends TestCase
     /** @test */
     function an_authorized_user_can_destroy_any_reply()
     {
-        $user = $this->signIn();
+        $user = create('User');
         Bouncer::allow($user)->to('moderate-channels');
 
         $reply = create('Reply');
         $data = $reply->only('body');
 
-        $this->json('DELETE', $this->routeDestroy([$reply->channel->slug, $reply->thread->slug, $reply->id]))
+        $this->apiAs($user,'DELETE', $this->routeDestroy([$reply->channel->slug, $reply->thread->slug, $reply->id]))
             ->assertStatus(200);
 
         $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
@@ -67,14 +67,14 @@ class DestroyTest extends TestCase
     /** @test */
     function an_authorized_user_can_destroy_replies_in_channels_they_moderate()
     {
-        $user = $this->signIn();
+        $user = create('User');
         Bouncer::allow($user)->toOwn(Channel::class)->to('moderate-channels');
 
         $inChannel = create('Reply');
         $notInChannel = create('Reply');
         $inChannel->thread->channel->moderators()->attach($user);
 
-        $this->json('DELETE', $this->routeDestroy([$inChannel->channel->slug, $inChannel->thread->slug, $inChannel->id]))
+        $this->apiAs($user,'DELETE', $this->routeDestroy([$inChannel->channel->slug, $inChannel->thread->slug, $inChannel->id]))
             ->assertStatus(200);
 
         $this->json('GET', $this->routeIndex([$inChannel->channel->slug, $inChannel->thread->slug]))
@@ -83,7 +83,7 @@ class DestroyTest extends TestCase
                 'data' => [$inChannel->only('body')]
             ]);
 
-        $this->json('DELETE', $this->routeDestroy([$notInChannel->channel->slug, $notInChannel->thread->slug, $notInChannel->id]))
+        $this->apiAs($user,'DELETE', $this->routeDestroy([$notInChannel->channel->slug, $notInChannel->thread->slug, $notInChannel->id]))
             ->assertStatus(403);
 
         $this->json('GET', $this->routeIndex([$notInChannel->channel->slug, $notInChannel->thread->slug]))
@@ -105,15 +105,13 @@ class DestroyTest extends TestCase
     /** @test */
     function a_user_whom_is_not_the_creator_can_not_destroy_a_reply()
     {
-        $user = $this->signIn();
+        $user = create('User');
         $reply = create('Reply', ['user_id' => $user->id]);
         $data = $reply->only('body');
 
-        auth()->logout();
+        $user = create('User');
 
-        $this->signIn();
-
-        $this->json('DELETE', $this->routeDestroy([$reply->channel->slug, $reply->thread->slug, $reply->id]))
+        $this->apiAs($user,'DELETE', $this->routeDestroy([$reply->channel->slug, $reply->thread->slug, $reply->id]))
             ->assertStatus(403);
 
         $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))

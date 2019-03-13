@@ -19,7 +19,8 @@
         "schuppo/password-strength": "~1.5",
         "silber/bouncer": "v1.0.0-rc.5",
         "spatie/laravel-fractal": "^5.4",
-        "staudenmeir/belongs-to-through": "^2.4"
+        "staudenmeir/belongs-to-through": "^2.4",
+        "tymon/jwt-auth": "1.0.0-rc.3"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",

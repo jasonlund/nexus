@@ -31,14 +31,14 @@ class UpdateTest extends TestCase
     /** @test */
     function the_creator_can_update_a_reply()
     {
-        $user = $this->signIn();
+        $user = create('User');
         $reply = create('Reply', ['user_id' => $user->id]);
         $oldData = $reply->only('body');
         $newData = [
             'body' => 'FooBar'
         ];
 
-        $this->json('PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), $newData)
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), $newData)
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($oldData);
@@ -56,7 +56,7 @@ class UpdateTest extends TestCase
     /** @test */
     function an_authorized_user_can_update_any_reply()
     {
-        $user = $this->signIn();
+        $user = create('User');
         Bouncer::allow($user)->to('moderate-channels');
 
         $reply = create('Reply');
@@ -65,7 +65,7 @@ class UpdateTest extends TestCase
             'body' => 'FooBar'
         ];
 
-        $this->json('PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), $newData)
+        $this->apiAs($user, 'PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), $newData)
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($oldData);
@@ -83,7 +83,7 @@ class UpdateTest extends TestCase
     /** @test */
     function an_authorized_user_can_update_replies_in_channels_they_moderate()
     {
-        $user = $this->signIn();
+        $user = create('User');
         Bouncer::allow($user)->toOwn(Channel::class)->to('moderate-channels');
 
         $inChannel = create('Reply');
@@ -93,7 +93,7 @@ class UpdateTest extends TestCase
             'body' => 'FooBar'
         ];
 
-        $this->json('PATCH', $this->routeUpdate([$inChannel->channel->slug, $inChannel->thread->slug, $inChannel->id]), $newData)
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$inChannel->channel->slug, $inChannel->thread->slug, $inChannel->id]), $newData)
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($inChannel->only('body'));
@@ -107,7 +107,7 @@ class UpdateTest extends TestCase
                 'data' => [$inChannel->only('body')]
             ]);
 
-        $this->json('PATCH', $this->routeUpdate([$notInChannel->channel->slug, $notInChannel->thread->slug, $notInChannel->id]), $newData)
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$notInChannel->channel->slug, $notInChannel->thread->slug, $notInChannel->id]), $newData)
             ->assertStatus(403);
     }
 
@@ -123,14 +123,12 @@ class UpdateTest extends TestCase
     /** @test */
     function a_user_whom_is_not_the_creator_can_not_update_a_reply()
     {
-        $user = $this->signIn();
+        $user = create('User');
         $reply = create('Reply', ['user_id' => $user->id]);
 
-        auth()->logout();
+        $user = create('User');
 
-        $this->signIn();
-
-        $this->json('PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), [])
+        $this->apiAs($user, 'PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), [])
             ->assertStatus(403);
 
     }
@@ -138,10 +136,10 @@ class UpdateTest extends TestCase
     /** @test */
     function a_reply_requires_a_body()
     {
-        $user = $this->signIn();
+        $user = create('User');
         $reply = create('Reply', ['user_id' => $user->id]);
 
-        $this->json('PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), ['body' => null])
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), ['body' => null])
             ->assertJsonValidationErrors(['body']);
     }
 }

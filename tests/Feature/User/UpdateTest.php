@@ -5,6 +5,7 @@ namespace Tests\Feature\User;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Bouncer;
+use Hash;
 
 class UpdateTest extends TestCase
 {
@@ -30,34 +31,75 @@ class UpdateTest extends TestCase
     /** @test */
     function a_user_can_update_themselves()
     {
-        $user = $this->signIn();
+        $user = create('User');
         $oldData = $user->only(['name', 'username']);
 
-        $this->json('PATCH', $this->routeUpdateSelf(), [
+        $this->apiAs($user,'PATCH', $this->routeUpdateSelf(), [
             'name' => 'John Doe',
             'username' => 'johndoe',
             'email' => 'john@email.com'
         ])->assertStatus(200)
-        ->assertJsonMissing($oldData)
-        ->assertJson($user->fresh()->only(['name', 'username', 'email']));
+            ->assertJsonMissing($oldData)
+            ->assertJson($user->fresh()->only(['name', 'username', 'email']));
+    }
+
+    /** @test */
+    function a_user_can_optionally_update_their_password()
+    {
+        $user = create('User');
+        $password = 'FooBar123';
+
+        $data = array_merge($user->only(['name', 'username', 'email']),
+            [
+                'password' => $password,
+                'password_confirmation' => $password
+            ]
+        );
+
+        $this->apiAs($user, 'PATCH', $this->routeUpdateSelf(), $data)
+            ->assertStatus(200);
+
+        $this->assertTrue(Hash::check($password, $user->fresh()->password));
     }
 
     /** @test */
     function an_authorized_user_can_update_users()
     {
-        $user = $this->signIn();
+        $user = create('User');
         Bouncer::allow($user)->to('update-users');
 
         $otherUser = create('User');
         $oldData = $otherUser->only(['name', 'username']);
 
-        $this->json('PATCH', $this->routeUpdate($otherUser->username), [
+        $this->apiAs($user,'PATCH', $this->routeUpdate($otherUser->username), [
             'name' => 'John Doe',
             'username' => 'johndoe',
             'email' => 'john@email.com'
         ])->assertStatus(200)
             ->assertJsonMissing($oldData)
             ->assertJson($otherUser->fresh()->only(['name', 'username']));
+    }
+
+    /** @test */
+    function an_authorized_user_can_optionally_update_the_password_of_users()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->to('update-users');
+        $password = 'FooBar123';
+
+        $otherUser = create('User');
+
+        $data = array_merge($otherUser->only(['name', 'username', 'email']),
+            [
+                'password' => $password,
+                'password_confirmation' => $password
+            ]
+        );
+
+        $this->apiAs($user,'PATCH', $this->routeUpdate($otherUser->username), $data)
+            ->assertStatus(200);
+
+        $this->assertTrue(Hash::check($password, $otherUser->fresh()->password));
     }
 
     /** @test */
@@ -71,9 +113,9 @@ class UpdateTest extends TestCase
             'email' => 'john@email.com'
         ])->assertStatus(401);
 
-        $this->signIn();
+        $user = create('User');
 
-        $this->json('PATCH', $this->routeUpdate($otherUser->username), [
+        $this->apiAs($user, 'PATCH', $this->routeUpdate($otherUser->username), [
             'name' => 'John Doe',
             'username' => 'johndoe',
             'email' => 'john@email.com'
@@ -187,22 +229,63 @@ class UpdateTest extends TestCase
             ->assertStatus(200);
     }
 
+    /** @test */
+    function a_user_optionally_requires_a_strong_password()
+    {
+        $otherUser = create('User');
+
+        $weakPassword = 'foobar';
+        $strongPassword = 'FooBar123';
+
+        $this->updateSelf(['password' => $weakPassword, 'password_confirmation' => $weakPassword])
+            ->assertJsonValidationErrors(['password']);
+
+        $this->update(['password' => $weakPassword, 'password_confirmation' => $weakPassword], $otherUser)
+            ->assertJsonValidationErrors(['password']);
+
+        $this->updateSelf(['password' => $strongPassword, 'password_confirmation' => $strongPassword])
+            ->assertStatus(200);
+
+        $this->update(['password' => $strongPassword, 'password_confirmation' => $strongPassword], $otherUser)
+            ->assertStatus(200);
+    }
+
+    /** @test */
+    function a_user_optionally_requires_a_confirmed_password()
+    {
+        $otherUser = create('User');
+
+        $password = 'FooBar123';
+
+        $this->updateSelf(['password' => $password, 'password_confirmation' => $password . '1'])
+            ->assertJsonValidationErrors(['password']);
+
+        $this->update(['password' => $password, 'password_confirmation' => $password . '1'], $otherUser)
+            ->assertJsonValidationErrors(['password']);
+
+        $this->updateSelf(['password' => $password, 'password_confirmation' => $password])
+            ->assertStatus(200);
+
+        $this->update(['password' => $password, 'password_confirmation' => $password], $otherUser)
+            ->assertStatus(200);
+    }
+
     private function updateSelf($data, $user = null)
     {
-        $user = $this->signIn($user);
+        if(!$user) $user = create('User');
 
         $data = array_merge($user->only(['name', 'username', 'email']), $data);
 
-        return $this->json('PATCH', $this->routeUpdateSelf(), $data);
+        return $this->apiAs($user,'PATCH', $this->routeUpdateSelf(), $data);
     }
 
     private function update($data, $user = null)
     {
-        $user = $this->signIn($user);
+        if(!$user) $user = create('User');
         Bouncer::allow($user)->to('update-users');
 
         $data = array_merge($user->only(['name', 'username', 'email']), $data);
 
-        return $this->json('PATCH', $this->routeUpdate($user), $data);
+        return $this->apiAs($user,'PATCH', $this->routeUpdate($user), $data);
     }
 }

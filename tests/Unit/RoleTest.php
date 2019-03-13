@@ -11,16 +11,20 @@ class RoleTest extends TestCase
 {
     use DatabaseMigrations;
 
+    protected $user;
+
     public function setUp()
     {
         parent::setUp();
+
+        $this->user = create('User');
+        $this->actingAs($this->user);
     }
 
     /** @test */
     function an_admin_has_all_abilities()
     {
-        $user = $this->signIn();
-        Bouncer::assign('admin')->to($user);
+        Bouncer::assign('admin')->to($this->user);
 
         $this->assertTrue(Bouncer::can('update-users'));
         $this->assertTrue(Bouncer::can('delete-users'));
@@ -37,8 +41,7 @@ class RoleTest extends TestCase
     /** @test */
     function a_super_moderator_has_abilities()
     {
-        $user = $this->signIn();
-        Bouncer::assign('super-moderator')->to($user);
+        Bouncer::assign('super-moderator')->to($this->user);
 
         $this->assertTrue(Bouncer::can('ban-users'));
 
@@ -49,12 +52,11 @@ class RoleTest extends TestCase
     /** @test */
     function a_moderator_has_abilities_specific_to_certain_channels()
     {
-        $user = $this->signIn();
-        Bouncer::assign('moderator')->to($user);
+        Bouncer::assign('moderator')->to($this->user);
 
         $inChannel = create('Channel');
         $notInChannel = create('Channel');
-        $inChannel->moderators()->attach($user);
+        $inChannel->moderators()->attach($this->user);
 
 
         $this->assertTrue(Bouncer::can('moderate-channels', $inChannel));

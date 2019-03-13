@@ -13,8 +13,10 @@ use App\Models\Channel;
 use Illuminate\Validation\Rule;
 use Cog\Contracts\Ban\Bannable as BannableContract;
 use Cog\Laravel\Ban\Traits\Bannable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Hash;
 
-class User extends Authenticatable implements BannableContract
+class User extends Authenticatable implements BannableContract, JWTSubject
 {
     use Notifiable, SoftDeletes, HasRolesAndAbilities, Bannable;
 
@@ -46,6 +48,14 @@ class User extends Authenticatable implements BannableContract
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function getJWTIdentifier() {
+        return $this->getKey();
+    }
+
+    public function getJWTCustomClaims() {
+        return [];
+    }
 
     /**
      * Get the route key for the model.
@@ -81,26 +91,57 @@ class User extends Authenticatable implements BannableContract
             'user_id');
     }
 
-    public static function validationRules()
+    public static function validationRules($key = null)
     {
-        return [
+        $ignoreUsername = $ignoreEmail = null;
+
+        if(request()->route('user')){
+            $ignoreUsername = request()->route('user')->username;
+            $ignoreEmail = request()->route('user')->email;
+        }else if(auth()->check()) {
+            $ignoreUsername = auth()->user()->username;
+            $ignoreEmail = auth()->user()->email;
+        }
+        $rules = [
             'name' => 'required|string|max:255',
             'username' => [
                 'required',
                 'min:3',
                 'max:16',
                 'alpha_dash',
-                new UniqueCaseInsensitive(self::class, request()->route('user') ?
-                    request()->route('user')->username :
-                    auth()->user()->username)
+                new UniqueCaseInsensitive(self::class, $ignoreUsername)
             ],
             'email' => [
                 'required',
                 'email',
-                Rule::unique('users')->ignore(request()->route('user') ?
-                    request()->route('user')->email :
-                    auth()->user()->email, 'email')
+                Rule::unique('users')->ignore($ignoreEmail, 'email')
+            ],
+            'password' => [
+                'string',
+                'min:8',
+                'confirmed',
+                'case_diff',
+                'numbers',
+                'letters'
             ]
         ];
+
+        return $key ? $rules[$key] : $rules;
+    }
+
+    /**
+     * Update the model in the database.
+     *
+     * @param  array  $attributes
+     * @param  array  $options
+     * @return bool
+     */
+    public function update(array $attributes = [], array $options = [])
+    {
+        if(isset($attributes['password'])){
+            $attributes['password'] = Hash::make($attributes['password']);
+        }
+
+        return parent::update($attributes, $options);
     }
 }

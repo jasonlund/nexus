@@ -7,6 +7,11 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset;
 
 class ResetPasswordController extends Controller
 {
@@ -30,15 +35,7 @@ class ResetPasswordController extends Controller
      */
     protected $redirectTo = '/home';
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware('guest');
-    }
+    protected $freshToken;
 
     /**
      * Get the password reset validation rules.
@@ -50,8 +47,28 @@ class ResetPasswordController extends Controller
         return [
             'token' => 'required',
             'email' => 'required|email',
-            'password' => ['required', 'string', 'min:8', 'confirmed', 'case_diff', 'numbers', 'letters'],
+            'password' => array_merge(User::validationRules('password'), ['required']),
         ];
+    }
+
+    /**
+     * Reset the given user's password.
+     *
+     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
+     * @param  string  $password
+     * @return void
+     */
+    protected function resetPassword($user, $password)
+    {
+        $user->password = Hash::make($password);
+
+        $user->setRememberToken(Str::random(60));
+
+        $user->save();
+
+        event(new PasswordReset($user));
+
+        $this->freshToken = \JWTAuth::fromUser($user);
     }
 
     /**
@@ -63,12 +80,11 @@ class ResetPasswordController extends Controller
      */
     protected function sendResetResponse(Request $request, $response)
     {
-        $data  = [];
-        if(app()->environment() === 'testing') {
-            $data = auth()->user()->only(['id', 'email', 'password']);
-        }
-
-        return response()->json($data);
+        return response()->json([
+            'access_token' => $this->freshToken,
+            'token_type' => 'bearer',
+            'expires_in' => auth()->factory()->getTTL() * 60
+        ]);
     }
 
     /**

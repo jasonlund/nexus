@@ -5,6 +5,7 @@ namespace Tests\Feature\User;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Bouncer;
+use App\Models\User;
 
 class DestroyTest extends TestCase
 {
@@ -30,12 +31,12 @@ class DestroyTest extends TestCase
     /** @test */
     function a_user_can_destroy_themselves()
     {
-        $this->signIn();
+        $user = create('User');
 
-        $this->json('DELETE', $this->routeDestroySelf())
+        $this->apiAs($user,'DELETE', $this->routeDestroySelf())
             ->assertStatus(200);
 
-        $this->assertGuest();
+        $this->assertCount(0, User::all());
     }
 
     /** @test */
@@ -48,15 +49,15 @@ class DestroyTest extends TestCase
     /** @test */
     function an_authorized_user_can_destroy_users()
     {
-        $user = $this->signIn();
+        $user = create('User');
         Bouncer::allow($user)->to('delete-users');
 
         $otherUser = create('User');
 
-        $this->json('DELETE', $this->routeDestroy($otherUser->username))
+        $this->apiAs($user,'DELETE', $this->routeDestroy($otherUser->username))
             ->assertStatus(200);
 
-        $this->assertAuthenticatedAs($user);
+        $this->assertCount(1, User::all());
     }
 
     /** @test */
@@ -67,8 +68,8 @@ class DestroyTest extends TestCase
         $this->json('DELETE', $this->routeDestroy($otherUser->username))
             ->assertStatus(401);
 
-        $this->signIn();
-        $this->json('DELETE', $this->routeDestroy($otherUser->username))
+        $user = create('User');
+        $this->apiAs($user,'DELETE', $this->routeDestroy($otherUser->username))
             ->assertStatus(403);
     }
 }

@@ -52,7 +52,6 @@ class ReadTest extends TestCase
     /** @test */
     function anyone_can_view_a_channel()
     {
-
         $this->json('GET', $this->routeShow([$this->channel->slug]))
             ->assertStatus(200)
             ->assertJson([

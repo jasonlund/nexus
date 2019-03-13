@@ -35,9 +35,9 @@ class ReadTest extends TestCase
     /** @test */
     function a_user_can_view_themselves()
     {
-        $user = $this->signIn();
+        $user = create('User');
 
-        $this->json('GET', $this->routeShowSelf())
+        $this->apiAs($user,'GET', $this->routeShowSelf())
             ->assertStatus(200)
             ->assertJson($user->only(['name', 'username', 'email']));
     }
@@ -45,11 +45,11 @@ class ReadTest extends TestCase
     /** @test */
     function an_authorized_user_can_view_another_user()
     {
-        $user = $this->signIn();
+        $user = create('User');
         Bouncer::allow($user)->to('view-all-users');
         $otherUser = create('User');
 
-        $this->json('GET', $this->routeShow([$otherUser->username]))
+        $this->apiAs($user,'GET', $this->routeShow([$otherUser->username]))
             ->assertStatus(200)
             ->assertJson($otherUser->only(['name', 'username', 'email']));
     }
@@ -57,16 +57,17 @@ class ReadTest extends TestCase
     /** @test */
     function an_unauthorized_user_can_not_view_another_user()
     {
-        $this->signIn();
+        $user = create('User');
         $otherUser = create('User');
 
-        $this->json('GET', $this->routeShow([$otherUser->username]))
+        $this->apiAs($user,'GET', $this->routeShow([$otherUser->username]))
             ->assertStatus(403);
     }
 
     /** @test */
-    function a_guest_can_list_all_users()
+    function a_user_can_list_all_users()
     {
+        $user = create('User');
         $users = create('User', [], 10);
         $valid = $users->map(function($item){
             return [
@@ -74,24 +75,26 @@ class ReadTest extends TestCase
                 'username' => $item->username
             ];
         })->toArray();
+        $valid = array_merge([$user->only(['name', 'username', 'email'])], $valid);
         $invalid = $users->map(function($item){
             return [
                 'email' => $item->email
             ];
         })->toArray();
 
-        $this->json('GET', $this->routeIndex())
+        $this->apiAs($user,'GET', $this->routeIndex())
             ->assertStatus(200)
-            ->assertJson($valid)
-            ->assertJsonMissing($invalid);
+            ->assertJson(['data' => $valid])
+            ->assertJsonMissing(['data' => $invalid]);
     }
 
     /** @test */
     function an_authorized_user_can_list_all_users_with_emails()
     {
         $users = create('User', [], 10);
-        $this->signIn($users->first());
-        Bouncer::allow($users->first())->to('view-all-users');
+        $user = create('User');
+        Bouncer::allow($user)->to('view-all-users');
+        $users = $users->push($user);
         $users = $users->map(function($item){
             return [
                 'name' => $item->name,
@@ -100,8 +103,35 @@ class ReadTest extends TestCase
             ];
         })->toArray();
 
-        $this->json('GET', $this->routeIndex())
+
+        $this->apiAs($user,'GET', $this->routeIndex())
             ->assertStatus(200)
-            ->assertJson($users);
+            ->assertJson(['data' => $users]);
+    }
+
+    /** @test */
+    function users_are_paginated()
+    {
+        create('User', [],49);
+        $user = create('User');
+        $response = $this->apiAs($user,'GET', $this->routeIndex())
+            ->assertJson([
+                'current_page' => 1,
+                'from' => 1,
+                'to' => 25,
+                'per_page' => 25,
+                'total' => 50
+            ]);
+
+        $response = $response->decodeResponseJson();
+
+        $this->apiAs($user,'GET', $response['next_page_url'])
+            ->assertJson([
+                'current_page' => 2,
+                'from' => 26,
+                'to' => 50,
+                'per_page' => 25,
+                'total' => 50
+            ]);
     }
 }

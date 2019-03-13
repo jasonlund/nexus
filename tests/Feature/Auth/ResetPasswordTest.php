@@ -47,11 +47,15 @@ class ResetPasswordTest extends TestCase
             'email' => $user->email,
             'password' => 'FooBaz123',
             'password_confirmation' => 'FooBaz123',
-        ])->assertStatus(200)
-        ->assertJsonMissing($user->only(['password']))
-        ->assertJson($user->fresh()->only(['id', 'email', 'password']));
-
-        $this->assertAuthenticatedAs($user);
+        ])
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'access_token'
+            ])
+            ->assertJson([
+                'token_type' => 'bearer',
+                'expires_in' => (int)config('jwt.ttl') * 60
+            ]);
 
         Event::assertDispatched(PasswordReset::class, function ($event) use ($user) {
             return $event->user->id === $user->id;
@@ -73,20 +77,6 @@ class ResetPasswordTest extends TestCase
 
         $this->assertTrue(Hash::check('a-password', $user->fresh()->password));
         $this->assertGuest();
-    }
-
-    /** @test */
-    function a_user_can_not_reset_their_password()
-    {
-        $user = $this->signIn();
-        $token = $this->generateValidToken($user);
-
-        $this->json('POST', $this->routeResetPassword(), [
-            'token' => $token,
-            'email' => $user->email,
-            'password' => 'FooBaz123',
-            'password_confirmation' => 'FooBaz123',
-        ])->assertStatus(403);
     }
 
     /** @test */

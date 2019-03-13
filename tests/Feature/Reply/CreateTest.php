@@ -29,12 +29,12 @@ class CreateTest extends TestCase
     /** @test */
     function a_user_can_reply_to_a_thread()
     {
-        $user = $this->signIn();
+        $user = create('User');
 
         $thread = create('Thread');
         $reply = raw('Reply');
 
-        $this->json('PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), $reply)
+        $this->apiAs($user,'PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), $reply)
             ->assertStatus(200)
             ->assertJson([
                 'body' => $reply['body'],
@@ -71,12 +71,12 @@ class CreateTest extends TestCase
     /** @test */
     function a_reply_requires_a_title()
     {
-        $this->signIn();
+        $user = create('User');
 
         $thread = create('Thread');
         $reply = raw('Reply', ['body' => null]);
 
-        $this->json('PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), $reply)
+        $this->apiAS($user,'PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), $reply)
             ->assertJsonValidationErrors(['body']);
     }
 }

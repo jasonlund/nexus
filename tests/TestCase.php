@@ -15,12 +15,12 @@ abstract class TestCase extends BaseTestCase
         $this->withoutExceptionHandling();
     }
 
-    protected function signIn($user = null)
+    protected function apiAs($user, $method, $uri, array $data = [], array $headers = [])
     {
-        $user = $user ?: create('User');
+        $headers = array_merge([
+            'Authorization' => 'Bearer ' . \JWTAuth::fromUser($user),
+        ], $headers);
 
-        $this->actingAs($user);
-
-        return $user;
+        return $this->json($method, $uri, $data, $headers);
     }
 }

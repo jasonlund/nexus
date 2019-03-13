@@ -17,9 +17,19 @@ class LoginTest extends TestCase
         return route('auth.login');
     }
 
-    protected function routeRedirect()
+    protected function routeLogout()
     {
-        return route('home');
+        return route('auth.logout');
+    }
+
+    protected function routeRefresh()
+    {
+        return route('auth.refresh');
+    }
+
+    protected function routeSelf()
+    {
+        return route('self.show');
     }
 
     public function setUp()
@@ -27,31 +37,83 @@ class LoginTest extends TestCase
         parent::setUp();
 
         $this->withExceptionHandling();
+
         $this->user = create('User');
     }
 
     /** @test */
     function a_guest_can_login()
     {
-        $this->post($this->routeLogin(), ['email' => $this->user->email, 'password' => 'secret'])
-            ->assertRedirect($this->routeRedirect());
+        $response = $this->json('post', $this->routeLogin(),
+            ['email' => $this->user->email, 'password' => 'secret'])
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'access_token'
+            ])
+            ->assertJson([
+                'token_type' => 'bearer',
+                'expires_in' => (int)config('jwt.ttl') * 60
+            ]);
+
+        $response = $response->decodeResponseJson();
+
+        $this->json('get', $this->routeSelf(), [], ['Authorization' => 'Bearer ' . $response['access_token']])
+            ->assertStatus(200);
     }
 
     /** @test */
-    function a_user_can_not_login()
+    function a_user_can_not_login_with_an_invalid_password()
     {
-        $this->signIn($this->user);
-
-        $this->post($this->routeLogin(), ['email' => $this->user->email, 'password' => 'secret'])
-            ->assertRedirect($this->routeRedirect());
+        $this->json('post', $this->routeLogin(),
+            ['email' => $this->user->email, 'password' => 'notthepassword'])
+            ->assertJsonValidationErrors('email');
     }
 
     /** @test */
     function a_user_can_logout()
     {
-        $this->signIn($this->user);
+        $token = \JWTAuth::fromUser($this->user);
 
-        $this->post($this->routeLogin())
-            ->assertRedirect($this->routeRedirect());
+        $this->json('post', $this->routeLogout(), [], ['Authorization' => 'Bearer ' . $token])
+            ->assertStatus(200);
+
+        $this->json('get', $this->routeSelf(), [], ['Authorization' => 'Bearer ' . $token])
+            ->assertStatus(401);
+    }
+
+    /** @test */
+    function a_user_can_manually_refresh_their_token()
+    {
+        $response = $this->apiAs($this->user, 'post', $this->routeRefresh())
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'access_token'
+            ])
+            ->assertJson([
+                'token_type' => 'bearer',
+                'expires_in' => (int)config('jwt.ttl') * 60
+            ]);
+
+        $response = $response->decodeResponseJson();
+
+        $this->json('get', $this->routeSelf(), [], ['Authorization' => 'Bearer ' . $response['access_token']])
+            ->assertStatus(200);
+    }
+
+    /** @test */
+    function a_users_token_is_refreshed_on_every_authenticated_call()
+    {
+        $token = \JWTAuth::fromUser($this->user);
+
+        $response = $this->json('get', $this->routeSelf(), [], ['Authorization' => 'Bearer ' . $token])
+            ->assertHeader('authorization');
+
+        $newToken = explode(' ', $response->headers->get('authorization'))[1];
+
+        $this->assertNotEquals($token, $newToken);
+        $this->json('get', $this->routeSelf(), [], ['Authorization' => 'Bearer ' . $newToken])
+            ->assertStatus(200);
+        $this->json('get', $this->routeSelf(), [], ['Authorization' => 'Bearer ' . $token])
+            ->assertStatus(401);
     }
 }

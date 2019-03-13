@@ -30,7 +30,7 @@ class UpdateTest extends TestCase
     /** @test */
     function an_authorized_user_can_update_a_channel()
     {
-        $user = $this->signIn();
+        $user = create('User');
         Bouncer::allow($user)->to('update-channels');
 
         $channel = create('Channel');
@@ -41,7 +41,7 @@ class UpdateTest extends TestCase
             'description' => 'FooBaz'
         ];
 
-        $this->json('PATCH', $this->routeUpdate([$channel->slug]), $newData)
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$channel->slug]), $newData)
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($oldData);
@@ -61,8 +61,8 @@ class UpdateTest extends TestCase
         $this->json('PATCH', $this->routeUpdate([$channel->slug]), [])
             ->assertStatus(401);
 
-        $this->signIn();
-        $this->json('PATCH', $this->routeUpdate([$channel->slug]), [])
+        $user = create('User');
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$channel->slug]), [])
             ->assertStatus(403);
     }
 
@@ -82,11 +82,11 @@ class UpdateTest extends TestCase
 
     function update($attributes)
     {
-        $user = $this->signIn();
+        $user = create('User');
         Bouncer::allow($user)->to('update-channels');
 
         $channel = create('Channel');
 
-        return $this->json('PATCH', $this->routeUpdate([$channel->slug]), $attributes);
+        return $this->apiAs($user, 'PATCH', $this->routeUpdate([$channel->slug]), $attributes);
     }
 }
