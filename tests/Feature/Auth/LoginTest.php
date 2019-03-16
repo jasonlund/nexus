@@ -5,6 +5,7 @@ namespace Tests\Feature\Auth;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use App\Http\Controllers\Auth\LoginController;
+use Carbon\Carbon;
 
 class LoginTest extends TestCase
 {
@@ -71,6 +72,13 @@ class LoginTest extends TestCase
         $this->json('post', $this->routeLogout(), [], ['Authorization' => 'Bearer ' . $token])
             ->assertStatus(200);
 
+        if((int)config('jwt.blacklist_grace_period') > 0) {
+            $this->json('get', $this->routeSelf(), [], ['Authorization' => 'Bearer ' . $token])
+                ->assertStatus(200);
+
+            Carbon::setTestNow(Carbon::now()->addSeconds((int)config('jwt.blacklist_grace_period') + 1));
+        }
+
         $this->json('get', $this->routeSelf(), [], ['Authorization' => 'Bearer ' . $token])
             ->assertStatus(401);
     }
@@ -78,7 +86,6 @@ class LoginTest extends TestCase
     /** @test */
     function a_user_can_manually_refresh_their_token()
     {
-        $this->withoutExceptionHandling();
         $response = $this->apiAs($this->user, 'get', $this->routeRefresh())
             ->assertStatus(200)
             ->assertHeader('authorization');
@@ -102,6 +109,14 @@ class LoginTest extends TestCase
         $this->assertNotEquals($token, $newToken);
         $this->json('get', $this->routeSelf(), [], ['Authorization' => 'Bearer ' . $newToken])
             ->assertStatus(200);
+
+        if((int)config('jwt.blacklist_grace_period') > 0) {
+            $this->json('get', $this->routeSelf(), [], ['Authorization' => 'Bearer ' . $token])
+                ->assertStatus(200);
+
+            Carbon::setTestNow(Carbon::now()->addSeconds((int)config('jwt.blacklist_grace_period') + 1));
+        }
+
         $this->json('get', $this->routeSelf(), [], ['Authorization' => 'Bearer ' . $token])
             ->assertStatus(401);
     }
