@@ -43,7 +43,7 @@ class ReadTest extends TestCase
                 'name' => $this->channel->name,
                 'description' => $this->channel->description,
                 'created_at' => $this->channel->created_at->format('Y-m-d H:i:s'),
-                'updated_at' => $this->channel->updated_at->format('Y-m-d H:i:s'),
+                'updated_at' => $this->channel->fresh()->updated_at->format('Y-m-d H:i:s'),
                 'thread_count' => 2,
                 'reply_count' => 4
             ]);
@@ -59,7 +59,7 @@ class ReadTest extends TestCase
                 'slug' => $this->channel->slug,
                 'description' => $this->channel->description,
                 'created_at' => $this->channel->created_at->format('Y-m-d H:i:s'),
-                'updated_at' => $this->channel->updated_at->format('Y-m-d H:i:s'),
+                'updated_at' => $this->channel->fresh()->updated_at->format('Y-m-d H:i:s'),
                 'thread_count' => 2,
                 'reply_count' => 4
             ]);

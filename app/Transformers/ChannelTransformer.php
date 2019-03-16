@@ -13,7 +13,7 @@ class ChannelTransformer extends TransformerAbstract
     ];
 
     /**
-     * A Fractal transformer.
+     * Transform Channels.
      *
      * @param \App\Models\Channel $channel
      * @return array
@@ -21,13 +21,14 @@ class ChannelTransformer extends TransformerAbstract
     public function transform(Channel $channel)
     {
         $data = [
+            'order' => (int) $channel->order,
             'name' => (string) $channel->name,
             'slug' => (string) $channel->slug,
             'description' => (string) $channel->description,
-            'created_at' => $channel->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => $channel->updated_at->format('Y-m-d H:i:s'),
-            'thread_count' => $channel->threads()->count(),
-            'reply_count' => $channel->replies()->count()
+            'created_at' => (string) $channel->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => (string) $channel->updated_at->format('Y-m-d H:i:s'),
+            'thread_count' => (int) $channel->threads()->count(),
+            'reply_count' => (int) $channel->replies()->count()
         ];
 
         return $data;

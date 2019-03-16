@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Bouncer;
-use App\Models\User;
 
-class UserUpdateRequest extends FormRequest
+class UserUnbanRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -15,7 +14,7 @@ class UserUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check() && Bouncer::can('update-users');
+        return auth()->check() && Bouncer::can('ban-users');
     }
 
     /**
@@ -25,6 +24,8 @@ class UserUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return User::validationRules();
+        return [
+            //
+        ];
     }
 }

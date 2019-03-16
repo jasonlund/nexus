@@ -13,25 +13,7 @@ use Illuminate\Auth\Events\Registered;
 
 class RegisterController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Register Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
-    | provide this functionality without requiring any additional code.
-    |
-    */
-
     use RegistersUsers;
-
-    /**
-     * Where to redirect users after registration.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/home';
 
     /**
      * Handle a registration request for the application.
@@ -81,7 +63,7 @@ class RegisterController extends Controller
     }
 
     /**
-     * The user has been registered.
+     * Generate and return a token for the newly registered user.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $user

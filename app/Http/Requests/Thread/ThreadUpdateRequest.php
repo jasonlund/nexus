@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Thread;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Bouncer;
 
-class UserUnbanRequest extends FormRequest
+class ThreadUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +14,10 @@ class UserUnbanRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check() && Bouncer::can('ban-users');
+        return auth() &&
+            (request()->route('thread')->user_id == auth()->user()->id ||
+                Bouncer::can('moderate-channels') ||
+                Bouncer::can('moderate-channels', request()->route('channel')));
     }
 
     /**
@@ -25,7 +28,8 @@ class UserUnbanRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'title' => 'required',
+            'body' => 'required'
         ];
     }
 }

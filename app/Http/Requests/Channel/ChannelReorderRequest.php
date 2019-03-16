@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Channel;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Bouncer;
 
-class ThreadUpdateRequest extends FormRequest
+class ChannelReorderRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,10 +14,7 @@ class ThreadUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth() &&
-            (request()->route('thread')->user_id == auth()->user()->id ||
-                Bouncer::can('moderate-channels') ||
-                Bouncer::can('moderate-channels', request()->route('channel')));
+        return auth()->check() && Bouncer::can('reorder-channels');
     }
 
     /**
@@ -28,8 +25,7 @@ class ThreadUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'title' => 'required',
-            'body' => 'required'
+            'order' => 'required|array|exists:channels,slug'
         ];
     }
 }

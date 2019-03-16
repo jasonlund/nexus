@@ -21,13 +21,11 @@ class User extends Authenticatable implements BannableContract, JWTSubject
     use Notifiable, SoftDeletes, HasRolesAndAbilities, Bannable;
 
     /**
-     * The attributes that are mass assignable.
+     * The attributes that can be mass assigned.
      *
      * @var array
      */
-    protected $fillable = [
-        'name', 'username', 'email', 'password',
-    ];
+    protected $fillable = ['name', 'username', 'email', 'password'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -38,6 +36,11 @@ class User extends Authenticatable implements BannableContract, JWTSubject
         'password', 'remember_token',
     ];
 
+    /**
+     * Cast Soft Deletes timestamp as a date.
+     *
+     * @var array
+     */
     protected $dates = ['deleted_at'];
 
     /**
@@ -49,10 +52,20 @@ class User extends Authenticatable implements BannableContract, JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
+    /**
+     * Get the identifier that will be stored in the subject claim of the JWT.
+     *
+     * @return mixed
+     */
     public function getJWTIdentifier() {
         return $this->getKey();
     }
 
+    /**
+     * Return a key value array, containing any custom claims to be added to the JWT.
+     *
+     * @return array
+     */
     public function getJWTCustomClaims() {
         return [];
     }
@@ -67,22 +80,42 @@ class User extends Authenticatable implements BannableContract, JWTSubject
         return 'username';
     }
 
+    /**
+     * A User owns many Threads.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function threads()
     {
         return $this->hasMany('App\Models\Thread');
     }
 
+    /**
+     * A User owns many Replies.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function replies()
     {
         return $this->hasMany('App\Models\Reply');
     }
 
+    /**
+     * A User belongs to many Channels as a Moderator or VIP.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function channels()
     {
         return $this->belongsToMany('App\Models\Channel')
             ->withPivot('ability_id');
     }
 
+    /**
+     * A Users belongs to many Channels as a Moderator
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function moderatedChannels()
     {
         return $this->belongsToMany('App\Models\Channel',
@@ -91,6 +124,12 @@ class User extends Authenticatable implements BannableContract, JWTSubject
             'user_id');
     }
 
+    /**
+     * Return the validation rules for requests.
+     *
+     * @param null $key
+     * @return array|mixed
+     */
     public static function validationRules($key = null)
     {
         $ignoreUsername = $ignoreEmail = null;
@@ -130,7 +169,7 @@ class User extends Authenticatable implements BannableContract, JWTSubject
     }
 
     /**
-     * Update the model in the database.
+     * Update the model in the database. If a new password is provided, properly Hash before storing.
      *
      * @param  array  $attributes
      * @param  array  $options

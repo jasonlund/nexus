@@ -10,7 +10,7 @@ Route::group(['middleware' => ['guest']], function() {
 });
 
 Route::group(['middleware' => ['auth']], function() {
-    Route::post('auth/refresh', ['as' => 'auth.refresh', 'uses' => 'Auth\TokenController@refresh']);
+    Route::get('auth/refresh', ['as' => 'auth.refresh', 'uses' => 'Auth\TokenController@refresh']);
     Route::post('auth/logout', ['as' => 'auth.logout', 'uses' => 'Auth\TokenController@logout']);
 });
 
@@ -20,6 +20,7 @@ Route::group(['middleware' => ['auth', 'refresh']], function() {
     Route::delete('profile', ['as' => 'self.destroy', 'uses' => 'UsersController@destroySelf']);
 
     Route::put('channels', ['as' => 'channels.store', 'uses' => 'ChannelsController@store']);
+    Route::post('channels/reorder', ['as' => 'channels.reorder', 'uses' => 'ChannelsController@reorder']);
     Route::patch('channels/{channel}', ['as' => 'channels.update', 'uses' => 'ChannelsController@update']);
     Route::delete('channels/{channel}', ['as' => 'channels.destroy', 'uses' => 'ChannelsController@destroy']);
 

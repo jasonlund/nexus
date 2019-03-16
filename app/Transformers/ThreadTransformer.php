@@ -12,12 +12,8 @@ class ThreadTransformer extends TransformerAbstract
         'owner', 'replies'
     ];
 
-    protected $defaultIncludes = [
-        'owner'
-    ];
-
     /**
-     * A Fractal transformer.
+     * Transform Threads.
      *
      * @param \App\Models\Thread $thread
      * @return array
@@ -26,10 +22,10 @@ class ThreadTransformer extends TransformerAbstract
     {
         $data = [
             'title' => (string) $thread->title,
-            'slug' => (string)$thread->slug,
-            'body' => (string)$thread->body,
-            'created_at' => (string)$thread->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => (string)$thread->updated_at->format('Y-m-d H:i:s')
+            'slug' => (string) $thread->slug,
+            'body' => (string) $thread->body,
+            'created_at' => (string) $thread->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => (string) $thread->updated_at->format('Y-m-d H:i:s')
         ];
 
         return $data;

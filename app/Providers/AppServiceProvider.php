@@ -25,6 +25,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        /**
+         * A User can moderate specific Channels.
+         */
         Bouncer::ownedVia(Channel::class, function ($channel, $user) {
             return $channel->moderators->where('id', $user->id)->count() !== 0;
         });

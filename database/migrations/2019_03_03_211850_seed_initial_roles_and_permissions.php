@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 use App\Models\Channel;
-//use Bouncer;
 
 class SeedInitialRolesAndPermissions extends Migration
 {
@@ -64,6 +63,27 @@ class SeedInitialRolesAndPermissions extends Migration
      */
     public function down()
     {
-        //
+        $r = Bouncer::role()->where('name', 'admin')->first();
+        Bouncer::disallow($r)->everything();
+        $r->delete();
+
+        $r = Bouncer::role()->where('name', 'super-moderator')->first();
+        Bouncer::disallow($r)->to('ban-users');
+        Bouncer::disallow($r)->to('moderate-channels');
+        Bouncer::disallow($r)->to('view-private-channels');
+        $r->delete();
+
+        $r = Bouncer::role()->where('name', 'moderator')->first();
+        Bouncer::disallow($r)->toOwn(Channel::class)->to('moderate-channels');
+        Bouncer::disallow($r)->toOwn(Channel::class)->to('view-private-channels');
+        $r->delete();
+
+        $r = Bouncer::role()->where('name', 'vip')->first();
+        Bouncer::disallow($r)->toOwn(Channel::class)->to('view-private-channels');
+        $r->delete();
+
+        foreach(Bouncer::ability()->get() as $a) {
+            $a->delete();
+        }
     }
 }

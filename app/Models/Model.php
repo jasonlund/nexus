@@ -8,7 +8,10 @@ class Model extends BaseModel
 {
     use SoftDeletes;
 
-    protected $guarded = [];
-
+    /**
+     * Cast Soft Deletes timestamp as a date.
+     *
+     * @var array
+     */
     protected $dates = ['deleted_at'];
 }

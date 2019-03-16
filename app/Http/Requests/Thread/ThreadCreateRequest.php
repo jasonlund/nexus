@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Thread;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Bouncer;
 
-class ChannelCreateRequest extends FormRequest
+class ThreadCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +13,7 @@ class ChannelCreateRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check() && Bouncer::can('create-channels');
+        return auth()->check();
     }
 
     /**
@@ -25,8 +24,8 @@ class ChannelCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|string',
-            'description' => 'required|string'
+            'title' => 'required',
+            'body' => 'required'
         ];
     }
 }

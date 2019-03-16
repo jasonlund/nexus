@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ThreadCreateRequest;
-use App\Http\Requests\ThreadDestroyRequest;
-use App\Http\Requests\ThreadUpdateRequest;
+use App\Http\Requests\Thread\ThreadCreateRequest;
+use App\Http\Requests\Thread\ThreadDestroyRequest;
+use App\Http\Requests\Thread\ThreadUpdateRequest;
 use App\Models\Thread;
 use App\Models\Channel;
 use Illuminate\Http\Request;
@@ -13,42 +13,24 @@ use App\Transformers\ThreadTransformer;
 class ThreadsController extends Controller
 {
     /**
-     * ThreadsController constructor.
-     */
-    public function __construct()
-    {
-        $this->middleware('auth')->except(['index', 'show']);
-    }
-
-    /**
-     * Display a listing of the resource.
+     * Display a listing of the Threads in a Channel.
      *
      * @param \App\Models\Channel $channel
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index(Channel $channel)
     {
-        $data = $channel->threads();
+        $data = $channel->threads()->orderBy('updated_at');
 
         return paginated_response($data, 'ThreadTransformer', ['owner']);
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Store a newly created Thread in storage.
      *
      * @param  \App\Http\Requests\ThreadCreateRequest
      * @param \App\Models\Channel $channel
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(ThreadCreateRequest $request, Channel $channel)
     {
@@ -65,11 +47,11 @@ class ThreadsController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified Thread.
      *
      * @param \App\Models\Channel $channel
      * @param  \App\Models\Thread  $thread
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Channel $channel, Thread $thread)
     {
@@ -80,23 +62,12 @@ class ThreadsController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Thread  $thread
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Thread $thread)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
+     * Update the specified Thread in storage.
      *
      * @param  \App\Http\Requests\ThreadUpdateRequest
      * @param \App\Models\Channel $channel
      * @param  \App\Models\Thread  $thread
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(ThreadUpdateRequest $request, Channel $channel, Thread $thread)
     {
@@ -112,12 +83,12 @@ class ThreadsController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified Thread from storage.
      *
      * @param  \App\Http\Requests\ThreadDestroyRequest
      * @param \App\Models\Channel $channel
      * @param \App\Models\Thread
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */
     public function destroy(ThreadDestroyRequest $request, Channel $channel, Thread $thread)

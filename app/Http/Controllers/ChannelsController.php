@@ -2,28 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ChannelCreateRequest;
-use App\Http\Requests\ChannelDestroyRequest;
-use App\Http\Requests\ChannelUpdateRequest;
+use App\Http\Requests\Channel\ChannelCreateRequest;
+use App\Http\Requests\Channel\ChannelDestroyRequest;
+use App\Http\Requests\Channel\ChannelReorderRequest;
+use App\Http\Requests\Channel\ChannelUpdateRequest;
 use App\Models\Channel;
 use Illuminate\Http\Request;
 use App\Transformers\ChannelTransformer;
 
 class ChannelsController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth')->except(['index', 'show']);
-    }
-
     /**
-     * Display a listing of the resource.
+     * Display a listing of the channels in order.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function index()
     {
-        $data = Channel::all();
+        $data = Channel::ordered()->get();
 
         return response()->json(fractal()
             ->collection($data)
@@ -31,20 +27,10 @@ class ChannelsController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Store a newly created channel in storage.
      *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\ChannelCreateRequest
-     * @return \Illuminate\Http\Response
+     * @param  ChannelCreateRequest $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(ChannelCreateRequest $request)
     {
@@ -59,10 +45,30 @@ class ChannelsController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Reorder existing Channels.
      *
-     * @param  \App\Channel  $channel
-     * @return \Illuminate\Http\Response
+     * @param ChannelReorderRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function reorder(ChannelReorderRequest $request)
+    {
+        $channels = Channel::whereIn('slug', request('order'))
+            ->get();
+
+        Channel::setNewOrder($channels->pluck('id')->toArray());
+
+        $data = Channel::ordered()->get();
+
+        return response()->json(fractal()
+            ->collection($data)
+            ->transformWith(new ChannelTransformer()));
+    }
+
+    /**
+     * Display the specified Channel.
+     *
+     * @param  \App\Models\Channel  $channel
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Channel $channel)
     {
@@ -72,22 +78,11 @@ class ChannelsController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Update the specified Channel in storage.
      *
-     * @param  \App\Channel  $channel
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Channel $channel)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Channel  $channel
-     * @return \Illuminate\Http\Response
+     * @param  ChannelUpdateRequest  $request
+     * @param  \App\Models\Channel  $channel
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(ChannelUpdateRequest $request, Channel $channel)
     {
@@ -104,8 +99,10 @@ class ChannelsController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Channel  $channel
-     * @return \Illuminate\Http\Response
+     * @param ChannelDestroyRequest $request
+     * @param Channel $channel
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Exception
      */
     public function destroy(ChannelDestroyRequest $request, Channel $channel)
     {

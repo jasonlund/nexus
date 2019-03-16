@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Channel;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Bouncer;
 
-class UserSelfDestroyRequest extends FormRequest
+class ChannelDestroyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +14,7 @@ class UserSelfDestroyRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check();
+        return auth()->check() && Bouncer::can('delete-channels');
     }
 
     /**

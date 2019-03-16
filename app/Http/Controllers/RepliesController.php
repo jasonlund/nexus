@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ReplyCreateRequest;
-use App\Http\Requests\ReplyDestroyRequest;
-use App\Http\Requests\ReplyUpdateRequest;
+use App\Http\Requests\Reply\ReplyCreateRequest;
+use App\Http\Requests\Reply\ReplyDestroyRequest;
+use App\Http\Requests\Reply\ReplyUpdateRequest;
 use App\Models\Reply;
 use App\Models\Thread;
 use App\Models\Channel;
@@ -14,13 +14,12 @@ use App\Transformers\ReplyTransformer;
 class RepliesController extends Controller
 {
     /**
-     * RepliesController constructor.
+     * Display a paginated listing of a thread's replies in order.
+     *
+     * @param Channel $channel
+     * @param Thread $thread
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function __construct()
-    {
-        $this->middleware('auth')->except(['index']);
-    }
-
     public function index(Channel $channel, Thread $thread)
     {
         $data = $thread->replies();
@@ -29,22 +28,12 @@ class RepliesController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
+     * Store a newly created Reply in storage.
      *
      * @param  \App\Http\Requests\ReplyCreateRequest  $request
      * @param  \App\Models\Channel $channel
      * @param  \App\Models\Thread $thread
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(ReplyCreateRequest $request, Channel $channel, Thread $thread)
     {
@@ -55,28 +44,18 @@ class RepliesController extends Controller
 
         return response()->json(fractal()
             ->item($reply)
+            ->includeOwner()
             ->transformWith(new ReplyTransformer()));
     }
 
     /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Reply  $reply
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Reply $reply)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
+     * Update the specified Reply in storage.
      *
      * @param  \App\Http\Requests\ReplyUpdateRequest $request
      * @param  \App\Models\Channel $channel
      * @param  \App\Models\Reply  $reply
      * @param  \App\Models\Thread  $thread
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(ReplyUpdateRequest $request, Channel $channel, Thread $thread, Reply $reply)
     {
@@ -86,17 +65,18 @@ class RepliesController extends Controller
 
         return response()->json(fractal()
             ->item($reply)
+            ->includeOwner()
             ->transformWith(new ReplyTransformer()));
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified Reply from storage.
      *
      * @param \App\Http\Requests\ReplyDestroyRequest $request
      * @param  \App\Models\Channel $channel
      * @param  \App\Models\Reply  $reply
      * @param  \App\Models\Thread  $thread
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */
     public function destroy(ReplyDestroyRequest $request, Channel $channel, Thread $thread, Reply $reply)

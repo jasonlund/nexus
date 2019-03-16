@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Bouncer;
 
-class ReplyCreateRequest extends FormRequest
+class UserShowRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +14,7 @@ class ReplyCreateRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check();
+        return auth()->check() && Bouncer::can('view-all-users');
     }
 
     /**
@@ -24,7 +25,7 @@ class ReplyCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'body' => 'required'
+            //
         ];
     }
 }

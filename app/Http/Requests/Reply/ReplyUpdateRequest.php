@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Reply;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Bouncer;
 
-class ChannelDestroyRequest extends FormRequest
+class ReplyUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +14,10 @@ class ChannelDestroyRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check() && Bouncer::can('delete-channels');
+        return auth() &&
+            (request()->route('reply')->user_id == auth()->user()->id ||
+                Bouncer::can('moderate-channels') ||
+                Bouncer::can('moderate-channels', request()->route('channel')));
     }
 
     /**
@@ -25,7 +28,7 @@ class ChannelDestroyRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'body' => 'required'
         ];
     }
 }

@@ -10,7 +10,16 @@ class Thread extends Model
 {
     use Sluggable, SoftCascadeTrait;
 
+    /**
+     * The attributes that can be mass assigned.
+     *
+     * @var array
+     */
+    protected $fillable = ['title', 'body', 'user_id'];
+
     protected $softCascade = ['replies'];
+
+    protected $touches = ['channel'];
 
     /**
      * Return the sluggable configuration array for this model.
@@ -27,9 +36,11 @@ class Thread extends Model
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @return \Illuminate\Database\Eloquent\Builder
+     * Thread slugs are unique to which Channel it belongs to.
+     *
+     * @param Builder $query
+     * @param Model $model
+     * @return Builder
      */
     public function scopeWithUniqueSlugConstraints(Builder $query, Model $model)
     {
@@ -37,7 +48,7 @@ class Thread extends Model
     }
 
     /**
-     * Retrieve the model for a bound value.
+     * Scope Thread slug route binding to the Channel it belows to.
      *
      * @param  mixed  $value
      * @return \Illuminate\Database\Eloquent\Model|null
@@ -50,6 +61,8 @@ class Thread extends Model
     }
 
     /**
+     * Threads have many Replies.
+     *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function replies()
@@ -58,6 +71,8 @@ class Thread extends Model
     }
 
     /**
+     * Threads belong to one Owner.
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function owner()
@@ -66,6 +81,8 @@ class Thread extends Model
     }
 
     /**
+     * Threads belong to one Channel.
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function channel()
@@ -74,6 +91,8 @@ class Thread extends Model
     }
 
     /**
+     * Add a Reply to this Thread.
+     *
      * @param $attributes
      * @return \App\Models\Thread
      */

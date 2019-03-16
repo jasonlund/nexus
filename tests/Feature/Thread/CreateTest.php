@@ -45,7 +45,8 @@ class CreateTest extends TestCase
                 'owner' => [
                     'name' => $user->name,
                     'username' => $user->username,
-                    'email' => $user->email
+                    'email' => $user->email,
+                    'role' => 'user'
                 ]
             ]);
 
@@ -57,7 +58,8 @@ class CreateTest extends TestCase
                 'owner' => [
                     'name' => $user->name,
                     'username' => $user->username,
-                    'email' => $user->email
+                    'email' => $user->email,
+                    'role' => 'user'
                 ]
             ]);
     }

@@ -1,5 +1,13 @@
 <?php
 if (! function_exists('paginated_response')) {
+    /**
+     * Paginate a query, transform it with the defined Transformer and return it as a JSON response.
+     *
+     * @param $data
+     * @param $transformer
+     * @param array $includes
+     * @return \Illuminate\Http\JsonResponse
+     */
     function paginated_response($data, $transformer, $includes = []) {
         $limit = 25;
         if(request()->has('limit')) {

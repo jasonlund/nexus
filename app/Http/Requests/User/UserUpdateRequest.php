@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Bouncer;
+use App\Models\User;
 
-class ThreadDestroyRequest extends FormRequest
+class UserUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,10 +15,7 @@ class ThreadDestroyRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth() &&
-            (request()->route('thread')->user_id == auth()->user()->id ||
-                Bouncer::can('moderate-channels') ||
-                Bouncer::can('moderate-channels', request()->route('channel')));
+        return auth()->check() && Bouncer::can('update-users');
     }
 
     /**
@@ -27,6 +25,6 @@ class ThreadDestroyRequest extends FormRequest
      */
     public function rules()
     {
-        return [];
+        return User::validationRules();
     }
 }

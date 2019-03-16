@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\User;
+use Bouncer;
 
-class UserSelfUpdateRequest extends FormRequest
+class UserDestroyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +14,7 @@ class UserSelfUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check();
+        return auth()->check() && Bouncer::can('delete-users');
     }
 
     /**
@@ -24,6 +24,8 @@ class UserSelfUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return User::validationRules();
+        return [
+            //
+        ];
     }
 }

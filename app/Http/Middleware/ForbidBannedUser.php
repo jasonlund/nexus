@@ -8,6 +8,13 @@ use App\Models\User;
 
 class ForbidBannedUser
 {
+    /**
+     * Check if the authenticated user is banned and return a Forbidden response if true.
+     *
+     * @param $request
+     * @param Closure $next
+     * @return mixed
+     */
     public function handle($request, Closure $next)
     {
         $user = auth()->user();
@@ -30,10 +37,6 @@ class ForbidBannedUser
             if($ban->comment) {
                 $message .= ' Reason: ' . $ban->comment;
             }
-
-
-//            $message = 'Account ' . $ban->isPermanent() ? 'permanently banned' : ' temporarily banned until ' .
-//                $ban->expires_at->diffForHumans() . $ban->comment ? '. Reason: ' . $ban->comment . '.' : '.';
 
             abort(403, $message);
         }

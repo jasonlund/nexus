@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Channel;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Bouncer;
 
-class UserShowRequest extends FormRequest
+class ChannelUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +14,7 @@ class UserShowRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check() && Bouncer::can('view-all-users');
+        return auth()->check() && Bouncer::can('update-channels');
     }
 
     /**
@@ -25,7 +25,8 @@ class UserShowRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'name' => 'required|string',
+            'description' => 'required|string'
         ];
     }
 }

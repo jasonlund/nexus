@@ -11,12 +11,8 @@ class ReplyTransformer extends TransformerAbstract
         'owner'
     ];
 
-    protected $defaultIncludes = [
-        'owner'
-    ];
-
     /**
-     * A Fractal transformer.
+     * Transform Replies.
      *
      * @param \App\Models\Reply $reply
      * @return array
@@ -24,10 +20,10 @@ class ReplyTransformer extends TransformerAbstract
     public function transform(Reply $reply)
     {
         $data = [
-            'id' => $reply->id,
-            'body' => $reply->body,
-            'created_at' => (string)$reply->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => (string)$reply->updated_at->format('Y-m-d H:i:s')
+            'id' => (int) $reply->id,
+            'body' => (string) $reply->body,
+            'created_at' => (string) $reply->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => (string) $reply->updated_at->format('Y-m-d H:i:s')
         ];
 
         return $data;

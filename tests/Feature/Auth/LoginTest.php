@@ -47,17 +47,11 @@ class LoginTest extends TestCase
         $response = $this->json('post', $this->routeLogin(),
             ['email' => $this->user->email, 'password' => 'secret'])
             ->assertStatus(200)
-            ->assertJsonStructure([
-                'access_token'
-            ])
-            ->assertJson([
-                'token_type' => 'bearer',
-                'expires_in' => (int)config('jwt.ttl') * 60
-            ]);
+            ->assertHeader('authorization');
 
-        $response = $response->decodeResponseJson();
+        $token = $response->headers->get('authorization');
 
-        $this->json('get', $this->routeSelf(), [], ['Authorization' => 'Bearer ' . $response['access_token']])
+        $this->json('get', $this->routeSelf(), [], ['Authorization' => $token])
             ->assertStatus(200);
     }
 
@@ -84,19 +78,14 @@ class LoginTest extends TestCase
     /** @test */
     function a_user_can_manually_refresh_their_token()
     {
-        $response = $this->apiAs($this->user, 'post', $this->routeRefresh())
+        $this->withoutExceptionHandling();
+        $response = $this->apiAs($this->user, 'get', $this->routeRefresh())
             ->assertStatus(200)
-            ->assertJsonStructure([
-                'access_token'
-            ])
-            ->assertJson([
-                'token_type' => 'bearer',
-                'expires_in' => (int)config('jwt.ttl') * 60
-            ]);
+            ->assertHeader('authorization');
 
-        $response = $response->decodeResponseJson();
+        $token = $response->headers->get('authorization');
 
-        $this->json('get', $this->routeSelf(), [], ['Authorization' => 'Bearer ' . $response['access_token']])
+        $this->json('get', $this->routeSelf(), [], ['Authorization' => $token])
             ->assertStatus(200);
     }
 

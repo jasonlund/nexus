@@ -9,29 +9,38 @@ use Bouncer;
 class UserTransformer extends TransformerAbstract
 {
     /**
-     * A Fractal transformer.
+     * Transform Users.
      *
      * @param \App\Models\User $user
      * @return array
      */
     public function transform(User $user)
     {
+        $role = $user->roles()->first();
         $data = [
-            'username' => $user->username,
-            'name' => $user->name,
+            'username' => (string) $user->username,
+            'name' => (string) $user->name,
+            'role' => $role ? (string) $role->name : 'user'
         ];
 
+        /**
+         * If the User is the currently authenticated User or the currently authenticated User has the ability to
+         * view other users include the email.
+         */
         if((auth()->check() && auth()->user()->id === $user->id) || Bouncer::can('view-all-users')){
-            $data['email'] = $user->email;
+            $data['email'] = (string) $user->email;
         }
 
+        /**
+         * If the currently authenticated User has the ability to view other users include the User's ban status.
+         */
         if(Bouncer::can('view-all-users'))
         {
-            $data['banned'] = $user->isBanned();
-            $data['banned_at'] = $user->banned_at;
+            $data['banned'] = (bool) $user->isBanned();
+            $data['banned_at'] = (string) $user->banned_at;
             if($data['banned']){
-                $data['banned_until'] = $user->bans->first()->expired_at ? $user->bans->first()->expired_at->format('Y-m-d H:i:s') : null;
-                $data['ban_comment'] = $user->bans->first()->comment;
+                $data['banned_until'] = $user->bans->first()->expired_at ? (string) $user->bans->first()->expired_at->format('Y-m-d H:i:s') : null;
+                $data['ban_comment'] = $user->bans->first()->comment ? (string) $user->bans->first()->comment : null;
             }else{
                 $data['banned_until'] = null;
                 $data['ban_comment'] = null;

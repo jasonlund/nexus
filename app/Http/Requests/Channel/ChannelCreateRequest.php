@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Channel;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Bouncer;
 
-class ChannelUpdateRequest extends FormRequest
+class ChannelCreateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -14,7 +14,7 @@ class ChannelUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check() && Bouncer::can('update-channels');
+        return auth()->check() && Bouncer::can('create-channels');
     }
 
     /**
