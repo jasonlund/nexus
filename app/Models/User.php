@@ -120,8 +120,8 @@ class User extends Authenticatable implements BannableContract, JWTSubject
     {
         return $this->belongsToMany('App\Models\Channel',
             'channel_moderator',
-            'channel_id',
-            'user_id');
+            'user_id',
+            'channel_id');
     }
 
     /**

@@ -89,8 +89,8 @@ class Channel extends Model implements Sortable
     {
         return $this->belongsToMany('App\Models\User',
             'channel_moderator',
-            'user_id',
-            'channel_id');
+            'channel_id',
+            'user_id');
     }
 
     /**
