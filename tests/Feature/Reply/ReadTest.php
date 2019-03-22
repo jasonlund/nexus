@@ -4,6 +4,7 @@ namespace Tests\Feature\Reply;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Markdown;
 
 class ReadTest extends TestCase
 {
@@ -41,6 +42,24 @@ class ReadTest extends TestCase
                             'name' => $this->reply->owner->name,
                             'username' => $this->reply->owner->username,
                         ]
+                    ]
+                ]
+            ]);
+    }
+
+    /** @test */
+    function the_body_is_formatted_as_markdown()
+    {
+        $reply = create('Reply', [
+            'body' => $this->sampleMarkdown
+        ]);
+
+        $this->json('GET', $this->routeIndex([$reply->thread->channel->slug, $reply->thread->slug]))
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    [
+                        'body' => Markdown::convertToHtml($reply->body)
                     ]
                 ]
             ]);

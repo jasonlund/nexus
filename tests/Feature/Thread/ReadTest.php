@@ -4,6 +4,7 @@ namespace Tests\Feature\Thread;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Markdown;
 
 class ReadTest extends TestCase
 {
@@ -94,6 +95,20 @@ class ReadTest extends TestCase
                     'name' => $this->thread->owner->name,
                     'username' => $this->thread->owner->username,
                 ]
+            ]);
+    }
+
+    /** @test */
+    function the_threads_body_is_formatted_as_markdown()
+    {
+        $thread = create('Thread', [
+            'body' => $this->sampleMarkdown
+        ]);
+
+        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->slug]))
+            ->assertStatus(200)
+            ->assertJson([
+                'body' => Markdown::convertToHtml($thread->body)
             ]);
     }
 }

@@ -15,6 +15,7 @@
         "cybercog/laravel-ban": "^4.0",
         "doctrine/dbal": "^2.9",
         "fideloper/proxy": "^4.0",
+        "graham-campbell/markdown": "^10.3",
         "laravel/framework": "5.7.*",
         "laravel/tinker": "^1.0",
         "schuppo/password-strength": "~1.5",

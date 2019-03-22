@@ -4,10 +4,12 @@ namespace App\Transformers;
 
 use League\Fractal\TransformerAbstract;
 use App\Models\Thread;
-use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use Markdown;
 
 class ThreadTransformer extends TransformerAbstract
 {
+    protected $converter;
+
     protected $availableIncludes = [
         'owner', 'replies'
     ];
@@ -23,7 +25,7 @@ class ThreadTransformer extends TransformerAbstract
         $data = [
             'title' => (string) $thread->title,
             'slug' => (string) $thread->slug,
-            'body' => (string) $thread->body,
+            'body' => (string) Markdown::convertToHtml($thread->body),
             'reply_count' => (int) $thread->replies()->count(),
             'created_at' => (string) $thread->created_at->format('Y-m-d H:i:s'),
             'updated_at' => (string) $thread->updated_at->format('Y-m-d H:i:s')
