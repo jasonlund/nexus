@@ -85,6 +85,16 @@ class CreateTest extends TestCase
             ->assertJsonValidationErrors(['body']);
     }
 
+    /** @test */
+    function a_thread_body_must_not_be_empty()
+    {
+        $this->publish(['body' => ''])
+            ->assertJsonValidationErrors(['body']);
+
+        $this->publish(['body' => '<p><strong> </strong><em><s> </s> </em></p>'])
+            ->assertJsonValidationErrors(['body']);
+    }
+
     private function publish($overrides)
     {
         $user = create('User');

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Thread;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\RichTextRequired;
 
 class ThreadCreateRequest extends FormRequest
 {
@@ -25,7 +26,7 @@ class ThreadCreateRequest extends FormRequest
     {
         return [
             'title' => 'required',
-            'body' => 'required'
+            'body' => [new RichTextRequired]
         ];
     }
 }

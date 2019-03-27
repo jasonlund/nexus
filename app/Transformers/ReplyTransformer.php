@@ -4,7 +4,7 @@ namespace App\Transformers;
 
 use League\Fractal\TransformerAbstract;
 use App\Models\Reply;
-use Markdown;
+use Purify;
 
 class ReplyTransformer extends TransformerAbstract
 {
@@ -22,7 +22,7 @@ class ReplyTransformer extends TransformerAbstract
     {
         $data = [
             'id' => (int) $reply->id,
-            'body' => (string) Markdown::convertToHtml($reply->body),
+            'body' => (string) Purify::clean($reply->body),
             'created_at' => (string) $reply->created_at->format('Y-m-d H:i:s'),
             'updated_at' => (string) $reply->updated_at->format('Y-m-d H:i:s')
         ];

@@ -142,4 +142,20 @@ class UpdateTest extends TestCase
         $this->apiAs($user,'PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), ['body' => null])
             ->assertJsonValidationErrors(['body']);
     }
+
+    /** @test */
+    function a_reply_body_must_not_be_empty()
+    {
+        $user = create('User');
+        $reply = create('Reply', ['user_id' => $user->id]);
+
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), ['body' => ''])
+            ->assertJsonValidationErrors(['body']);
+
+        $user = create('User');
+        $reply = create('Reply', ['user_id' => $user->id]);
+
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), ['body' => '<p><strong> </strong><em><s> </s> </em></p>'])
+            ->assertJsonValidationErrors(['body']);
+    }
 }

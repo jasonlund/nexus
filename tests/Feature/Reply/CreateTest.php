@@ -69,12 +69,29 @@ class CreateTest extends TestCase
     }
 
     /** @test */
-    function a_reply_requires_a_title()
+    function a_reply_requires_a_body()
     {
         $user = create('User');
 
         $thread = create('Thread');
         $reply = raw('Reply', ['body' => null]);
+
+        $this->apiAS($user,'PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), $reply)
+            ->assertJsonValidationErrors(['body']);
+    }
+
+    /** @test */
+    function a_reply_body_must_not_be_empty()
+    {
+        $user = create('User');
+
+        $thread = create('Thread');
+        $reply = raw('Reply', ['body' => '']);
+
+        $this->apiAS($user,'PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), $reply)
+            ->assertJsonValidationErrors(['body']);
+
+        $reply = raw('Reply', ['body' => '<p><strong> </strong><em><s> </s> </em></p>']);
 
         $this->apiAS($user,'PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), $reply)
             ->assertJsonValidationErrors(['body']);

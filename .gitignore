@@ -6,6 +6,7 @@
 /public/js
 /public/images
 /storage/*.key
+/storage/purify
 /vendor
 .env
 .phpunit.result.cache

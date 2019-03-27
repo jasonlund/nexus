@@ -140,6 +140,16 @@ class UpdateTest extends TestCase
             ->assertJsonValidationErrors(['body']);
     }
 
+    /** @test */
+    function a_thread_body_must_not_be_empty()
+    {
+        $this->update(['body' => ''])
+            ->assertJsonValidationErrors(['body']);
+
+        $this->update(['body' => '<p><strong> </strong><em><s> </s> </em></p>'])
+            ->assertJsonValidationErrors(['body']);
+    }
+
     function update($attributes)
     {
         $user = create('User');

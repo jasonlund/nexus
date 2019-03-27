@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Reply;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\RichTextRequired;
 
 class ReplyCreateRequest extends FormRequest
 {
@@ -24,7 +25,7 @@ class ReplyCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'body' => 'required'
+            'body' => [new RichTextRequired]
         ];
     }
 }

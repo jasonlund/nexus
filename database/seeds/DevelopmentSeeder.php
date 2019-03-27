@@ -58,7 +58,7 @@ class DevelopmentSeeder extends Seeder
         $this->command->info('Creating Replies..');
         $replyCount = 0;
         foreach($threads as $thread) {
-            for($x = 0; $x < rand(5, 100); $x++) {
+            for($x = 0; $x < rand(25, 100); $x++) {
                 factory('App\Models\Reply')->create([
                     'thread_id' => $thread->id,
                     'user_id' => $allUsers->random()->id

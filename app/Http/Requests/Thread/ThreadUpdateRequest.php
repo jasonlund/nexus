@@ -4,6 +4,7 @@ namespace App\Http\Requests\Thread;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Bouncer;
+use App\Rules\RichTextRequired;
 
 class ThreadUpdateRequest extends FormRequest
 {
@@ -29,7 +30,7 @@ class ThreadUpdateRequest extends FormRequest
     {
         return [
             'title' => 'required',
-            'body' => 'required'
+            'body' => [new RichTextRequired]
         ];
     }
 }
