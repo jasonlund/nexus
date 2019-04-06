@@ -22,7 +22,20 @@ class UsersController extends Controller
      */
     public function index()
     {
-        return paginated_response(User::query(), 'UserTransformer');
+        $paginated = true;
+        $query = User::query();
+        if(request()->has('role')
+            && in_array(request('role'), ['admin', 'super-moderator', 'moderator'])){
+            $paginated = false;
+            $query->whereIs(request('role'))->orderBy('username');
+        }else{
+            $query = $query->orderBy('created_at');
+        }
+
+        return $paginated ? paginated_response($query, 'UserTransformer') :
+            response()->json(fractal()
+                ->collection($query->get())
+                ->transformWith(new UserTransformer()));
     }
 
     /**

@@ -41,8 +41,8 @@ class Kernel extends HttpKernel
         'api' => [
             'throttle:60,1',
             'bindings',
-            \App\Http\Middleware\ForbidBannedUser::class,
             \Barryvdh\Cors\HandleCors::class,
+            \App\Http\Middleware\ForbidBannedUser::class,
         ],
     ];
 

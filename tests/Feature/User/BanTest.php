@@ -150,4 +150,40 @@ class BanTest extends TestCase
         $this->apiAs($user,'PATCH', $this->routeBan($bannedUser->username), ['expired_at' => 'notadatettime'])
             ->assertJsonValidationErrors(['expired_at']);
     }
+
+    /** @test */
+    function an_admin_cannot_be_banned()
+    {
+        $user = create('User');
+        $bannedUser = create('User');
+        Bouncer::allow($user)->to('ban-users');
+        Bouncer::assign('admin')->to($bannedUser);
+
+        $this->apiAs($user,'PATCH', $this->routeBan($bannedUser->username))
+            ->assertStatus(403);
+    }
+
+    /** @test */
+    function a_super_moderator_cannot_be_banned()
+    {
+        $user = create('User');
+        $bannedUser = create('User');
+        Bouncer::allow($user)->to('ban-users');
+        Bouncer::assign('super-moderator')->to($bannedUser);
+
+        $this->apiAs($user,'PATCH', $this->routeBan($bannedUser->username))
+            ->assertStatus(403);
+    }
+
+    /** @test */
+    function a_moderator_cannot_be_banned()
+    {
+        $user = create('User');
+        $bannedUser = create('User');
+        Bouncer::allow($user)->to('ban-users');
+        Bouncer::assign('moderator')->to($bannedUser);
+
+        $this->apiAs($user,'PATCH', $this->routeBan($bannedUser->username))
+            ->assertStatus(403);
+    }
 }

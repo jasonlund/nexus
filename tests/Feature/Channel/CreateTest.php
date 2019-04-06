@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Channel;
 
+use App\Models\Channel;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Bouncer;
@@ -48,6 +49,34 @@ class CreateTest extends TestCase
                 'name' => 'FooBar',
                 'slug' => 'foobar',
                 'description' => $channel['description']
+            ]);
+    }
+
+    /** @test */
+    function moderators_can_be_assigned_to_channels()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->to('create-channels');
+        $mods = create('User', [], 3);
+
+        $channel = raw('Channel', []);
+
+        $this->apiAs($user, 'PUT', $this->routeStore(), array_merge($channel,
+            ['moderators' => $mods->pluck('username')->toArray()]
+        ))
+            ->assertStatus(200)
+            ->assertJson([
+                'name' => $channel['name'],
+                'description' => $channel['description'],
+                'moderators' => $mods->sortBy('username')->pluck('username')->toArray()
+            ]);
+
+        $this->json('GET', $this->routeIndex())
+            ->assertStatus(200)
+            ->assertJsonFragment([
+                'name' => $channel['name'],
+                'description' => $channel['description'],
+                'moderators' => $mods->sortBy('username')->pluck('username')->toArray()
             ]);
     }
 

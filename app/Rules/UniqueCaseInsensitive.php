@@ -30,7 +30,7 @@ class UniqueCaseInsensitive implements Rule
     public function passes($attribute, $value)
     {
         if(strtolower($value) === strtolower($this->ignore)) return true;
-        return $this->model::whereRaw('lower(' . $attribute . ') like (?)',["%{$value}%"])
+        return $this->model::whereRaw('lower(' . $attribute . ') like (?)',["{$value}"])
                 ->count() === 0;
     }
 

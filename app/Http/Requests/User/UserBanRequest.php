@@ -14,7 +14,8 @@ class UserBanRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check() && Bouncer::can('ban-users');
+        return (auth()->check() && Bouncer::can('ban-users')) &&
+            (Bouncer::is(request()->route('user'))->notA('admin', 'super-moderator', 'moderator'));
     }
 
     /**

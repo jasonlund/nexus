@@ -23,6 +23,9 @@ class UserTransformer extends TransformerAbstract
             'role' => $role ? (string) $role->name : 'user'
         ];
 
+        $data['moderatable_channels'] = $data['role'] !== 'moderator' ? [] :
+            $user->moderatedChannels()->pluck('slug');
+
         /**
          * If the User is the currently authenticated User or the currently authenticated User has the ability to
          * view other users include the email.

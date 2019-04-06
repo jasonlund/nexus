@@ -26,7 +26,8 @@ class ChannelUpdateRequest extends FormRequest
     {
         return [
             'name' => 'required|string',
-            'description' => 'required|string'
+            'description' => 'required|string',
+            'moderators' => 'array|exists:users,username'
         ];
     }
 }

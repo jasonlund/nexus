@@ -37,6 +37,16 @@ class Channel extends Model implements Sortable
     ];
 
     /**
+     * Fill gaps in sort order on delete.
+     */
+    protected static function boot() {
+        parent::boot();
+        static::deleted(function() {
+            self::setNewOrder(self::ordered()->pluck('id')->toArray());
+        });
+    }
+
+    /**
      * Return the sluggable configuration array for this model.
      *
      * @return array

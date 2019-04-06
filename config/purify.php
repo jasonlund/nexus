@@ -67,7 +67,7 @@ return [
         |
         */
 
-        'HTML.Allowed' => 'h3,strong,em,s,u,a[href],ul,ol,li,p,',
+        'HTML.Allowed' => 'h3,strong,em,s,u,a[href],ul,ol,li,p,blockquote',
 
         /*
         |--------------------------------------------------------------------------

@@ -55,6 +55,35 @@ class UpdateTest extends TestCase
     }
 
     /** @test */
+    function moderators_can_be_assigned_to_channels()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->to('update-channels');
+
+        $channel = create('Channel');
+        $oldMods = create('User', [], 3);
+        $channel->moderators()->sync($oldMods);
+        $newMods = create('User', [], 3);
+
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$channel->slug]), array_merge([
+            'moderators' => $newMods->pluck('username')->toArray()
+        ], $channel->only(['name', 'description'])))
+            ->assertStatus(200)
+            ->assertJson([
+                'moderators' => $newMods->sortBy('username')->pluck('username')->toArray()
+            ])
+            ->assertJsonMissing([
+                'moderators' => $oldMods->sortBy('username')->pluck('username')->toArray()
+            ]);
+
+        $this->json('GET', $this->routeShow([$channel->slug]))
+            ->assertStatus(200)
+            ->assertJson([
+                'moderators' => $newMods->sortBy('username')->pluck('username')->toArray()
+            ]);
+    }
+
+    /** @test */
     function a_guest_and_an_unauthorized_user_can_not_delete_a_channel()
     {
         $channel = create('Channel');

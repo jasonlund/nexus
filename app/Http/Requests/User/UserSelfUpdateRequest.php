@@ -24,6 +24,9 @@ class UserSelfUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return User::validationRules();
+        $rules = User::validationRules();
+        array_unshift($rules['password'], 'nullable');
+
+        return $rules;
     }
 }

@@ -83,11 +83,23 @@ class UpdateTest extends TestCase
     /** @test */
     function an_authorized_user_can_optionally_update_the_password_of_users()
     {
+        $this->withoutExceptionHandling();
         $user = create('User');
         Bouncer::allow($user)->to('update-users');
         $password = 'FooBar123';
 
         $otherUser = create('User');
+
+        $data = array_merge($otherUser->only(['name', 'username', 'email']),
+            [
+                'password' => null
+            ]
+        );
+
+        $this->apiAs($user,'PATCH', $this->routeUpdate($otherUser->username), $data)
+            ->assertStatus(200);
+
+        $this->assertTrue(Hash::check('secret', $otherUser->fresh()->password));
 
         $data = array_merge($otherUser->only(['name', 'username', 'email']),
             [

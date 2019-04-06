@@ -9,6 +9,8 @@ use App\Http\Requests\Channel\ChannelUpdateRequest;
 use App\Models\Channel;
 use Illuminate\Http\Request;
 use App\Transformers\ChannelTransformer;
+use App\Models\User;
+use DB;
 
 class ChannelsController extends Controller
 {
@@ -39,6 +41,11 @@ class ChannelsController extends Controller
             'description' => request('description')
         ]);
 
+        if(request()->has('moderators')){
+            $moderators = User::whereIn('username', request('moderators'))->get();
+            $channel->moderators()->sync($moderators);
+        }
+
         return response()->json(fractal()
             ->item($channel)
             ->transformWith(new ChannelTransformer()));
@@ -52,8 +59,16 @@ class ChannelsController extends Controller
      */
     public function reorder(ChannelReorderRequest $request)
     {
-        $channels = Channel::whereIn('slug', request('order'))
-            ->get();
+        // TODO -- find a better way to do this. this is required bc testing using sqlite.
+        if(app()->environment() !== 'testing') {
+            $order = implode("','", request('order'));
+            $channels = Channel::whereIn('slug', request('order'))
+                ->orderByRaw(DB::raw("FIELD(slug, '$order')"))
+                ->get();
+        }else{
+            $channels = Channel::whereIn('slug', request('order'))->get();
+        }
+
 
         Channel::setNewOrder($channels->pluck('id')->toArray());
 
@@ -90,6 +105,13 @@ class ChannelsController extends Controller
             'name' => request('name'),
             'description' => request('description')
         ]);
+
+        if(request()->has('moderators')){
+            $moderators = User::whereIn('username', request('moderators'))->get();
+            $channel->moderators()->sync($moderators);
+        }else{
+            $channel->moderators()->sync([]);
+        }
 
         return response()->json(fractal()
             ->item($channel)

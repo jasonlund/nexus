@@ -59,6 +59,7 @@ class CreateTest extends TestCase
                     'name' => $user->name,
                     'username' => $user->username,
                     'email' => $user->email,
+                    'moderatable_channels' => [],
                     'role' => 'user'
                 ]
             ]);

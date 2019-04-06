@@ -25,6 +25,7 @@ class ChannelTransformer extends TransformerAbstract
             'name' => (string) $channel->name,
             'slug' => (string) $channel->slug,
             'description' => (string) $channel->description,
+            'moderators' => (array) $channel->moderators->sortBy('username')->pluck('username')->toArray(),
             'created_at' => (string) $channel->created_at->format('Y-m-d H:i:s'),
             'updated_at' => (string) $channel->updated_at->format('Y-m-d H:i:s'),
             'thread_count' => (int) $channel->threads()->count(),

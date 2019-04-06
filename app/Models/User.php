@@ -177,8 +177,12 @@ class User extends Authenticatable implements BannableContract, JWTSubject
      */
     public function update(array $attributes = [], array $options = [])
     {
-        if(isset($attributes['password'])){
-            $attributes['password'] = Hash::make($attributes['password']);
+        if(array_key_exists('password', $attributes)){
+            if($attributes['password']){
+                $attributes['password'] = Hash::make($attributes['password']);
+            }else{
+                unset($attributes['password']);
+            }
         }
 
         return parent::update($attributes, $options);
