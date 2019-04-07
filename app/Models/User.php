@@ -15,6 +15,7 @@ use Cog\Contracts\Ban\Bannable as BannableContract;
 use Cog\Laravel\Ban\Traits\Bannable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Hash;
+use App\Notifications\ResetPassword as ResetPasswordNotification;
 
 class User extends Authenticatable implements BannableContract, JWTSubject
 {
@@ -68,6 +69,11 @@ class User extends Authenticatable implements BannableContract, JWTSubject
      */
     public function getJWTCustomClaims() {
         return [];
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPasswordNotification($token));
     }
 
     /**

@@ -6,7 +6,7 @@ Route::group(['middleware' => ['guest']], function() {
     Route::post('auth/register', ['as' => 'auth.register', 'uses' => 'Auth\RegisterController@register']);
 
     Route::post('password/email', ['as' => 'password.email', 'uses' => 'Auth\ForgotPasswordController@sendResetLinkEmail']);
-    Route::post('password/reset', ['as' => 'password.update', 'uses' => 'Auth\ResetPasswordController@reset']);
+    Route::post('password/reset', ['as' => 'password.reset', 'uses' => 'Auth\ResetPasswordController@reset']);
 });
 
 Route::group(['middleware' => ['auth']], function() {

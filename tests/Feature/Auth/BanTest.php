@@ -45,7 +45,7 @@ class BanTest extends TestCase
 
     protected function routeResetPassword($params = [])
     {
-        return route('password.update', $params);
+        return route('password.reset', $params);
     }
 
     public function generateValidToken($user)

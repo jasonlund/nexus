@@ -4,7 +4,7 @@ namespace Tests\Feature\Auth;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Illuminate\Auth\Notifications\ResetPassword;
+use App\Notifications\ResetPassword;
 use Notification;
 use DB;
 use Hash;
@@ -39,7 +39,8 @@ class ForgotPasswordTest extends TestCase
         $this->assertNotNull($token);
 
         Notification::assertSentTo($user, ResetPassword::class, function ($notification, $channels) use ($token) {
-            return Hash::check($notification->token, $token->token) === true;
+            return Hash::check($notification->token, $token->token) === true &&
+                $notification->action = config('app.front_end_url') . '/password/reset/' . $notification->token;
         });
     }
 

@@ -19,7 +19,7 @@ class ForbidBannedUser
     {
         $user = auth()->user();
 
-        if(!$user && request()->routeIs('auth.login', 'password.email', 'password.update')) {
+        if(!$user && request()->routeIs('auth.login', 'password.email', 'password.reset')) {
             $user = User::where('email', request('email'))->first();
         }
 
