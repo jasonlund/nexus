@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests\Thread;
 
+use App\Services\ThreadsService;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Rules\RichTextRequired;
 
 class ThreadCreateRequest extends FormRequest
 {
@@ -24,9 +24,6 @@ class ThreadCreateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'title' => 'required',
-            'body' => [new RichTextRequired]
-        ];
+        return ThreadsService::validationRules('create');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Channel;
 
+use App\Services\ChannelsService;
 use Illuminate\Foundation\Http\FormRequest;
 use Bouncer;
 
@@ -24,10 +25,6 @@ class ChannelUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'name' => 'required|string',
-            'description' => 'required|string',
-            'moderators' => 'array|exists:users,username'
-        ];
+        return ChannelsService::validationRules('update');
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Channel;
 
+use App\Services\ThreadsService;
+use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 
@@ -11,6 +13,7 @@ class ReadTest extends TestCase
 
     protected $channel;
     protected $threads;
+    protected $replies;
 
     public function setUp()
     {
@@ -32,6 +35,16 @@ class ReadTest extends TestCase
     protected function routeShow($params = [])
     {
         return route('channels.show', $params);
+    }
+
+    protected function routeRead($params = [])
+    {
+        return route('channels.read', $params);
+    }
+
+    protected function routeShowThread($params = [])
+    {
+        return route('threads.show', $params);
     }
 
     /** @test */
@@ -62,6 +75,61 @@ class ReadTest extends TestCase
                 'updated_at' => $this->channel->fresh()->updated_at->format('Y-m-d H:i:s'),
                 'thread_count' => 2,
                 'reply_count' => 4
+            ]);
+    }
+
+    /** @test */
+    function a_channels_threads_are_marked_as_viewed_per_user()
+    {
+        $user = create('User');
+
+        Carbon::setTestNow(Carbon::now()->addMinutes(1));
+        $this->apiAs($user, 'GET', $this->routeIndex())
+            ->assertJson([
+                [
+                    'new' => true
+                ]
+            ]);
+
+        Carbon::setTestNow(Carbon::now()->addMinutes(1));
+        $this->apiAs($user, 'GET', $this->routeShowThread([$this->channel->slug, $this->threads[1]->slug]));
+        $this->apiAs($user, 'GET', $this->routeIndex())
+            ->assertJson([
+                [
+                    'new' => true
+                ]
+            ]);
+
+        Carbon::setTestNow(Carbon::now()->addMinutes(1));
+        $this->apiAs($user, 'GET', $this->routeShowThread([$this->channel->slug, $this->threads[0]->slug]));
+        $this->apiAs($user, 'GET', $this->routeIndex())
+            ->assertJson([
+                [
+                    'new' => false
+                ]
+            ]);
+    }
+
+    /** @test */
+    function an_authorized_user_can_mark_all_threads_in_a_channel_read()
+    {
+        $user = create('User');
+
+        Carbon::setTestNow(Carbon::now()->addMinutes(1));
+        $this->apiAs($user, 'GET', $this->routeIndex())
+            ->assertJson([
+                [
+                    'new' => true
+                ]
+            ]);
+
+        $this->apiAs($user, 'GET', $this->routeRead($this->channel->slug));
+        Carbon::setTestNow(Carbon::now()->addMinutes(1));
+        $this->apiAs($user, 'GET', $this->routeIndex())
+            ->assertJson([
+                [
+                    'new' => false
+                ]
             ]);
     }
 }

@@ -17,11 +17,13 @@
         "fideloper/proxy": "^4.0",
         "laravel/framework": "5.7.*",
         "laravel/tinker": "^1.0",
+        "predis/predis": "^1.1",
         "schuppo/password-strength": "~1.5",
         "silber/bouncer": "v1.0.0-rc.5",
         "spatie/eloquent-sortable": "^3.4.4",
         "spatie/laravel-fractal": "^5.4",
         "staudenmeir/belongs-to-through": "^2.4",
+        "staudenmeir/eloquent-has-many-deep": "^1.7",
         "stevebauman/purify": "^2.0",
         "tymon/jwt-auth": "1.0.0-rc.3"
     },

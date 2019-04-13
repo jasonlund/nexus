@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Thread;
 
+use App\Services\ThreadsService;
+use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Purify;
@@ -31,6 +33,11 @@ class ReadTest extends TestCase
     protected function routeShow($params = [])
     {
         return route('threads.show', $params);
+    }
+
+    protected function routeStoreReply($params = [])
+    {
+        return route('replies.store', $params);
     }
 
     /** @test */
@@ -109,6 +116,36 @@ class ReadTest extends TestCase
             ->assertStatus(200)
             ->assertJson([
                 'body' => Purify::clean($thread->body)
+            ]);
+    }
+
+    /** @test */
+    function a_thread_is_marked_as_viewed_per_user()
+    {
+        $this->withoutExceptionHandling();
+        $user = create('User');
+        Carbon::setTestNow(Carbon::now()->addMinutes(20));
+
+        $this->apiAs($user, 'GET', $this->routeIndex([$this->thread->channel->slug]))
+            ->assertJson([
+                'data' => [
+                    [
+                        'new' => [
+                            'id' => $this->replies->first()->id
+                        ]
+                    ]
+                ]
+            ]);
+
+        $this->apiAs($user, 'GET', $this->routeShow([$this->thread->channel->slug, $this->thread->slug]));
+
+        $this->apiAs($user, 'GET', $this->routeIndex([$this->thread->channel->slug]))
+            ->assertJson([
+                'data' => [
+                    [
+                        'new' => false
+                    ]
+                ]
             ]);
     }
 }

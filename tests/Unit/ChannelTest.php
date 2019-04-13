@@ -7,6 +7,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use App\Models\Channel;
 use App\Models\Thread;
 use Bouncer;
+use App\Services\ThreadsService;
 
 class ChannelTest extends TestCase
 {
@@ -71,17 +72,5 @@ class ChannelTest extends TestCase
         $this->channel->delete();
 
         $this->assertCount(0, Thread::where('channel_id', $id)->get());
-    }
-
-    /** @test */
-    function it_can_add_a_thread()
-    {
-        $this->channel->addThread([
-            'title' => 'FooBaz',
-            'body' => 'Foobar',
-            'user_id' => 1
-        ]);
-
-        $this->assertCount(1, $this->channel->threads);
     }
 }

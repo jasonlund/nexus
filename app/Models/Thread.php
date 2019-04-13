@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Builder;
 use Askedio\SoftCascade\Traits\SoftCascadeTrait;
@@ -48,7 +49,7 @@ class Thread extends Model
     }
 
     /**
-     * Scope Thread slug route binding to the Channel it belows to.
+     * Scope Thread slug route binding to the Channel it belongs to.
      *
      * @param  mixed  $value
      * @return \Illuminate\Database\Eloquent\Model|null
@@ -90,14 +91,15 @@ class Thread extends Model
         return $this->belongsTo('App\Models\Channel');
     }
 
-    /**
-     * Add a Reply to this Thread.
-     *
-     * @param $attributes
-     * @return \App\Models\Thread
-     */
-    public function addReply($attributes)
+    public function views()
     {
-        return $this->replies()->create($attributes);
+        return $this->hasMany('App\Models\ViewedThread');
+    }
+
+    public function viewedBy()
+    {
+        return $this->belongsToMany('App\Models\User', 'viewed_threads', 'thread_id', 'user_id')
+            ->using('App\Models\ViewedThread')
+            ->withPivot('timestamp');
     }
 }

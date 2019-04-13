@@ -8,6 +8,7 @@ use App\Http\Requests\User\UserSelfUpdateRequest;
 use App\Http\Requests\User\UserShowRequest;
 use App\Http\Requests\User\UserUnbanRequest;
 use App\Http\Requests\User\UserUpdateRequest;
+use App\Services\UsersService;
 use Illuminate\Http\Request;
 use App\Transformers\UserTransformer;
 use App\Models\User;
@@ -15,6 +16,13 @@ use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 
 class UsersController extends Controller
 {
+    protected $service;
+
+    public function __construct(UsersService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Display a listing of the Users.
      *
@@ -22,6 +30,7 @@ class UsersController extends Controller
      */
     public function index()
     {
+        // TODO -- clean this up. a new controller method for listing by role?
         $paginated = true;
         $query = User::query();
         if(request()->has('role')
@@ -33,9 +42,7 @@ class UsersController extends Controller
         }
 
         return $paginated ? paginated_response($query, 'UserTransformer') :
-            response()->json(fractal()
-                ->collection($query->get())
-                ->transformWith(new UserTransformer()));
+            collection_response($query->get(), 'UserTransformer');
     }
 
     /**
@@ -47,9 +54,7 @@ class UsersController extends Controller
      */
     public function show(UserShowRequest $request, User $user)
     {
-        return response()->json(fractal()
-            ->item($user)
-            ->transformWith(new UserTransformer()));
+        return item_response($user, 'UserTransformer');
     }
 
     /**
@@ -61,11 +66,10 @@ class UsersController extends Controller
      */
     public function update(UserUpdateRequest $request, User $user)
     {
-        $user->update(request()->all());
+        $this->service->update($user, request()->all());
+        $this->service->assignRole($user, request('role'));
 
-        return response()->json(fractal()
-            ->item($user)
-            ->transformWith(new UserTransformer()));
+        return item_response($user, 'UserTransformer');
     }
 
     /**
@@ -78,12 +82,7 @@ class UsersController extends Controller
      */
     public function destroy(UserDestroyRequest $request, User $user)
     {
-        $authedUser = auth()->user();
-        auth()->setUser($user);
-        auth()->logout();
-        auth()->setUser($authedUser);
-
-        $user->delete();
+        $this->service->delete($user, auth()->user());
 
         return response()->json([]);
     }
@@ -97,11 +96,9 @@ class UsersController extends Controller
      */
     public function ban(UserBanRequest $request, User $user)
     {
-        $user->ban(request()->all());
+        $this->service->ban($user, request()->all());
 
-        return response()->json(fractal()
-            ->item($user->fresh())
-            ->transformWith(new UserTransformer()));
+        return item_response($user->fresh(), 'UserTransformer');
     }
 
     /**
@@ -113,11 +110,9 @@ class UsersController extends Controller
      */
     public function unban(UserUnbanRequest $request, User $user)
     {
-        $user->unban();
+        $this->service->unban($user);
 
-        return response()->json(fractal()
-            ->item($user->fresh())
-            ->transformWith(new UserTransformer()));
+        return item_response($user->fresh(), 'UserTransformer');
     }
 
     /**
@@ -127,9 +122,7 @@ class UsersController extends Controller
      */
     public function showSelf()
     {
-        return response()->json(fractal()
-            ->item(auth()->user())
-            ->transformWith(new UserTransformer()));
+        return item_response(auth()->user(), 'UserTransformer');
     }
 
     /**
@@ -140,11 +133,9 @@ class UsersController extends Controller
      */
     public function updateSelf(UserSelfUpdateRequest $request)
     {
-        auth()->user()->update(request()->all());
+        $this->service->update(auth()->user(), request()->all());
 
-        return response()->json(fractal()
-            ->item(auth()->user())
-            ->transformWith(new UserTransformer()));
+        return item_response(auth()->user(), 'UserTransformer');
     }
 
     /**
@@ -154,9 +145,7 @@ class UsersController extends Controller
      */
     public function destroySelf()
     {
-        $user = auth()->user();
-        auth()->logout($user);
-        $user->delete();
+        $this->service->delete(auth()->user());
 
         return response()->json([]);
     }

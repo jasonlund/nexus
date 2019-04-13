@@ -2,6 +2,7 @@
 
 namespace App\Transformers;
 
+use App\Services\ChannelsService;
 use League\Fractal\TransformerAbstract;
 use App\Models\Channel;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
@@ -20,11 +21,14 @@ class ChannelTransformer extends TransformerAbstract
      */
     public function transform(Channel $channel)
     {
+        $service = new ChannelsService();
+
         $data = [
             'order' => (int) $channel->order,
             'name' => (string) $channel->name,
             'slug' => (string) $channel->slug,
             'description' => (string) $channel->description,
+            'new' => $service->hasNewReplies($channel),
             'moderators' => (array) $channel->moderators->sortBy('username')->pluck('username')->toArray(),
             'created_at' => (string) $channel->created_at->format('Y-m-d H:i:s'),
             'updated_at' => (string) $channel->updated_at->format('Y-m-d H:i:s'),

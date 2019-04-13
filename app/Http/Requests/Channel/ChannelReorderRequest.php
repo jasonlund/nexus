@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Channel;
 
+use App\Services\ChannelsService;
 use Illuminate\Foundation\Http\FormRequest;
 use Bouncer;
 
@@ -24,8 +25,6 @@ class ChannelReorderRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'order' => 'required|array|exists:channels,slug'
-        ];
+        return ChannelsService::validationRules('reorder');
     }
 }

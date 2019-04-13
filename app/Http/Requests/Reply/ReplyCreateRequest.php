@@ -3,7 +3,7 @@
 namespace App\Http\Requests\Reply;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Rules\RichTextRequired;
+use App\Services\RepliesService;
 
 class ReplyCreateRequest extends FormRequest
 {
@@ -24,8 +24,6 @@ class ReplyCreateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'body' => [new RichTextRequired]
-        ];
+        return RepliesService::validationRules('create');
     }
 }

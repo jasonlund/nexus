@@ -7,10 +7,11 @@ use Askedio\SoftCascade\Traits\SoftCascadeTrait;
 use Bouncer;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
+use Staudenmeir\EloquentHasManyDeep\HasRelationships;
 
 class Channel extends Model implements Sortable
 {
-    use Sluggable, SoftCascadeTrait, SortableTrait;
+    use Sluggable, SoftCascadeTrait, SortableTrait, HasRelationships;
 
     /**
      * The attributes that can be mass assigned.
@@ -103,14 +104,10 @@ class Channel extends Model implements Sortable
             'user_id');
     }
 
-    /**
-     * Add a Thread to this Channel.
-     *
-     * @param $attributes
-     * @return \App\Models\Thread
-     */
-    public function addThread($attributes)
+    public function viewedBy()
     {
-        return $this->threads()->create($attributes);
+        return $this->hasManyDeep(
+            'App\Models\User', ['App\Models\Thread', 'App\Models\ViewedThread'])
+            ->withIntermediate('App\Models\ViewedThread');
     }
 }

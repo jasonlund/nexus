@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\User;
 
+use App\Services\UsersService;
 use Illuminate\Foundation\Http\FormRequest;
 use Bouncer;
 
@@ -25,9 +26,6 @@ class UserBanRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'comment' => 'nullable|string',
-            'expired_at' => 'nullable|date'
-        ];
+        return UsersService::validationRules('ban');
     }
 }

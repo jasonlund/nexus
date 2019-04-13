@@ -22,15 +22,16 @@ Route::group(['middleware' => ['auth', 'refresh']], function() {
     Route::put('channels', ['as' => 'channels.store', 'uses' => 'ChannelsController@store']);
     Route::post('channels/reorder', ['as' => 'channels.reorder', 'uses' => 'ChannelsController@reorder']);
     Route::patch('channels/{channel}', ['as' => 'channels.update', 'uses' => 'ChannelsController@update']);
+    Route::get('channels/{channel}/read', ['as' => 'channels.read', 'uses' => 'ChannelsController@markRead']);
     Route::delete('channels/{channel}', ['as' => 'channels.destroy', 'uses' => 'ChannelsController@destroy']);
 
     Route::put('channels/{channel}', ['as' => 'threads.store', 'uses' => 'ThreadsController@store']);
-    Route::patch('channels/{channel}/{thread}', ['as' => 'threads.update', 'uses' => 'ThreadsController@update']);
-    Route::delete('channels/{channel}/{thread}', ['as' => 'threads.destroy', 'uses' => 'ThreadsController@destroy']);
+    Route::patch('channels/{channel}/threads/{thread}', ['as' => 'threads.update', 'uses' => 'ThreadsController@update']);
+    Route::delete('channels/{channel}/threads/{thread}', ['as' => 'threads.destroy', 'uses' => 'ThreadsController@destroy']);
 
-    Route::put('channels/{channel}/{thread}/replies', ['as' => 'replies.store', 'uses' => 'RepliesController@store']);
-    Route::patch('channels/{channel}/{thread}/replies/{reply}', ['as' => 'replies.update', 'uses' => 'RepliesController@update']);
-    Route::delete('channels/{channel}/{thread}/replies/{reply}', ['as' => 'replies.destroy', 'uses' => 'RepliesController@destroy']);
+    Route::put('channels/{channel}/threads/{thread}/replies', ['as' => 'replies.store', 'uses' => 'RepliesController@store']);
+    Route::patch('channels/{channel}/threads/{thread}/replies/{reply}', ['as' => 'replies.update', 'uses' => 'RepliesController@update']);
+    Route::delete('channels/{channel}/threads/{thread}/replies/{reply}', ['as' => 'replies.destroy', 'uses' => 'RepliesController@destroy']);
 
     Route::get('users', ['as' => 'users.index', 'uses' => 'UsersController@index']);
     Route::get('users/{user}', ['as' => 'users.show', 'uses' => 'UsersController@show']);
@@ -44,6 +45,6 @@ Route::get('channels', ['as' => 'channels.index', 'uses' => 'ChannelsController@
 Route::get('channels/{channel}', ['as' => 'channels.show', 'uses' => 'ChannelsController@show']);
 
 Route::get('channels/{channel}/threads', ['as' => 'threads.index', 'uses' => 'ThreadsController@index']);
-Route::get('channels/{channel}/{thread}', ['as' => 'threads.show', 'uses' => 'ThreadsController@show']);
+Route::get('channels/{channel}/threads/{thread}', ['as' => 'threads.show', 'uses' => 'ThreadsController@show']);
 
-Route::get('channels/{channel}/{thread}/replies', ['as' => 'replies.index', 'uses' => 'RepliesController@index']);
+Route::get('channels/{channel}/threads/{thread}/replies', ['as' => 'replies.index', 'uses' => 'RepliesController@index']);

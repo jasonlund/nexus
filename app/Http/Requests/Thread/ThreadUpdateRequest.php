@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Thread;
 
+use App\Services\ThreadsService;
 use Illuminate\Foundation\Http\FormRequest;
 use Bouncer;
 use App\Rules\RichTextRequired;
@@ -28,9 +29,6 @@ class ThreadUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'title' => 'required',
-            'body' => [new RichTextRequired]
-        ];
+        return ThreadsService::validationRules('update');
     }
 }

@@ -74,7 +74,8 @@ class UpdateTest extends TestCase
         $this->apiAs($user,'PATCH', $this->routeUpdate($otherUser->username), [
             'name' => 'John Doe',
             'username' => 'johndoe',
-            'email' => 'john@email.com'
+            'email' => 'john@email.com',
+            'role' => 'user'
         ])->assertStatus(200)
             ->assertJsonMissing($oldData)
             ->assertJson($otherUser->fresh()->only(['name', 'username']));
@@ -83,7 +84,6 @@ class UpdateTest extends TestCase
     /** @test */
     function an_authorized_user_can_optionally_update_the_password_of_users()
     {
-        $this->withoutExceptionHandling();
         $user = create('User');
         Bouncer::allow($user)->to('update-users');
         $password = 'FooBar123';
@@ -92,7 +92,8 @@ class UpdateTest extends TestCase
 
         $data = array_merge($otherUser->only(['name', 'username', 'email']),
             [
-                'password' => null
+                'password' => null,
+                'role' => 'user'
             ]
         );
 
@@ -104,7 +105,8 @@ class UpdateTest extends TestCase
         $data = array_merge($otherUser->only(['name', 'username', 'email']),
             [
                 'password' => $password,
-                'password_confirmation' => $password
+                'password_confirmation' => $password,
+                'role' => 'user'
             ]
         );
 
@@ -260,6 +262,8 @@ class UpdateTest extends TestCase
 
         $this->update(['password' => $strongPassword, 'password_confirmation' => $strongPassword], $otherUser)
             ->assertStatus(200);
+
+//        dd($response->decodeResponseJson());
     }
 
     /** @test */
@@ -297,6 +301,7 @@ class UpdateTest extends TestCase
         Bouncer::allow($user)->to('update-users');
 
         $data = array_merge($user->only(['name', 'username', 'email']), $data);
+        $data['role'] = 'user';
 
         return $this->apiAs($user,'PATCH', $this->routeUpdate($user), $data);
     }

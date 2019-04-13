@@ -65,17 +65,6 @@ class ThreadTest extends TestCase
     }
 
     /** @test */
-    function it_can_add_a_reply()
-    {
-        $this->thread->addReply([
-            'body' => 'Foobar',
-            'user_id' => 1
-        ]);
-
-        $this->assertCount(1, $this->thread->replies);
-    }
-
-    /** @test */
     function its_slug_is_unique_to_its_channel()
     {
         $threads = create('Thread', ['title' => 'FooBar'], 2)->toArray();

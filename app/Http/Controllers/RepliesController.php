@@ -8,11 +8,19 @@ use App\Http\Requests\Reply\ReplyUpdateRequest;
 use App\Models\Reply;
 use App\Models\Thread;
 use App\Models\Channel;
+use App\Services\RepliesService;
 use Illuminate\Http\Request;
 use App\Transformers\ReplyTransformer;
 
 class RepliesController extends Controller
 {
+    protected $service;
+
+    public function __construct(RepliesService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Display a paginated listing of a thread's replies in order.
      *
@@ -22,9 +30,7 @@ class RepliesController extends Controller
      */
     public function index(Channel $channel, Thread $thread)
     {
-        $data = $thread->replies();
-
-        return paginated_response($data, 'ReplyTransformer', ['owner']);
+        return paginated_response($thread->replies(), 'ReplyTransformer', ['owner']);
     }
 
     /**
@@ -37,15 +43,9 @@ class RepliesController extends Controller
      */
     public function store(ReplyCreateRequest $request, Channel $channel, Thread $thread)
     {
-        $reply = $thread->addReply([
-            'body' => request('body'),
-            'user_id' => auth()->user()->id
-        ]);
+        $reply = $this->service->create($thread, request()->all());
 
-        return response()->json(fractal()
-            ->item($reply)
-            ->includeOwner()
-            ->transformWith(new ReplyTransformer()));
+        return item_response($reply, 'ReplyTransformer', ['owner']);
     }
 
     /**
@@ -59,14 +59,9 @@ class RepliesController extends Controller
      */
     public function update(ReplyUpdateRequest $request, Channel $channel, Thread $thread, Reply $reply)
     {
-        $reply->update([
-            'body' => request('body')
-        ]);
+        $this->service->update($reply, request()->all());
 
-        return response()->json(fractal()
-            ->item($reply)
-            ->includeOwner()
-            ->transformWith(new ReplyTransformer()));
+        return item_response($reply, 'ReplyTransformer', ['owner']);
     }
 
     /**

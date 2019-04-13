@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Channel;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Services\ChannelsService;
 use Bouncer;
 
 class ChannelCreateRequest extends FormRequest
@@ -24,10 +25,6 @@ class ChannelCreateRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'name' => 'required|string',
-            'description' => 'required|string',
-            'moderators' => 'array|exists:users,username'
-        ];
+        return ChannelsService::validationRules('create');
     }
 }

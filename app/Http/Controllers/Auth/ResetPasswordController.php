@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\UsersService;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Http\Request;
@@ -31,11 +32,7 @@ class ResetPasswordController extends Controller
      */
     protected function rules()
     {
-        return [
-            'token' => 'required',
-            'email' => 'required|email',
-            'password' => array_merge(User::validationRules('password'), ['required']),
-        ];
+        return UsersService::validationRules('password.reset');
     }
 
     /**

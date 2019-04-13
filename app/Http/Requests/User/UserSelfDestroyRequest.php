@@ -23,8 +23,6 @@ class UserSelfDestroyRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            //
-        ];
+        return [];
     }
 }

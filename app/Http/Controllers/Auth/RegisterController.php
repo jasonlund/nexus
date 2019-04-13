@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Models\User;
 use App\Http\Controllers\Controller;
+use App\Services\UsersService;
 use App\Transformers\UserTransformer;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
@@ -38,12 +39,7 @@ class RegisterController extends Controller
      */
     protected function validator(array $data)
     {
-        return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'min:3', 'max:16', 'unique:users', 'alpha_dash'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => array_merge(User::validationRules('password'), ['required']),
-        ]);
+        return Validator::make($data, UsersService::validationRules('register'));
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\User;
 
+use App\Services\UsersService;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\User;
 
@@ -24,9 +25,6 @@ class UserSelfUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        $rules = User::validationRules();
-        array_unshift($rules['password'], 'nullable');
-
-        return $rules;
+        return UsersService::validationRules('update.self');
     }
 }

@@ -7,11 +7,20 @@ use App\Http\Requests\Thread\ThreadDestroyRequest;
 use App\Http\Requests\Thread\ThreadUpdateRequest;
 use App\Models\Thread;
 use App\Models\Channel;
+use App\Services\ThreadsService;
 use Illuminate\Http\Request;
 use App\Transformers\ThreadTransformer;
+use App\Events\ThreadViewed;
 
 class ThreadsController extends Controller
 {
+    protected $service;
+
+    public function __construct(ThreadsService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Display a listing of the Threads in a Channel.
      *
@@ -20,9 +29,8 @@ class ThreadsController extends Controller
      */
     public function index(Channel $channel)
     {
-        $data = $channel->threads()->orderBy('updated_at', 'DESC');
-
-        return paginated_response($data, 'ThreadTransformer', ['owner']);
+        return paginated_response($channel->threads()->orderBy('updated_at', 'DESC'),
+            'ThreadTransformer', ['owner']);
     }
 
     /**
@@ -34,16 +42,9 @@ class ThreadsController extends Controller
      */
     public function store(ThreadCreateRequest $request, Channel $channel)
     {
-        $thread = $channel->addThread([
-            'title' => request('title'),
-            'body' => request('body'),
-            'user_id' => auth()->user()->id
-        ]);
+        $thread = $this->service->create($channel, request()->all());
 
-        return response()->json(fractal()
-            ->item($thread)
-            ->transformWith(new ThreadTransformer())
-            ->includeOwner());
+        return item_response($thread, 'ThreadTransformer', ['owner']);
     }
 
     /**
@@ -55,10 +56,9 @@ class ThreadsController extends Controller
      */
     public function show(Channel $channel, Thread $thread)
     {
-        return response()->json(fractal()
-            ->item($thread)
-            ->transformWith(new ThreadTransformer())
-            ->includeOwner());
+        $this->service->show($thread);
+
+        return item_response($thread, 'ThreadTransformer', ['owner']);
     }
 
     /**
@@ -71,15 +71,9 @@ class ThreadsController extends Controller
      */
     public function update(ThreadUpdateRequest $request, Channel $channel, Thread $thread)
     {
-        $thread->update([
-            'title' => request('title'),
-            'body' => request('body')
-        ]);
+        $this->service->update($thread, request()->all());
 
-        return response()->json(fractal()
-            ->item($thread)
-            ->transformWith(new ThreadTransformer())
-            ->includeOwner());
+        return item_response($thread, 'ThreadTransformer', ['owner']);
     }
 
     /**

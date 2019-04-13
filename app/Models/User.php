@@ -16,6 +16,8 @@ use Cog\Laravel\Ban\Traits\Bannable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use Hash;
 use App\Notifications\ResetPassword as ResetPasswordNotification;
+use Cache;
+use Carbon\Carbon;
 
 class User extends Authenticatable implements BannableContract, JWTSubject
 {
@@ -130,67 +132,10 @@ class User extends Authenticatable implements BannableContract, JWTSubject
             'channel_id');
     }
 
-    /**
-     * Return the validation rules for requests.
-     *
-     * @param null $key
-     * @return array|mixed
-     */
-    public static function validationRules($key = null)
+    public function viewed()
     {
-        $ignoreUsername = $ignoreEmail = null;
-
-        if(request()->route('user')){
-            $ignoreUsername = request()->route('user')->username;
-            $ignoreEmail = request()->route('user')->email;
-        }else if(auth()->check()) {
-            $ignoreUsername = auth()->user()->username;
-            $ignoreEmail = auth()->user()->email;
-        }
-        $rules = [
-            'name' => 'required|string|max:255',
-            'username' => [
-                'required',
-                'min:3',
-                'max:16',
-                'alpha_dash',
-                new UniqueCaseInsensitive(self::class, $ignoreUsername)
-            ],
-            'email' => [
-                'required',
-                'email',
-                Rule::unique('users')->ignore($ignoreEmail, 'email')
-            ],
-            'password' => [
-                'string',
-                'min:8',
-                'confirmed',
-                'case_diff',
-                'numbers',
-                'letters'
-            ]
-        ];
-
-        return $key ? $rules[$key] : $rules;
-    }
-
-    /**
-     * Update the model in the database. If a new password is provided, properly Hash before storing.
-     *
-     * @param  array  $attributes
-     * @param  array  $options
-     * @return bool
-     */
-    public function update(array $attributes = [], array $options = [])
-    {
-        if(array_key_exists('password', $attributes)){
-            if($attributes['password']){
-                $attributes['password'] = Hash::make($attributes['password']);
-            }else{
-                unset($attributes['password']);
-            }
-        }
-
-        return parent::update($attributes, $options);
+        return $this->belongsToMany('App\Models\Thread', 'viewed_threads', 'user_id', 'thread_id')
+            ->using('App\Models\ViewedThread')
+            ->withPivot('timestamp');
     }
 }

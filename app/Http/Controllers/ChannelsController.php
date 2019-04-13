@@ -11,9 +11,17 @@ use Illuminate\Http\Request;
 use App\Transformers\ChannelTransformer;
 use App\Models\User;
 use DB;
+use App\Services\ChannelsService;
 
 class ChannelsController extends Controller
 {
+    protected $service;
+
+    public function __construct(ChannelsService $service)
+    {
+        $this->service = $service;
+    }
+
     /**
      * Display a listing of the channels in order.
      *
@@ -21,11 +29,7 @@ class ChannelsController extends Controller
      */
     public function index()
     {
-        $data = Channel::ordered()->get();
-
-        return response()->json(fractal()
-            ->collection($data)
-            ->transformWith(new ChannelTransformer()));
+        return collection_response(Channel::ordered(), 'ChannelTransformer');
     }
 
     /**
@@ -36,19 +40,10 @@ class ChannelsController extends Controller
      */
     public function store(ChannelCreateRequest $request)
     {
-        $channel = Channel::create([
-            'name' => request('name'),
-            'description' => request('description')
-        ]);
+        $channel = $this->service->create(request()->all());
+        $this->service->assignModerators($channel, request('moderators'));
 
-        if(request()->has('moderators')){
-            $moderators = User::whereIn('username', request('moderators'))->get();
-            $channel->moderators()->sync($moderators);
-        }
-
-        return response()->json(fractal()
-            ->item($channel)
-            ->transformWith(new ChannelTransformer()));
+        return item_response($channel, 'ChannelTransformer');
     }
 
     /**
@@ -59,24 +54,9 @@ class ChannelsController extends Controller
      */
     public function reorder(ChannelReorderRequest $request)
     {
-        // TODO -- find a better way to do this. this is required bc testing using sqlite.
-        if(app()->environment() !== 'testing') {
-            $order = implode("','", request('order'));
-            $channels = Channel::whereIn('slug', request('order'))
-                ->orderByRaw(DB::raw("FIELD(slug, '$order')"))
-                ->get();
-        }else{
-            $channels = Channel::whereIn('slug', request('order'))->get();
-        }
+        $this->service->reorder(request('order'));
 
-
-        Channel::setNewOrder($channels->pluck('id')->toArray());
-
-        $data = Channel::ordered()->get();
-
-        return response()->json(fractal()
-            ->collection($data)
-            ->transformWith(new ChannelTransformer()));
+        return collection_response(Channel::ordered(), 'ChannelTransformer');
     }
 
     /**
@@ -87,9 +67,7 @@ class ChannelsController extends Controller
      */
     public function show(Channel $channel)
     {
-        return response()->json(fractal()
-            ->item($channel)
-            ->transformWith(new ChannelTransformer()));
+        return item_response($channel, 'ChannelTransformer');
     }
 
     /**
@@ -101,21 +79,17 @@ class ChannelsController extends Controller
      */
     public function update(ChannelUpdateRequest $request, Channel $channel)
     {
-        $channel->update([
-            'name' => request('name'),
-            'description' => request('description')
-        ]);
+        $this->service->update($channel, request()->all());
+        $this->service->assignModerators($channel, request('moderators'));
 
-        if(request()->has('moderators')){
-            $moderators = User::whereIn('username', request('moderators'))->get();
-            $channel->moderators()->sync($moderators);
-        }else{
-            $channel->moderators()->sync([]);
-        }
+        return item_response($channel, 'ChannelTransformer');
+    }
 
-        return response()->json(fractal()
-            ->item($channel)
-            ->transformWith(new ChannelTransformer()));
+    public function markRead(Channel $channel)
+    {
+        $this->service->viewed($channel);
+
+        return response()->json([]);
     }
 
     /**
