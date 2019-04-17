@@ -15,9 +15,10 @@ Route::group(['middleware' => ['auth']], function() {
 });
 
 Route::group(['middleware' => ['auth', 'refresh']], function() {
-    Route::get('profile', ['as' => 'self.show', 'uses' => 'UsersController@showSelf']);
-    Route::patch('profile', ['as' => 'self.update', 'uses' => 'UsersController@updateSelf']);
-    Route::delete('profile', ['as' => 'self.destroy', 'uses' => 'UsersController@destroySelf']);
+    Route::get('profile', ['as' => 'self.show', 'uses' => 'SelfController@show']);
+    Route::patch('profile', ['as' => 'self.update', 'uses' => 'SelfController@update']);
+    Route::delete('profile', ['as' => 'self.destroy', 'uses' => 'SelfController@destroy']);
+    Route::post('profile/avatar', ['as' => 'self.avatar', 'uses' => 'SelfController@avatar']);
 
     Route::put('channels', ['as' => 'channels.store', 'uses' => 'ChannelsController@store']);
     Route::post('channels/reorder', ['as' => 'channels.reorder', 'uses' => 'ChannelsController@reorder']);
@@ -37,6 +38,7 @@ Route::group(['middleware' => ['auth', 'refresh']], function() {
     Route::get('users/{user}', ['as' => 'users.show', 'uses' => 'UsersController@show']);
     Route::delete('users/{user}', ['as' => 'users.destroy', 'uses' => 'UsersController@destroy']);
     Route::patch('users/{user}', ['as' => 'users.update', 'uses' => 'UsersController@update']);
+    Route::post('users/{user}/avatar', ['as' => 'users.avatar', 'uses' => 'UsersController@avatar']);
     Route::patch('users/{user}/ban', ['as' => 'users.ban', 'uses' => 'UsersController@ban']);
     Route::patch('users/{user}/unban', ['as' => 'users.unban', 'uses' => 'UsersController@unban']);
 });

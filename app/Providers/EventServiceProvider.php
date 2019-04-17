@@ -21,6 +21,12 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\ThreadViewed' => [
             'App\Listeners\MarkThreadRead',
         ],
+        'App\Events\ReplyCreated' => [
+            'App\Listeners\UpdateThreadReplyColumns',
+        ],
+        'App\Events\ReplyDeleted' => [
+            'App\Listeners\UpdateThreadReplyColumns',
+        ],
     ];
 
     /**

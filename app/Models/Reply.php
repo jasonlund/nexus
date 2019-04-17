@@ -1,7 +1,9 @@
 <?php
 
 namespace App\Models;
+use App\Events\ReplyDeleted;
 use Znck\Eloquent\Traits\BelongsToThrough;
+use App\Events\ReplyCreated;
 
 class Reply extends Model
 {
@@ -14,12 +16,10 @@ class Reply extends Model
      */
     protected $fillable = ['body', 'user_id'];
 
-    /**
-     * Replies touch Threads on update.
-     *
-     * @var array
-     */
-    protected $touches = ['thread'];
+    protected $dispatchesEvents = [
+        'created' => ReplyCreated::class,
+        'deleted' => ReplyDeleted::class
+    ];
 
     /**
      * Replies belong to one owner.

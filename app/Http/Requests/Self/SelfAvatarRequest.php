@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace App\Http\Requests\Self;
 
+use App\Services\UsersService;
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserSelfDestroyRequest extends FormRequest
+class SelfAvatarRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,6 +24,6 @@ class UserSelfDestroyRequest extends FormRequest
      */
     public function rules()
     {
-        return [];
+        return UsersService::validationRules('avatar');
     }
 }

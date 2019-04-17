@@ -1,12 +1,10 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace App\Http\Requests\Self;
 
-use App\Services\UsersService;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\User;
 
-class UserSelfUpdateRequest extends FormRequest
+class SelfDestroyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,6 +23,6 @@ class UserSelfUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        return UsersService::validationRules('update.self');
+        return [];
     }
 }

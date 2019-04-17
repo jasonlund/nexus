@@ -68,7 +68,7 @@ class ThreadsService
 
         if(!$view) {
             return $thread->replies()->first() ?? true;
-        }else if($thread->updated_at < $view->pivot->timestamp){
+        }else if($thread->latest_reply_at < $view->pivot->timestamp){
             return false;
         }else{
             return $thread->replies()->where('created_at', '>', $view->pivot->timestamp)->first();

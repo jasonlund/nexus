@@ -28,7 +28,7 @@ class User extends Authenticatable implements BannableContract, JWTSubject
      *
      * @var array
      */
-    protected $fillable = ['name', 'username', 'email', 'password'];
+    protected $fillable = ['name', 'username', 'email', 'password', 'avatar_path'];
 
     /**
      * The attributes that should be hidden for arrays.

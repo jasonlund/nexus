@@ -6,6 +6,7 @@ use App\Models\User;
 use Cache;
 use App\Models\ViewedThread;
 use Carbon\Carbon;
+use \App\Services\ThreadsService;
 
 class ChannelsService
 {
@@ -77,11 +78,12 @@ class ChannelsService
 
     public function viewed($channel)
     {
+        $service = new ThreadsService();
         $threads = $channel->threads()->get();
         $user = auth()->user();
 
         foreach($threads as $thread) {
-            (new \App\Services\ThreadsService())->viewed($thread, $user);
+            $service->viewed($thread, $user);
         }
     }
 
@@ -94,7 +96,7 @@ class ChannelsService
         if($view->count() === 0 || $view->count() !== $channel->threads()->count()) return true;
 
         $result = $view->search(function($item) {
-            return $item->viewed_thread->timestamp < $item->viewed_thread->thread->updated_at;
+            return $item->viewed_thread->timestamp < $item->viewed_thread->thread->latest_reply_at;
         });
 
         return $result !== false;

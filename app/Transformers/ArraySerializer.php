@@ -36,4 +36,9 @@ class ArraySerializer extends Base
         }
         return $data;
     }
+
+    public function null()
+    {
+        return null;
+    }
 }

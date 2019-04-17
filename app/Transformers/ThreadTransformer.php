@@ -12,7 +12,7 @@ class ThreadTransformer extends TransformerAbstract
     protected $service;
 
     protected $availableIncludes = [
-        'owner', 'replies'
+        'owner', 'latest_reply'
     ];
 
     /**
@@ -40,5 +40,10 @@ class ThreadTransformer extends TransformerAbstract
     public function includeOwner(Thread $thread)
     {
         return $this->item($thread->owner, new UserTransformer);
+    }
+
+    public function includeLatestReply(Thread $thread)
+    {
+        return $thread->latestReply ? $this->item($thread->latestReply, new ReplyTransformer) : $this->null();
     }
 }

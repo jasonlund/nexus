@@ -5,6 +5,7 @@ namespace App\Transformers;
 use League\Fractal\TransformerAbstract;
 use App\Models\User;
 use Bouncer;
+use Storage;
 
 class UserTransformer extends TransformerAbstract
 {
@@ -20,7 +21,8 @@ class UserTransformer extends TransformerAbstract
         $data = [
             'username' => (string) $user->username,
             'name' => (string) $user->name,
-            'role' => $role ? (string) $role->name : 'user'
+            'role' => $role ? (string) $role->name : 'user',
+            'avatar' => $user->avatar_path ? url(Storage::url($user->avatar_path)) : null
         ];
 
         $data['moderatable_channels'] = $data['role'] !== 'moderator' ? [] :

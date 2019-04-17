@@ -2,17 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\User\UserAvatarRequest;
 use App\Http\Requests\User\UserBanRequest;
 use App\Http\Requests\User\UserDestroyRequest;
-use App\Http\Requests\User\UserSelfUpdateRequest;
 use App\Http\Requests\User\UserShowRequest;
 use App\Http\Requests\User\UserUnbanRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Services\UsersService;
-use Illuminate\Http\Request;
-use App\Transformers\UserTransformer;
 use App\Models\User;
-use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 
 class UsersController extends Controller
 {
@@ -115,38 +112,10 @@ class UsersController extends Controller
         return item_response($user->fresh(), 'UserTransformer');
     }
 
-    /**
-     * Display the authenticated User.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function showSelf()
+    public function avatar(UserAvatarRequest $request, User $user)
     {
-        return item_response(auth()->user(), 'UserTransformer');
-    }
+        $this->service->avatar($user, request());
 
-    /**
-     * Update the authorized User in storage.
-     *
-     * @param UserSelfUpdateRequest $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function updateSelf(UserSelfUpdateRequest $request)
-    {
-        $this->service->update(auth()->user(), request()->all());
-
-        return item_response(auth()->user(), 'UserTransformer');
-    }
-
-    /**
-     * Remove the authenticated User from storage.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroySelf()
-    {
-        $this->service->delete(auth()->user());
-
-        return response()->json([]);
+        return item_response($user, 'UserTransformer');
     }
 }

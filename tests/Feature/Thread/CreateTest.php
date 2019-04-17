@@ -46,7 +46,8 @@ class CreateTest extends TestCase
                     'name' => $user->name,
                     'username' => $user->username,
                     'email' => $user->email,
-                    'role' => 'user'
+                    'role' => 'user',
+                    'avatar' => null
                 ]
             ]);
 
@@ -60,7 +61,8 @@ class CreateTest extends TestCase
                     'username' => $user->username,
                     'email' => $user->email,
                     'moderatable_channels' => [],
-                    'role' => 'user'
+                    'role' => 'user',
+                    'avatar' => null
                 ]
             ]);
     }

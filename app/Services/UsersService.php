@@ -5,6 +5,7 @@ use App\Rules\RichTextRequired;
 use App\Rules\UniqueCaseInsensitive;
 use Bouncer;
 use Hash;
+use Storage;
 use App\Models\User;
 use Illuminate\Validation\Rule;
 
@@ -23,6 +24,7 @@ class UsersService
         }
 
         $rules = collect([
+            'avatar' => ['nullable', 'sometimes', 'image'],
             'comment' => ['nullable', 'string'],
             'email' => ['required', 'email', Rule::unique('users')->ignore($ignoreEmail, 'email')],
             'expired_at' => ['nullable', 'date'],
@@ -71,6 +73,9 @@ class UsersService
                     return $item;
                 });
                 $rules = $rules->only(['name', 'username', 'email', 'password', 'role']);
+                break;
+            case "avatar":
+                $rules = $rules->only(['avatar']);
                 break;
         }
 
@@ -125,5 +130,17 @@ class UsersService
     public function unban($user)
     {
         $user->unban();
+    }
+
+    public function avatar($user, $data)
+    {
+        if($user->avatar_path)
+            Storage::disk('public')->delete($user->avatar_path);
+
+        $file_path = $data->file('avatar') !== null ? $data->file('avatar')->store('avatars', 'public') : null;
+
+        return $user->update([
+            'avatar_path' => $file_path
+        ]);
     }
 }

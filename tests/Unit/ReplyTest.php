@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use App\Models\Reply;
+use Carbon\Carbon;
 
 class ReplyTest extends TestCase
 {
@@ -46,5 +47,30 @@ class ReplyTest extends TestCase
 
         $this->assertNull(Reply::find($data['id']));
         $this->assertNotNull(Reply::withTrashed()->find($data['id']));
+    }
+
+    /** @test */
+    function it_stores_the_latest_reply_in_a_thread_column_when_created_or_destroyed()
+    {
+        $thread = create('Thread', ['title' => 'FooBar']);
+        Carbon::setTestNow(Carbon::now()->addMinutes(1));
+
+        $reply = create('Reply', ['thread_id' => $thread->id], 2);
+        $thread = $thread->fresh();
+
+        $this->assertEquals($thread->latest_reply_id, $reply[1]->id);
+        $this->assertEquals($thread->latest_reply_at, $reply[1]->created_at);
+
+        $reply[1]->delete();
+        $thread = $thread->fresh();
+
+        $this->assertEquals($thread->latest_reply_id, $reply[0]->id);
+        $this->assertEquals($thread->latest_reply_at, $reply[0]->created_at);
+
+        $reply[0]->delete();
+        $thread = $thread->fresh();
+
+        $this->assertEquals($thread->latest_reply_id, null);
+        $this->assertEquals($thread->latest_reply_at, null);
     }
 }

@@ -30,7 +30,7 @@ class ThreadsController extends Controller
     public function index(Channel $channel)
     {
         return paginated_response($channel->threads()->orderBy('updated_at', 'DESC'),
-            'ThreadTransformer', ['owner']);
+            'ThreadTransformer', ['owner', 'latest_reply', 'latest_reply.owner']);
     }
 
     /**

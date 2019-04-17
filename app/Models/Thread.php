@@ -71,6 +71,11 @@ class Thread extends Model
         return $this->hasMany('App\Models\Reply');
     }
 
+    public function latestReply()
+    {
+        return $this->hasOne('App\Models\Reply', 'id', 'latest_reply_id');
+    }
+
     /**
      * Threads belong to one Owner.
      *
