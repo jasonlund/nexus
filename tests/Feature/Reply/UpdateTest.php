@@ -155,7 +155,7 @@ class UpdateTest extends TestCase
         $user = create('User');
         $reply = create('Reply', ['user_id' => $user->id]);
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), ['body' => '<p><strong> </strong><em><s> </s> </em></p>'])
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), ['body' => $this->nullHTML])
             ->assertJsonValidationErrors(['body']);
     }
 }

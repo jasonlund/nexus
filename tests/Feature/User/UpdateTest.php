@@ -63,6 +63,47 @@ class UpdateTest extends TestCase
     }
 
     /** @test */
+    function a_user_can_optionally_set_a_signature()
+    {
+        $user = create('User');
+        $signature = 'this is a signature 123';
+
+        $data = array_merge($user->only(['name', 'username', 'email']),
+            [
+                'signature' => $signature
+            ]
+        );
+
+        $this->apiAs($user, 'PATCH', $this->routeUpdateSelf(), $data)
+            ->assertStatus(200)
+            ->assertJson([
+                'signature' => $signature
+            ]);
+
+        $this->assertEquals($signature, $user->fresh()->signature);
+
+        $data['signature'] = null;
+
+        $this->apiAs($user, 'PATCH', $this->routeUpdateSelf(), $data)
+            ->assertStatus(200)
+            ->assertJson([
+                'signature' => null
+            ]);
+
+        $this->assertEquals(null, $user->fresh()->signature);
+
+        $data['signature'] = $this->nullHTML;
+
+        $this->apiAs($user, 'PATCH', $this->routeUpdateSelf(), $data)
+            ->assertStatus(200)
+            ->assertJson([
+                'signature' => null
+            ]);
+
+        $this->assertEquals(null, $user->fresh()->signature);
+    }
+
+    /** @test */
     function an_authorized_user_can_update_users()
     {
         $user = create('User');
@@ -114,6 +155,42 @@ class UpdateTest extends TestCase
             ->assertStatus(200);
 
         $this->assertTrue(Hash::check($password, $otherUser->fresh()->password));
+    }
+
+    /** @test */
+    function an_authorized_user_can_optionally_set_the_signature_of_users()
+    {
+        $user = create('User');
+        $authorizedUser = create('User');
+        Bouncer::allow($authorizedUser)->to('update-users');
+
+        $signature = 'this is a signature 123';
+
+        $data = array_merge($user->only(['name', 'username', 'email']),
+            [
+                'signature' => $signature,
+                'role' => 'user'
+            ]
+        );
+
+        $response = $this->apiAs($authorizedUser, 'PATCH', $this->routeUpdate([$user->username]), $data)
+            ->assertStatus(200)
+            ->assertJson([
+                'signature' => $signature
+            ]);
+
+        $this->assertEquals($signature, $user->fresh()->signature);
+
+        $data['signature'] = null;
+
+        $this->apiAs($authorizedUser, 'PATCH', $this->routeUpdate([$user->username]), $data)
+            ->assertStatus(200)
+            ->assertJson([
+                'signature' => null,
+                'role' => 'user'
+            ]);
+
+        $this->assertEquals(null, $user->fresh()->signature);
     }
 
     /** @test */
@@ -262,8 +339,6 @@ class UpdateTest extends TestCase
 
         $this->update(['password' => $strongPassword, 'password_confirmation' => $strongPassword], $otherUser)
             ->assertStatus(200);
-
-//        dd($response->decodeResponseJson());
     }
 
     /** @test */

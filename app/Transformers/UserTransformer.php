@@ -6,6 +6,7 @@ use League\Fractal\TransformerAbstract;
 use App\Models\User;
 use Bouncer;
 use Storage;
+use Purify;
 
 class UserTransformer extends TransformerAbstract
 {
@@ -22,7 +23,8 @@ class UserTransformer extends TransformerAbstract
             'username' => (string) $user->username,
             'name' => (string) $user->name,
             'role' => $role ? (string) $role->name : 'user',
-            'avatar' => $user->avatar_path ? url(Storage::url($user->avatar_path)) : null
+            'avatar' => $user->avatar_path ? url(Storage::url($user->avatar_path)) : null,
+            'signature' => $user->signature ? (string) Purify::clean($user->signature) : null,
         ];
 
         $data['moderatable_channels'] = $data['role'] !== 'moderator' ? [] :

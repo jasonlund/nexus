@@ -91,7 +91,7 @@ class CreateTest extends TestCase
         $this->apiAS($user,'PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), $reply)
             ->assertJsonValidationErrors(['body']);
 
-        $reply = raw('Reply', ['body' => '<p><strong> </strong><em><s> </s> </em></p>']);
+        $reply = raw('Reply', ['body' => $this->nullHTML]);
 
         $this->apiAS($user,'PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), $reply)
             ->assertJsonValidationErrors(['body']);

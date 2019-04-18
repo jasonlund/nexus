@@ -31,6 +31,7 @@ class UsersService
             'name' => ['required', 'string', 'max:255'],
             'password' => ['string', 'min:8', 'confirmed', 'case_diff', 'numbers', 'letters'],
             'role' => ['required', 'string'],
+            'signature' => ['nullable', 'string'],
             'token' => ['required'],
             'username' => ['required', 'min:3', 'max:16', 'alpha_dash',
                 new UniqueCaseInsensitive(User::class, $ignoreUsername)],
@@ -64,7 +65,7 @@ class UsersService
                         array_unshift($item, 'nullable');
                     return $item;
                 });
-                $rules = $rules->only(['name', 'username', 'email', 'password']);
+                $rules = $rules->only(['name', 'username', 'email', 'password', 'signature']);
                 break;
             case "update":
                 $rules = $rules->map(function($item, $key){
@@ -89,6 +90,12 @@ class UsersService
             'username' => $data['username'],
             'email' => $data['email']
         ];
+
+        if(array_key_exists('signature', $data)){
+            $attr['signature'] = strip_html_whitespace($data['signature']) !== '' ? $data['signature'] : null;
+        }else{
+            $attr['signature'] = null;
+        }
 
         if(array_key_exists('password', $data) && $data['password']){
             $attr['password'] = Hash::make($data['password']);

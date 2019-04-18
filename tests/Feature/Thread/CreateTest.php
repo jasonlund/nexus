@@ -47,7 +47,8 @@ class CreateTest extends TestCase
                     'username' => $user->username,
                     'email' => $user->email,
                     'role' => 'user',
-                    'avatar' => null
+                    'avatar' => null,
+                    'signature' => null
                 ]
             ]);
 
@@ -62,7 +63,8 @@ class CreateTest extends TestCase
                     'email' => $user->email,
                     'moderatable_channels' => [],
                     'role' => 'user',
-                    'avatar' => null
+                    'avatar' => null,
+                    'signature' => null
                 ]
             ]);
     }
@@ -94,7 +96,7 @@ class CreateTest extends TestCase
         $this->publish(['body' => ''])
             ->assertJsonValidationErrors(['body']);
 
-        $this->publish(['body' => '<p><strong> </strong><em><s> </s> </em></p>'])
+        $this->publish(['body' => $this->nullHTML])
             ->assertJsonValidationErrors(['body']);
     }
 

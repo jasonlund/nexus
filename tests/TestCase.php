@@ -14,6 +14,8 @@ abstract class TestCase extends BaseTestCase
         "<blockquote>Foobar</blockquote>\n"
     ;
 
+    protected $nullHTML = '<p><strong> </strong><em><s> </s> </em></p><p> <u> </u></p> <p></p>';
+
     public function setUp()
     {
         parent::setUp();

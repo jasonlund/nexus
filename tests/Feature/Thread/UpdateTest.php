@@ -146,7 +146,7 @@ class UpdateTest extends TestCase
         $this->update(['body' => ''])
             ->assertJsonValidationErrors(['body']);
 
-        $this->update(['body' => '<p><strong> </strong><em><s> </s> </em></p>'])
+        $this->update(['body' => $this->nullHTML])
             ->assertJsonValidationErrors(['body']);
     }
 

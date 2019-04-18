@@ -25,9 +25,7 @@ class RichTextRequired implements Rule
      */
     public function passes($attribute, $value)
     {
-        $value = preg_replace('/\s/', '', $value);
-        $value = preg_replace('~\x{00a0}~','', $value);
-        $value = strip_tags($value);
+        $value = strip_html_whitespace($value);
 
         if($value === '') return false;
 
