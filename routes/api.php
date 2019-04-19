@@ -9,8 +9,9 @@ Route::group(['middleware' => ['guest']], function() {
     Route::post('password/reset', ['as' => 'password.reset', 'uses' => 'Auth\ResetPasswordController@reset']);
 });
 
+Route::get('auth/refresh', ['as' => 'auth.refresh', 'uses' => 'Auth\TokenController@refresh']);
+
 Route::group(['middleware' => ['auth']], function() {
-    Route::get('auth/refresh', ['as' => 'auth.refresh', 'uses' => 'Auth\TokenController@refresh']);
     Route::post('auth/logout', ['as' => 'auth.logout', 'uses' => 'Auth\TokenController@logout']);
 });
 

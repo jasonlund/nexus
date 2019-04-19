@@ -33,6 +33,7 @@ class UsersService
             'role' => ['required', 'string'],
             'signature' => ['nullable', 'string'],
             'token' => ['required'],
+            'timezone' => ['sometimes', 'timezone'],
             'username' => ['required', 'min:3', 'max:16', 'alpha_dash',
                 new UniqueCaseInsensitive(User::class, $ignoreUsername)],
         ]);
@@ -65,7 +66,7 @@ class UsersService
                         array_unshift($item, 'nullable');
                     return $item;
                 });
-                $rules = $rules->only(['name', 'username', 'email', 'password', 'signature']);
+                $rules = $rules->only(['name', 'username', 'email', 'password', 'signature', 'timezone']);
                 break;
             case "update":
                 $rules = $rules->map(function($item, $key){
@@ -73,7 +74,7 @@ class UsersService
                         array_unshift($item, 'nullable');
                     return $item;
                 });
-                $rules = $rules->only(['name', 'username', 'email', 'password', 'role']);
+                $rules = $rules->only(['name', 'username', 'email', 'password', 'role', 'timezone']);
                 break;
             case "avatar":
                 $rules = $rules->only(['avatar']);
@@ -95,6 +96,10 @@ class UsersService
             $attr['signature'] = strip_html_whitespace($data['signature']) !== '' ? $data['signature'] : null;
         }else{
             $attr['signature'] = null;
+        }
+
+        if(array_key_exists('timezone', $data)){
+            $attr['timezone'] = $data['timezone'];
         }
 
         if(array_key_exists('password', $data) && $data['password']){

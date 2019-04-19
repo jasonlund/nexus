@@ -92,8 +92,15 @@ class LoginTest extends TestCase
 
         $token = $response->headers->get('authorization');
 
+        Carbon::setTestNow(Carbon::now()->addMinutes((int)config('jwt.ttl') + 1));
+
         $this->json('get', $this->routeSelf(), [], ['Authorization' => $token])
             ->assertStatus(200);
+
+        Carbon::setTestNow(Carbon::now()->addMinutes((int)config('jwt.blacklist_grace_period') + 1));
+
+        $this->json('get', $this->routeSelf(), [], ['Authorization' => $token])
+            ->assertStatus(401);
     }
 
     /** @test */

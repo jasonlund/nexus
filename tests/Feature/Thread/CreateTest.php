@@ -51,22 +51,6 @@ class CreateTest extends TestCase
                     'signature' => null
                 ]
             ]);
-
-        $this->json('GET', $this->routeIndex([$this->channel->slug]))
-            ->assertStatus(200)
-            ->assertJsonFragment([
-                'title' => $thread['title'],
-                'body' => $thread['body'],
-                'owner' => [
-                    'name' => $user->name,
-                    'username' => $user->username,
-                    'email' => $user->email,
-                    'moderatable_channels' => [],
-                    'role' => 'user',
-                    'avatar' => null,
-                    'signature' => null
-                ]
-            ]);
     }
 
     /** @test */

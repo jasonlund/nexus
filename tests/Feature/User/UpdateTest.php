@@ -104,6 +104,30 @@ class UpdateTest extends TestCase
     }
 
     /** @test */
+    function a_user_optionally_can_set_their_timezone()
+    {
+        $user = create('User');
+
+        $timezone = 'America/Los_Angeles';
+
+        $data = $user->only(['name', 'username', 'email']);
+
+        $this->apiAs($user, 'PATCH', $this->routeUpdateSelf(), $data)
+            ->assertStatus(200)
+            ->assertJson([
+                'timezone' => 'America/New_York'
+            ]);
+
+        $data['timezone'] = $timezone;
+
+        $this->apiAs($user, 'PATCH', $this->routeUpdateSelf(), $data)
+            ->assertStatus(200)
+            ->assertJson([
+                'timezone' => $timezone
+            ]);
+    }
+
+    /** @test */
     function an_authorized_user_can_update_users()
     {
         $user = create('User');
@@ -173,7 +197,7 @@ class UpdateTest extends TestCase
             ]
         );
 
-        $response = $this->apiAs($authorizedUser, 'PATCH', $this->routeUpdate([$user->username]), $data)
+        $this->apiAs($authorizedUser, 'PATCH', $this->routeUpdate([$user->username]), $data)
             ->assertStatus(200)
             ->assertJson([
                 'signature' => $signature
@@ -191,6 +215,36 @@ class UpdateTest extends TestCase
             ]);
 
         $this->assertEquals(null, $user->fresh()->signature);
+    }
+
+    /** @test */
+    function an_authorized_user_optionally_can_set_the_timezone_of_users()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->to('update-users');
+        $otherUser = create('User');
+
+        $timezone = 'America/Los_Angeles';
+
+        $data = array_merge($otherUser->only(['name', 'username', 'email']),
+            [
+                'role' => 'user'
+            ]
+        );
+
+        $this->apiAs($user, 'PATCH', $this->routeUpdate([$otherUser]), $data)
+            ->assertStatus(200)
+            ->assertJson([
+                'timezone' => 'America/New_York'
+            ]);
+
+        $data['timezone'] = $timezone;
+
+        $this->apiAs($user, 'PATCH', $this->routeUpdate([$otherUser]), $data)
+            ->assertStatus(200)
+            ->assertJson([
+                'timezone' => $timezone
+            ]);
     }
 
     /** @test */
