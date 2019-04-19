@@ -41,7 +41,9 @@ class ThreadsService
     {
         return $thread->update([
             'title' => $data['title'],
-            'body' => $data['body']
+            'body' => $data['body'],
+            'edited_at' => Carbon::now(),
+            'edited_by' => auth()->user()->id
         ]);
     }
 

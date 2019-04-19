@@ -2,6 +2,8 @@
 
 namespace Tests\Unit;
 
+use App\Services\ThreadsService;
+use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use App\Models\Reply;
@@ -78,5 +80,27 @@ class ThreadTest extends TestCase
         ])->toArray();
 
         $this->assertNotEquals($threads[0]['slug'], $threadInChannel['slug']);
+    }
+
+    /** @test */
+    function it_stores_the_latest_edit_status()
+    {
+        $service = new ThreadsService();
+        $user = create('User');
+        $this->actingAs($user);
+
+        $this->assertEquals(null, $this->thread->edited_at);
+        $this->assertEquals(null, $this->thread->edited_by);
+
+        $time = Carbon::now()->addMinute();
+        Carbon::setTestNow($time);
+
+        $service->update($this->thread, [
+            'title' => 'title',
+            'body' => 'body'
+        ]);
+
+        $this->assertEquals($time, $this->thread->edited_at);
+        $this->assertEquals($user->id, $this->thread->edited_by);
     }
 }

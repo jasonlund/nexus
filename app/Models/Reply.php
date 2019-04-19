@@ -2,6 +2,7 @@
 
 namespace App\Models;
 use App\Events\ReplyDeleted;
+use App\Events\ReplyUpdating;
 use Znck\Eloquent\Traits\BelongsToThrough;
 use App\Events\ReplyCreated;
 
@@ -14,7 +15,9 @@ class Reply extends Model
      *
      * @var array
      */
-    protected $fillable = ['body', 'user_id'];
+    protected $fillable = ['body', 'user_id', 'edited_at', 'edited_by'];
+
+    protected $dates = ['edited_at'];
 
     protected $dispatchesEvents = [
         'created' => ReplyCreated::class,
@@ -29,6 +32,11 @@ class Reply extends Model
     public function owner()
     {
         return $this->belongsTo('App\Models\User', 'user_id');
+    }
+
+    public function editor()
+    {
+        return $this->belongsTo('App\Models\User', 'edited_by');
     }
 
     /**

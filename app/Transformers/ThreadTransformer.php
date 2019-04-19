@@ -12,7 +12,7 @@ class ThreadTransformer extends TransformerAbstract
     protected $service;
 
     protected $availableIncludes = [
-        'owner', 'latest_reply'
+        'owner', 'latest_reply', 'editor'
     ];
 
     /**
@@ -31,7 +31,8 @@ class ThreadTransformer extends TransformerAbstract
             'reply_count' => (int) $thread->replies()->count(),
             'new' => $service->hasNewReplies($thread),
             'created_at' => (string) $thread->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => (string) $thread->updated_at->format('Y-m-d H:i:s')
+            'updated_at' => (string) $thread->updated_at->format('Y-m-d H:i:s'),
+            'edited_at' => $thread->edited_at ? $thread->edited_at->format('Y-m-d H:i:s') : null
         ];
 
         return $data;
@@ -40,6 +41,11 @@ class ThreadTransformer extends TransformerAbstract
     public function includeOwner(Thread $thread)
     {
         return $this->item($thread->owner, new UserTransformer);
+    }
+
+    public function includeEditor(Thread $thread)
+    {
+        return $thread->editor ? $this->item($thread->editor, new UserTransformer) : $this->null();
     }
 
     public function includeLatestReply(Thread $thread)

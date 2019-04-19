@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use App\Services\RepliesService;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use App\Models\Reply;
@@ -72,5 +73,26 @@ class ReplyTest extends TestCase
 
         $this->assertEquals($thread->latest_reply_id, null);
         $this->assertEquals($thread->latest_reply_at, null);
+    }
+
+    /** @test */
+    function it_stores_the_latest_edit_status()
+    {
+        $service = new RepliesService();
+        $user = create('User');
+        $this->actingAs($user);
+
+        $this->assertEquals(null, $this->reply->edited_at);
+        $this->assertEquals(null, $this->reply->edited_by);
+
+        $time = Carbon::now()->addMinute();
+        Carbon::setTestNow($time);
+
+        $service->update($this->reply, [
+            'body' => 'body'
+        ]);
+
+        $this->assertEquals($time, $this->reply->edited_at);
+        $this->assertEquals($user->id, $this->reply->edited_by);
     }
 }

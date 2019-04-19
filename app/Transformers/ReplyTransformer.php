@@ -9,7 +9,7 @@ use Purify;
 class ReplyTransformer extends TransformerAbstract
 {
     protected $availableIncludes = [
-        'owner'
+        'owner', 'editor'
     ];
 
     /**
@@ -24,7 +24,8 @@ class ReplyTransformer extends TransformerAbstract
             'id' => (int) $reply->id,
             'body' => (string) Purify::clean($reply->body),
             'created_at' => (string) $reply->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => (string) $reply->updated_at->format('Y-m-d H:i:s')
+            'updated_at' => (string) $reply->updated_at->format('Y-m-d H:i:s'),
+            'edited_at' => $reply->edited_at ? $reply->edited_at->format('Y-m-d H:i:s') : null
         ];
 
         return $data;
@@ -33,5 +34,10 @@ class ReplyTransformer extends TransformerAbstract
     public function includeOwner(Reply $reply)
     {
         return $this->item($reply->owner, new UserTransformer);
+    }
+
+    public function includeEditor(Reply $reply)
+    {
+        return $reply->editor ? $this->item($reply->editor, new UserTransformer) : $this->null();
     }
 }

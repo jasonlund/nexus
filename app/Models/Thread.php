@@ -16,11 +16,13 @@ class Thread extends Model
      *
      * @var array
      */
-    protected $fillable = ['title', 'body', 'user_id'];
+    protected $fillable = ['title', 'body', 'user_id', 'edited_at', 'edited_by'];
 
     protected $softCascade = ['replies'];
 
     protected $touches = ['channel'];
+
+    protected $dates = ['edited_at'];
 
     /**
      * Return the sluggable configuration array for this model.
@@ -84,6 +86,11 @@ class Thread extends Model
     public function owner()
     {
         return $this->belongsTo('App\Models\User', 'user_id');
+    }
+
+    public function editor()
+    {
+        return $this->belongsTo('App\Models\User', 'edited_by');
     }
 
     /**

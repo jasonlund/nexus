@@ -30,7 +30,7 @@ class ThreadsController extends Controller
     public function index(Channel $channel)
     {
         return paginated_response($channel->threads()->orderBy('updated_at', 'DESC'),
-            'ThreadTransformer', ['owner', 'latest_reply', 'latest_reply.owner']);
+            'ThreadTransformer', ['owner', 'latest_reply', 'latest_reply.owner', 'editor']);
     }
 
     /**
@@ -44,7 +44,7 @@ class ThreadsController extends Controller
     {
         $thread = $this->service->create($channel, request()->all());
 
-        return item_response($thread, 'ThreadTransformer', ['owner']);
+        return item_response($thread, 'ThreadTransformer', ['owner', 'latest_reply', 'latest_reply.owner', 'editor']);
     }
 
     /**
@@ -58,7 +58,7 @@ class ThreadsController extends Controller
     {
         $this->service->show($thread);
 
-        return item_response($thread, 'ThreadTransformer', ['owner']);
+        return item_response($thread, 'ThreadTransformer', ['owner', 'latest_reply', 'latest_reply.owner', 'editor']);
     }
 
     /**
@@ -73,7 +73,7 @@ class ThreadsController extends Controller
     {
         $this->service->update($thread, request()->all());
 
-        return item_response($thread, 'ThreadTransformer', ['owner']);
+        return item_response($thread, 'ThreadTransformer', ['owner', 'latest_reply', 'latest_reply.owner', 'editor']);
     }
 
     /**

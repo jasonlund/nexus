@@ -30,7 +30,7 @@ class RepliesController extends Controller
      */
     public function index(Channel $channel, Thread $thread)
     {
-        return paginated_response($thread->replies(), 'ReplyTransformer', ['owner']);
+        return paginated_response($thread->replies(), 'ReplyTransformer', ['owner', 'editor']);
     }
 
     /**
@@ -45,7 +45,7 @@ class RepliesController extends Controller
     {
         $reply = $this->service->create($thread, request()->all());
 
-        return item_response($reply, 'ReplyTransformer', ['owner']);
+        return item_response($reply, 'ReplyTransformer', ['owner', 'editor']);
     }
 
     /**
@@ -61,7 +61,7 @@ class RepliesController extends Controller
     {
         $this->service->update($reply, request()->all());
 
-        return item_response($reply, 'ReplyTransformer', ['owner']);
+        return item_response($reply, 'ReplyTransformer', ['owner', 'editor']);
     }
 
     /**

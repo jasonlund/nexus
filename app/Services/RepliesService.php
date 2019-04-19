@@ -2,6 +2,7 @@
 namespace App\Services;
 
 use App\Rules\RichTextRequired;
+use Carbon\Carbon;
 
 class RepliesService
 {
@@ -34,7 +35,9 @@ class RepliesService
     public function update($reply, $data)
     {
         return $reply->update([
-            'body' => $data['body']
+            'body' => $data['body'],
+            'edited_at' => Carbon::now(),
+            'edited_by' => auth()->user()->id
         ]);
     }
 }
