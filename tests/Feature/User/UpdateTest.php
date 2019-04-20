@@ -128,6 +128,30 @@ class UpdateTest extends TestCase
     }
 
     /** @test */
+    function a_user_can_optionally_set_their_location()
+    {
+        $user = create('User');
+
+        $location = 'Miami, Florida';
+
+        $data = $user->only(['name', 'username', 'email']);
+
+        $this->apiAs($user, 'PATCH', $this->routeUpdateSelf(), $data)
+            ->assertStatus(200)
+            ->assertJson([
+                'location' => null
+            ]);
+
+        $data['location'] = $location;
+
+        $this->apiAs($user, 'PATCH', $this->routeUpdateSelf(), $data)
+            ->assertStatus(200)
+            ->assertJson([
+                'location' => $location
+            ]);
+    }
+
+    /** @test */
     function an_authorized_user_can_update_users()
     {
         $user = create('User');

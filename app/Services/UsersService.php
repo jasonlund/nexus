@@ -102,6 +102,10 @@ class UsersService
             $attr['timezone'] = $data['timezone'];
         }
 
+        if(array_key_exists('location', $data)){
+            $attr['location'] = $data['location'];
+        }
+
         if(array_key_exists('password', $data) && $data['password']){
             $attr['password'] = Hash::make($data['password']);
         }
