@@ -272,6 +272,36 @@ class UpdateTest extends TestCase
     }
 
     /** @test */
+    function an_authorized_user_optionally_can_set_the_location_of_users()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->to('update-users');
+        $otherUser = create('User');
+
+        $location = 'Miami, Florida';
+
+        $data = array_merge($otherUser->only(['name', 'username', 'email']),
+            [
+                'role' => 'user'
+            ]
+        );
+
+        $this->apiAs($user, 'PATCH', $this->routeUpdate([$otherUser]), $data)
+            ->assertStatus(200)
+            ->assertJson([
+                'location' => null
+            ]);
+
+        $data['location'] = $location;
+
+        $this->apiAs($user, 'PATCH', $this->routeUpdate([$otherUser]), $data)
+            ->assertStatus(200)
+            ->assertJson([
+                'location' => $location
+            ]);
+    }
+
+    /** @test */
     function a_guest_and_an_unauthorized_user_can_not_update_users()
     {
         $otherUser = create('User');
