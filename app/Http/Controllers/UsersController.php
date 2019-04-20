@@ -33,10 +33,10 @@ class UsersController extends Controller
         if(request()->has('role')
             && in_array(request('role'), ['admin', 'super-moderator', 'moderator'])){
             $paginated = false;
-            $query->whereIs(request('role'))->orderBy('username');
-        }else{
-            $query = $query->orderBy('created_at');
+            $query->whereIs(request('role'));
         }
+
+        $query->orderBy('username');
 
         return $paginated ? paginated_response($query, 'UserTransformer') :
             collection_response($query->get(), 'UserTransformer');

@@ -25,8 +25,11 @@ class UserTransformer extends TransformerAbstract
             'role' => $role ? (string) $role->name : 'user',
             'avatar' => $user->avatar_path ? url(Storage::url($user->avatar_path)) : null,
             'signature' => $user->signature ? (string) Purify::clean($user->signature) : null,
+            'thread_count' => (int) $user->threads()->count(),
+            'reply_count' => (int) $user->replies()->count(),
             'timezone' => (string) $user->timezone,
-            'location' => $user->location ? (string) $user->location : null
+            'location' => $user->location ? (string) $user->location : null,
+            'created_at' => (string) $user->created_at
         ];
 
         $data['moderatable_channels'] = $data['role'] !== 'moderator' ? [] :
