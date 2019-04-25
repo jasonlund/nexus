@@ -106,6 +106,68 @@ class UpdateTest extends TestCase
     }
 
     /** @test */
+    function an_authorized_user_can_update_any_locked_thread()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->to('moderate-channels');
+
+        $thread = create('Thread', ['locked' => true]);
+        $oldData = $thread->only(['title', 'body']);
+        $newData = [
+            'title' => 'Foo',
+            'body' => 'Bar'
+        ];
+
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$thread->channel->slug, $thread->slug]), $newData)
+            ->assertStatus(200)
+            ->assertJson($newData)
+            ->assertJsonMissing($oldData);
+
+        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->fresh()->slug]))
+            ->assertStatus(200)
+            ->assertJson($newData)
+            ->assertJsonMissing($oldData);
+    }
+
+    /** @test */
+    function an_authorized_user_can_update_locked_threads_in_channels_they_moderate()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->toOwn(Channel::class)->to('moderate-channels');
+
+        $inChannel = create('Thread', ['locked' => true]);
+        $notInChannel = create('Thread', ['locked' => true]);
+        $inChannel->channel->moderators()->attach($user);
+        $newData = [
+            'title' => 'Foo',
+            'body' => 'Bar'
+        ];
+
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$inChannel->channel->slug, $inChannel->slug]), $newData)
+            ->assertStatus(200)
+            ->assertJson($newData)
+            ->assertJsonMissing($inChannel->only(['title', 'body']));
+
+        $this->json('GET', $this->routeShow([$inChannel->channel->slug, $inChannel->fresh()->slug]))
+            ->assertStatus(200)
+            ->assertJson($newData)
+            ->assertJsonMissing($inChannel->only(['title', 'body']));
+
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$notInChannel->channel->slug, $notInChannel->slug]), $newData)
+            ->assertStatus(403);
+    }
+
+    /** @test */
+    function the_creator_can_not_update_a_locked_thread()
+    {
+        $user = create('User');
+        $thread = create('Thread', ['user_id' => $user->id, 'locked' => true]);
+
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$thread->channel->slug, $thread->slug]), [])
+            ->assertStatus(403);
+    }
+
+    /** @test */
     function a_guest_can_not_update_a_thread()
     {
         $thread = create('Thread');

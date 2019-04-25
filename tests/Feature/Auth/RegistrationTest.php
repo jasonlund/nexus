@@ -8,10 +8,13 @@ use Event;
 use Hash;
 use Illuminate\Auth\Events\Registered;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 class RegistrationTest extends TestCase
 {
     use DatabaseMigrations;
+
+    protected $factory;
 
     public function setUp()
     {
@@ -30,7 +33,7 @@ class RegistrationTest extends TestCase
     {
         Event::fake();
 
-        $data = make('User')->only(['name', 'username', 'email', 'password']);
+        $data = make('User', ['password' => 'FooBar123'])->only(['name', 'username', 'email', 'password']);
         $data = array_merge($data, ['password_confirmation' => $data['password']]);
 
         $this->json('post', $this->routeRegister(), $data)
@@ -129,7 +132,7 @@ class RegistrationTest extends TestCase
 
     private function create($overrides)
     {
-        $user = raw('User', $overrides);
+        $user = raw('User', array_merge(['password' => 'FooBar123'], $overrides));
         if(!isset($overrides['password_confirmation'])){
             $user['password_confirmation'] = $user['password'];
         }

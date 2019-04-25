@@ -112,6 +112,77 @@ class UpdateTest extends TestCase
     }
 
     /** @test */
+    function the_creator_can_not_update_a_reply_in_a_locked_thread()
+    {
+        $user = create('User');
+        $thread = create('Thread', ['locked' => true]);
+        $reply = create('Reply', ['thread_id' => $thread->id, 'user_id' => $user->id]);
+
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), [])
+            ->assertStatus(403);
+    }
+
+    /** @test */
+    function an_authorized_user_can_update_a_reply_in_a_locked_thread()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->to('moderate-channels');
+
+        $thread = create('Thread', ['locked' => true]);
+        $reply = create('Reply', ['thread_id' => $thread->id]);
+        $oldData = $reply->only('body');
+        $newData = [
+            'body' => 'FooBar'
+        ];
+
+        $this->apiAs($user, 'PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), $newData)
+            ->assertStatus(200)
+            ->assertJson($newData)
+            ->assertJsonMissing($oldData);
+
+        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [$newData]
+            ])
+            ->assertJsonMissing([
+                'data' => [$oldData]
+            ]);
+    }
+
+    /** @test */
+    function an_authorized_user_can_updated_a_reply_in_a_locked_thread_in_a_channel_they_moderate()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->toOwn(Channel::class)->to('moderate-channels');
+
+        $threads = create('Thread', ['locked' => true], 2);
+        $inChannel = create('Reply', ['thread_id' => $threads[0]->id]);
+        $notInChannel = create('Reply', ['thread_id' => $threads[1]->id]);
+        $threads[0]->channel->moderators()->attach($user);
+        $newData = [
+            'body' => 'FooBar'
+        ];
+
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$inChannel->channel->slug, $inChannel->thread->slug, $inChannel->id]), $newData)
+            ->assertStatus(200)
+            ->assertJson($newData)
+            ->assertJsonMissing($inChannel->only('body'));
+
+        $this->json('GET', $this->routeIndex([$inChannel->channel->slug, $inChannel->thread->slug]))
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [$newData]
+            ])
+            ->assertJsonMissing([
+                'data' => [$inChannel->only('body')]
+            ]);
+
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$notInChannel->channel->slug, $notInChannel->thread->slug, $notInChannel->id]), $newData)
+            ->assertStatus(403);
+    }
+
+    /** @test */
     function a_guest_can_not_update_a_reply()
     {
         $reply = create('Reply');

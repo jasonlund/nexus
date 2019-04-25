@@ -12,6 +12,7 @@ $factory->define(Thread::class, function (Faker $faker) {
             return factory('App\Models\Channel')->create()->id;
         },
         'title' => $faker->sentence,
-        'body' => '<p>' . implode('</p><p>', $faker->paragraphs(rand(2, 10))) . '</p>'
+        'body' => '<p>' . implode('</p><p>', $faker->paragraphs(rand(2, 10))) . '</p>',
+        'locked' => false
     ];
 });

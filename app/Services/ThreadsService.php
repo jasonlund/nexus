@@ -12,8 +12,8 @@ class ThreadsService
     public static function validationRules($action = null)
     {
         $rules = collect([
-            'title' => 'required',
-            'body' => [ new RichTextRequired ]
+            'title' => ['required', 'max:100'],
+            'body' => [ new RichTextRequired, 'max:10000' ]
         ]);
 
         switch ($action) {
@@ -75,5 +75,13 @@ class ThreadsService
         }else{
             return $thread->replies()->where('created_at', '>', $view->pivot->timestamp)->first();
         }
+    }
+
+    public function toggleLock($thread)
+    {
+        $thread->locked = !$thread->locked;
+        $thread->save();
+
+        return $thread;
     }
 }

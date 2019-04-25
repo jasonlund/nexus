@@ -25,16 +25,18 @@ class UsersService
 
         $rules = collect([
             'avatar' => ['nullable', 'sometimes', 'image'],
-            'comment' => ['nullable', 'string'],
-            'email' => ['required', 'email', Rule::unique('users')->ignore($ignoreEmail, 'email')],
+            'comment' => ['nullable', 'string', 'max:1000'],
+            'email' => ['required', 'email', 'max:255',
+                Rule::unique('users')->ignore($ignoreEmail, 'email')],
             'expired_at' => ['nullable', 'date'],
-            'name' => ['required', 'string', 'max:255'],
-            'password' => ['string', 'min:8', 'confirmed', 'case_diff', 'numbers', 'letters'],
+            'location' => ['sometimes', 'max:100'],
+            'name' => ['required', 'string', 'max:100'],
+            'password' => ['string', 'min:8', 'confirmed', 'case_diff', 'numbers', 'letters', 'max:30'],
             'role' => ['required', 'string'],
-            'signature' => ['nullable', 'string'],
+            'signature' => ['nullable', 'string', 'max:1000'],
             'token' => ['required'],
-            'timezone' => ['sometimes', 'timezone'],
-            'username' => ['required', 'min:3', 'max:16', 'alpha_dash',
+            'timezone' => ['sometimes', 'timezone', 'max:255'],
+            'username' => ['required', 'min:3', 'max:20', 'alpha_dash',
                 new UniqueCaseInsensitive(User::class, $ignoreUsername)],
         ]);
 
@@ -66,7 +68,7 @@ class UsersService
                         array_unshift($item, 'nullable');
                     return $item;
                 });
-                $rules = $rules->only(['name', 'username', 'email', 'password', 'signature', 'timezone']);
+                $rules = $rules->only(['name', 'username', 'email', 'password', 'signature', 'timezone', 'location']);
                 break;
             case "update":
                 $rules = $rules->map(function($item, $key){
@@ -74,7 +76,7 @@ class UsersService
                         array_unshift($item, 'nullable');
                     return $item;
                 });
-                $rules = $rules->only(['name', 'username', 'email', 'password', 'role', 'timezone']);
+                $rules = $rules->only(['name', 'username', 'email', 'password', 'role', 'timezone', 'location']);
                 break;
             case "avatar":
                 $rules = $rules->only(['avatar']);

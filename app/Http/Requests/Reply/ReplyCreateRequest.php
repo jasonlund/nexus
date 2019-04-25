@@ -4,6 +4,7 @@ namespace App\Http\Requests\Reply;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Services\RepliesService;
+use Bouncer;
 
 class ReplyCreateRequest extends FormRequest
 {
@@ -14,7 +15,10 @@ class ReplyCreateRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check();
+        return auth()->check() &&
+            (!request()->route('thread')->locked
+                || Bouncer::can('moderate-channels')
+                || Bouncer::can('moderate-channels', request()->route('channel')));
     }
 
     /**

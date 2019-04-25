@@ -39,7 +39,7 @@ class UsersController extends Controller
         $query->orderBy('username');
 
         return $paginated ? paginated_response($query, 'UserTransformer') :
-            collection_response($query->get(), 'UserTransformer');
+            collection_response($query, 'UserTransformer');
     }
 
     /**

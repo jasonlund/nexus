@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Reply;
 
+use App\Models\Channel;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
+use Bouncer;
 
 class CreateTest extends TestCase
 {
@@ -66,6 +68,90 @@ class CreateTest extends TestCase
 
         $this->json('PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), [])
             ->assertStatus(401);
+    }
+
+    /** @test */
+    function a_user_can_not_reply_to_a_locked_thread()
+    {
+        $user = create('User');
+
+        $thread = create('Thread', ['locked' => true]);
+
+        $this->apiAs($user,'PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), [])
+            ->assertStatus(403);
+    }
+
+    /** @test */
+    function an_authorized_user_can_reply_to_a_locked_thread()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->to('moderate-channels');
+
+        $thread = create('Thread', ['locked' => true]);
+        $reply = raw('Reply');
+
+        $this->apiAs($user,'PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), $reply)
+            ->assertStatus(200)
+            ->assertJson([
+                'body' => $reply['body'],
+                'owner' => [
+                    'name' => $user->name,
+                    'username' => $user->username
+                ]
+            ]);
+
+        $this->json('GET', $this->routeIndex([$thread->channel->slug, $thread->slug]))
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    [
+                        'body' => $reply['body'],
+                        'owner' => [
+                            'name' => $user->name,
+                            'username' => $user->username
+                        ]
+                    ]
+                ]
+            ]);
+    }
+
+    /** @test */
+    function an_authorized_user_can_reply_to_a_locked_thread_in_a_channel_they_moderate()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->toOwn(Channel::class)->to('moderate-channels');
+
+        $inChannel = create('Thread', ['locked' => true]);
+        $notInChannel = create('Thread', ['locked' => true]);
+        $inChannel->channel->moderators()->attach($user);
+        $reply = raw('Reply');
+
+        $this->apiAs($user,'PUT', $this->routeStore([$inChannel->channel->slug, $inChannel->slug]), $reply)
+            ->assertStatus(200)
+            ->assertJson([
+                'body' => $reply['body'],
+                'owner' => [
+                    'name' => $user->name,
+                    'username' => $user->username
+                ]
+            ]);
+
+        $this->json('GET', $this->routeIndex([$inChannel->channel->slug, $inChannel->slug]))
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    [
+                        'body' => $reply['body'],
+                        'owner' => [
+                            'name' => $user->name,
+                            'username' => $user->username
+                        ]
+                    ]
+                ]
+            ]);
+
+        $this->apiAs($user,'PUT', $this->routeStore([$notInChannel->channel->slug, $notInChannel->slug]), $reply)
+            ->assertStatus(403);
     }
 
     /** @test */

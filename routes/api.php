@@ -30,19 +30,21 @@ Route::group(['middleware' => ['auth', 'refresh']], function() {
     Route::put('channels/{channel}', ['as' => 'threads.store', 'uses' => 'ThreadsController@store']);
     Route::patch('channels/{channel}/threads/{thread}', ['as' => 'threads.update', 'uses' => 'ThreadsController@update']);
     Route::delete('channels/{channel}/threads/{thread}', ['as' => 'threads.destroy', 'uses' => 'ThreadsController@destroy']);
+    Route::post('channels/{channel}/threads/{thread}/lock', ['as' => 'threads.lock', 'uses' => 'ThreadsController@lock']);
 
     Route::put('channels/{channel}/threads/{thread}/replies', ['as' => 'replies.store', 'uses' => 'RepliesController@store']);
     Route::patch('channels/{channel}/threads/{thread}/replies/{reply}', ['as' => 'replies.update', 'uses' => 'RepliesController@update']);
     Route::delete('channels/{channel}/threads/{thread}/replies/{reply}', ['as' => 'replies.destroy', 'uses' => 'RepliesController@destroy']);
 
-    Route::get('users', ['as' => 'users.index', 'uses' => 'UsersController@index']);
-    Route::get('users/{user}', ['as' => 'users.show', 'uses' => 'UsersController@show']);
     Route::delete('users/{user}', ['as' => 'users.destroy', 'uses' => 'UsersController@destroy']);
     Route::patch('users/{user}', ['as' => 'users.update', 'uses' => 'UsersController@update']);
     Route::post('users/{user}/avatar', ['as' => 'users.avatar', 'uses' => 'UsersController@avatar']);
     Route::patch('users/{user}/ban', ['as' => 'users.ban', 'uses' => 'UsersController@ban']);
     Route::patch('users/{user}/unban', ['as' => 'users.unban', 'uses' => 'UsersController@unban']);
 });
+
+Route::get('users', ['as' => 'users.index', 'uses' => 'UsersController@index']);
+Route::get('users/{user}', ['as' => 'users.show', 'uses' => 'UsersController@show']);
 
 Route::get('channels', ['as' => 'channels.index', 'uses' => 'ChannelsController@index']);
 Route::get('channels/{channel}', ['as' => 'channels.show', 'uses' => 'ChannelsController@show']);

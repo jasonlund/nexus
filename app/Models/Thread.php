@@ -16,13 +16,22 @@ class Thread extends Model
      *
      * @var array
      */
-    protected $fillable = ['title', 'body', 'user_id', 'edited_at', 'edited_by'];
+    protected $fillable = ['title', 'body', 'user_id', 'locked', 'edited_at', 'edited_by'];
 
     protected $softCascade = ['replies'];
 
     protected $touches = ['channel'];
 
     protected $dates = ['edited_at'];
+
+    /**
+     * The attributes that should be casted to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'locked' => 'boolean',
+    ];
 
     /**
      * Return the sluggable configuration array for this model.

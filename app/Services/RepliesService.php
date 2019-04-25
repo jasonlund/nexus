@@ -9,7 +9,7 @@ class RepliesService
     public static function validationRules($action = null)
     {
         $rules = collect([
-            'body' => [ new RichTextRequired ]
+            'body' => [ new RichTextRequired, 'max:10000' ]
         ]);
 
         switch ($action) {

@@ -17,9 +17,9 @@ class ThreadUpdateRequest extends FormRequest
     public function authorize()
     {
         return auth() &&
-            (request()->route('thread')->user_id == auth()->user()->id ||
-                Bouncer::can('moderate-channels') ||
-                Bouncer::can('moderate-channels', request()->route('channel')));
+            ((!request()->route('thread')->locked && request()->route('thread')->user_id == auth()->user()->id)
+                || Bouncer::can('moderate-channels')
+                || Bouncer::can('moderate-channels', request()->route('channel')));
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Thread\ThreadCreateRequest;
 use App\Http\Requests\Thread\ThreadDestroyRequest;
+use App\Http\Requests\Thread\ThreadLockRequest;
 use App\Http\Requests\Thread\ThreadUpdateRequest;
 use App\Models\Thread;
 use App\Models\Channel;
@@ -90,5 +91,12 @@ class ThreadsController extends Controller
         $thread->delete();
 
         return response()->json();
+    }
+
+    public function lock(ThreadLockRequest $request, Channel $channel, Thread $thread)
+    {
+        $this->service->toggleLock($thread);
+
+        return item_response($thread, 'ThreadTransformer', ['owner', 'latest_reply', 'latest_reply.owner', 'editor']);
     }
 }

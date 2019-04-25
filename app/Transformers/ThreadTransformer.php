@@ -28,6 +28,7 @@ class ThreadTransformer extends TransformerAbstract
             'title' => (string) $thread->title,
             'slug' => (string) $thread->slug,
             'body' => (string) Purify::clean($thread->body),
+            'locked' => (boolean) $thread->locked,
             'reply_count' => (int) $thread->replies()->count(),
             'new' => $service->hasNewReplies($thread),
             'created_at' => (string) $thread->created_at->format('Y-m-d H:i:s'),
