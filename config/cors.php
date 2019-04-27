@@ -13,7 +13,7 @@ return [
     */
    
     'supportsCredentials' => false,
-    'allowedOrigins' => [ 'http://localhost' ],
+    'allowedOrigins' => [ 'http://localhost', 'https://nexus.thepylonshow.com' ],
     'allowedOriginsPatterns' => [ '/localhost:\d/' ],
     'allowedHeaders' => ['*'],
     'allowedMethods' => ['*'],
