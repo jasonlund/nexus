@@ -93,7 +93,7 @@ class ChannelsService
 
     public function hasNewReplies($channel)
     {
-        if(!auth()->check()) return false;
+        if(!auth()->check() || !$channel->threads()->count()) return false;
 
         $view = $channel->viewedBy()->where('users.id', auth()->user()->id)->get();
 
