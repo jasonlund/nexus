@@ -8,6 +8,7 @@ use Hash;
 use Storage;
 use App\Models\User;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
 
 class UsersService
 {
@@ -159,6 +160,13 @@ class UsersService
 
         return $user->update([
             'avatar_path' => $file_path
+        ]);
+    }
+
+    public function logActive($user)
+    {
+        $user->update([
+            'last_active_at' => Carbon::now()
         ]);
     }
 }

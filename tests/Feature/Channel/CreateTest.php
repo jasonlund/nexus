@@ -29,7 +29,7 @@ class CreateTest extends TestCase
     }
 
     /** @test */
-    function an_authorized_user_user_can_create_new_channels()
+    function an_authorized_user_can_create_new_channels()
     {
         $user = create('User');
         Bouncer::allow($user)->to('create-channels');
@@ -40,7 +40,8 @@ class CreateTest extends TestCase
             ->assertStatus(200)
             ->assertJson([
                 'name' => $channel['name'],
-                'description' => $channel['description']
+                'description' => $channel['description'],
+                'locked' => false
             ]);
 
         $this->json('GET', $this->routeIndex())
@@ -92,6 +93,21 @@ class CreateTest extends TestCase
 
         $this->apiAs($user, 'PUT', $this->routeStore(), $channel)
             ->assertStatus(403);
+    }
+
+    /** @test */
+    function a_channel_may_be_optionally_locked()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->to('create-channels');
+
+        $channel = raw('Channel', ['name' => 'FooBar', 'locked' => true]);
+
+        $this->apiAs($user, 'PUT', $this->routeStore(), $channel)
+            ->assertStatus(200)
+            ->assertJson([
+                'locked' => true
+            ]);
     }
 
     /** @test */

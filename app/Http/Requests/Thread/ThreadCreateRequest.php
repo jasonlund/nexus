@@ -4,6 +4,7 @@ namespace App\Http\Requests\Thread;
 
 use App\Services\ThreadsService;
 use Illuminate\Foundation\Http\FormRequest;
+use Bouncer;
 
 class ThreadCreateRequest extends FormRequest
 {
@@ -14,7 +15,9 @@ class ThreadCreateRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check();
+        return auth()->check() && (!request()->route('channel')->locked
+                || Bouncer::can('moderate-channels')
+                || Bouncer::can('moderate-channels', request()->route('channel')));
     }
 
     /**

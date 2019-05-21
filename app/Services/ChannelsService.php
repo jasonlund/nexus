@@ -7,6 +7,7 @@ use Cache;
 use App\Models\ViewedThread;
 use Carbon\Carbon;
 use \App\Services\ThreadsService;
+use DB;
 
 class ChannelsService
 {
@@ -16,15 +17,16 @@ class ChannelsService
             'name' => ['required', 'string', 'max:100'],
             'description' => ['required', 'string', 'max:1000'],
             'moderators' => ['array', 'exists:users,username'],
-            'order' => ['required', 'array', 'exists:channels,slug']
+            'order' => ['required', 'array', 'exists:channels,slug'],
+            'locked' => ['sometimes', 'boolean']
         ]);
 
         switch ($action) {
             case "create":
-                $rules = $rules->only(['name', 'description', 'moderators']);
+                $rules = $rules->only(['name', 'description', 'moderators', 'locked']);
                 break;
             case "update":
-                $rules = $rules->only(['name', 'description', 'moderators']);
+                $rules = $rules->only(['name', 'description', 'moderators', 'locked']);
                 break;
             case "reorder":
                 $rules = $rules->only('order');
@@ -38,7 +40,8 @@ class ChannelsService
     {
         return Channel::create([
             'name' => $data['name'],
-            'description' => $data['description']
+            'description' => $data['description'],
+            'locked' => $data['locked'] ?? false
         ]);
     }
 
@@ -46,7 +49,8 @@ class ChannelsService
     {
         return $channel->update([
             'name' => $data['name'],
-            'description' => $data['description']
+            'description' => $data['description'],
+            'locked' => $data['locked'] ?? false
         ]);
     }
 
@@ -65,9 +69,9 @@ class ChannelsService
         // TODO -- find a better way to do this. sqlite honors the array order but mysql does not. so a special query
         //          is required for mysql.
         if(app()->environment() !== 'testing') {
-            $order = implode("','", $order);
+            $imploded = implode("','", $order);
             $channels = Channel::whereIn('slug', $order)
-                ->orderByRaw(DB::raw("FIELD(slug, '$order')"))
+                ->orderByRaw(DB::raw("FIELD(slug, '$imploded')"))
                 ->get();
         }else{
             $channels = Channel::whereIn('slug', $order)->get();

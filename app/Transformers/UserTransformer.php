@@ -29,7 +29,8 @@ class UserTransformer extends TransformerAbstract
             'reply_count' => (int) $user->replies()->count(),
             'timezone' => (string) $user->timezone,
             'location' => $user->location ? (string) $user->location : null,
-            'created_at' => (string) $user->created_at
+            'created_at' => (string) $user->created_at,
+            'last_active_at' => (string) $user->last_active_at->format('Y-m-d H:i:s')
         ];
 
         $data['moderatable_channels'] = $data['role'] !== 'moderator' ? [] :

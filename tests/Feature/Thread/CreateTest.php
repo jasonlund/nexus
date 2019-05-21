@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\Thread;
 
+use App\Models\Channel;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Bouncer;
 
 class CreateTest extends TestCase
 {
@@ -58,6 +60,50 @@ class CreateTest extends TestCase
     {
         $this->json('PUT', $this->routeStore([$this->channel->slug]), [])
             ->assertStatus(401);
+    }
+
+    /** @test */
+    function a_user_cannot_create_threads_in_a_locked_channel()
+    {
+        $user = create('User');
+        $channel = create('Channel', ['locked' => true]);
+
+        $thread = raw('Thread', ['channel_id' => $channel->id]);
+
+        $this->apiAs($user,'PUT', $this->routeStore([$channel->slug]), $thread)
+            ->assertStatus(403);
+    }
+
+    /** @test */
+    function an_authorized_user_can_create_threads_in_a_locked_channel()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->to('moderate-channels');
+        $channel = create('Channel', ['locked' => true]);
+
+        $thread = raw('Thread');
+
+        $this->apiAs($user,'PUT', $this->routeStore([$channel->slug]), $thread)
+            ->assertStatus(200);
+    }
+
+    /** @test */
+    function an_authorized_user_can_create_threads_in_a_locked_channel_they_moderate()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->toOwn(Channel::class)->to('moderate-channels');
+
+        $authedChannel = create('Channel', ['locked' => true]);
+        $unauthedChannel = create('Channel', ['locked' => true]);
+        $authedChannel->moderators()->attach($user);
+
+        $thread = raw('Thread');
+
+        $this->apiAs($user,'PUT', $this->routeStore([$authedChannel->slug]), $thread)
+            ->assertStatus(200);
+
+        $this->apiAs($user,'PUT', $this->routeStore([$unauthedChannel->slug]), $thread)
+            ->assertStatus(403);
     }
 
     /** @test */

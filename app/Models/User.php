@@ -28,7 +28,7 @@ class User extends Authenticatable implements BannableContract, JWTSubject
      *
      * @var array
      */
-    protected $fillable = ['name', 'username', 'email', 'signature', 'password', 'avatar_path', 'location', 'timezone'];
+    protected $fillable = ['name', 'username', 'email', 'signature', 'password', 'avatar_path', 'location', 'timezone', 'last_active_at'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -40,20 +40,11 @@ class User extends Authenticatable implements BannableContract, JWTSubject
     ];
 
     /**
-     * Cast Soft Deletes timestamp as a date.
+     * Cast timestamps as a date.
      *
      * @var array
      */
-    protected $dates = ['deleted_at'];
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    protected $dates = ['deleted_at', 'email_verified_at', 'last_active_at'];
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.

@@ -29,7 +29,8 @@ class ChannelsController extends Controller
      */
     public function index()
     {
-        return collection_response(Channel::ordered(), 'ChannelTransformer');
+        return collection_response(Channel::ordered(), 'ChannelTransformer',
+            ['latest_thread', 'latest_thread.owner', 'latest_reply', 'latest_reply.owner']);
     }
 
     /**

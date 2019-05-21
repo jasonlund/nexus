@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Auth;
 use Illuminate\Validation\ValidationException;
 use App\Http\Controllers\Controller;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 class TokenController extends Controller
 {
@@ -46,7 +47,13 @@ class TokenController extends Controller
      */
     public function refresh()
     {
-        return $this->respondWithToken(auth()->refresh());
+        try{
+            return $this->respondWithToken(auth()->refresh());
+        }catch(TokenExpiredException $e) {
+            return response(null, 403)->json([
+                'message' => 'Token Expired'
+            ]);
+        }
     }
 
     /**

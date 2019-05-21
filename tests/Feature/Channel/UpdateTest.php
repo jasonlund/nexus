@@ -84,6 +84,36 @@ class UpdateTest extends TestCase
     }
 
     /** @test */
+    function a_channel_may_be_optionally_locked()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->to('update-channels');
+
+        $channel = create('Channel');
+        $data = array_merge($channel->only(['name', 'description']), ['locked' => true]);
+
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$channel->slug]), $data)
+            ->assertStatus(200)
+            ->assertJson([
+                'locked' => true
+            ])
+            ->assertJsonMissing([
+                'locked' => false
+            ]);
+
+        $data = array_merge($channel->only(['name', 'description']), ['locked' => false]);
+
+        $this->apiAs($user,'PATCH', $this->routeUpdate([$channel->slug]), $data)
+            ->assertStatus(200)
+            ->assertJson([
+                'locked' => false
+            ])
+            ->assertJsonMissing([
+                'locked' => true
+            ]);
+    }
+
+    /** @test */
     function a_guest_and_an_unauthorized_user_can_not_delete_a_channel()
     {
         $channel = create('Channel');

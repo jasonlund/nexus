@@ -2,6 +2,7 @@
 
 namespace App\Transformers;
 
+use App\Models\Thread;
 use App\Services\ChannelsService;
 use League\Fractal\TransformerAbstract;
 use App\Models\Channel;
@@ -10,7 +11,7 @@ use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 class ChannelTransformer extends TransformerAbstract
 {
     protected $availableIncludes = [
-        'threads'
+        'threads', 'latest_thread', 'latest_reply'
     ];
 
     /**
@@ -28,6 +29,7 @@ class ChannelTransformer extends TransformerAbstract
             'name' => (string) $channel->name,
             'slug' => (string) $channel->slug,
             'description' => (string) $channel->description,
+            'locked' => (boolean) $channel->locked,
             'new' => $service->hasNewReplies($channel),
             'moderators' => (array) $channel->moderators->sortBy('username')->pluck('username')->toArray(),
             'created_at' => (string) $channel->created_at->format('Y-m-d H:i:s'),
@@ -37,5 +39,17 @@ class ChannelTransformer extends TransformerAbstract
         ];
 
         return $data;
+    }
+
+    public function includeLatestThread(Channel $channel)
+    {
+        return $channel->threads()->count() !== 0 ?
+            $this->item($channel->threads()->latest()->first(), new ThreadTransformer()) : $this->null();
+    }
+
+    public function includeLatestReply(Channel $channel)
+    {
+        return $channel->replies()->count() !== 0 ?
+            $this->item($channel->replies()->latest()->first(), new ReplyTransformer()) : $this->null();
     }
 }
