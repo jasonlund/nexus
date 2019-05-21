@@ -50,9 +50,9 @@ class TokenController extends Controller
         try{
             return $this->respondWithToken(auth()->refresh());
         }catch(TokenExpiredException $e) {
-            return response(null, 403)->json([
+            return response([
                 'message' => 'Token Expired'
-            ]);
+            ], 403);
         }
     }
 
