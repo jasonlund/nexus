@@ -37,19 +37,13 @@ class CreateTest extends TestCase
         $channel = raw('Channel', ['name' => 'FooBar']);
 
         $this->apiAs($user, 'PUT', $this->routeStore(), $channel)
-            ->assertStatus(200)
-            ->assertJson([
-                'name' => $channel['name'],
-                'description' => $channel['description'],
-                'locked' => false
-            ]);
+            ->assertStatus(200);
 
         $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
             ->assertJsonFragment([
                 'name' => 'FooBar',
-                'slug' => 'foobar',
-                'description' => $channel['description']
+                'slug' => 'foobar'
             ]);
     }
 
@@ -65,18 +59,11 @@ class CreateTest extends TestCase
         $this->apiAs($user, 'PUT', $this->routeStore(), array_merge($channel,
             ['moderators' => $mods->pluck('username')->toArray()]
         ))
-            ->assertStatus(200)
-            ->assertJson([
-                'name' => $channel['name'],
-                'description' => $channel['description'],
-                'moderators' => $mods->sortBy('username')->pluck('username')->toArray()
-            ]);
+            ->assertStatus(200);
 
         $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
             ->assertJsonFragment([
-                'name' => $channel['name'],
-                'description' => $channel['description'],
                 'moderators' => $mods->sortBy('username')->pluck('username')->toArray()
             ]);
     }
@@ -101,7 +88,7 @@ class CreateTest extends TestCase
         $user = create('User');
         Bouncer::allow($user)->to('create-channels');
 
-        $channel = raw('Channel', ['name' => 'FooBar', 'locked' => true]);
+        $channel = raw('Channel', ['locked' => true]);
 
         $this->apiAs($user, 'PUT', $this->routeStore(), $channel)
             ->assertStatus(200)

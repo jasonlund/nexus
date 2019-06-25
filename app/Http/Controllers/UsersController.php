@@ -34,6 +34,9 @@ class UsersController extends Controller
             && in_array(request('role'), ['admin', 'super-moderator', 'moderator'])){
             $paginated = false;
             $query->whereIs(request('role'));
+        }else if(request()->has('active')){
+            $paginated = false;
+            $query->where('last_active_at', '>=', now()->subMinutes(10));
         }
 
         $query->orderBy('username');

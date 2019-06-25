@@ -5,7 +5,7 @@ namespace App\Transformers;
 use App\Services\ThreadsService;
 use League\Fractal\TransformerAbstract;
 use App\Models\Thread;
-use Purify;
+use App\Services\PurifyService;
 
 class ThreadTransformer extends TransformerAbstract
 {
@@ -27,8 +27,9 @@ class ThreadTransformer extends TransformerAbstract
         $data = [
             'title' => (string) $thread->title,
             'slug' => (string) $thread->slug,
-            'body' => (string) Purify::clean($thread->body),
+            'body' => (string) PurifyService::clean($thread->body),
             'locked' => (boolean) $thread->locked,
+            'replies' => $thread->replies()->pluck('id'),
             'reply_count' => (int) $thread->replies()->count(),
             'new' => $service->hasNewReplies($thread),
             'created_at' => (string) $thread->created_at->format('Y-m-d H:i:s'),

@@ -36,6 +36,8 @@ Route::group(['middleware' => ['auth', 'refresh']], function() {
     Route::patch('channels/{channel}/threads/{thread}/replies/{reply}', ['as' => 'replies.update', 'uses' => 'RepliesController@update']);
     Route::delete('channels/{channel}/threads/{thread}/replies/{reply}', ['as' => 'replies.destroy', 'uses' => 'RepliesController@destroy']);
 
+    Route::post('/images', ['as' => 'images.store', 'uses' => 'ImagesController@store']);
+
     Route::delete('users/{user}', ['as' => 'users.destroy', 'uses' => 'UsersController@destroy']);
     Route::patch('users/{user}', ['as' => 'users.update', 'uses' => 'UsersController@update']);
     Route::post('users/{user}/avatar', ['as' => 'users.avatar', 'uses' => 'UsersController@avatar']);

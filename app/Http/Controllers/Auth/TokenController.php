@@ -7,6 +7,7 @@ use Auth;
 use Illuminate\Validation\ValidationException;
 use App\Http\Controllers\Controller;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
 
 class TokenController extends Controller
 {
@@ -50,6 +51,10 @@ class TokenController extends Controller
         try{
             return $this->respondWithToken(auth()->refresh());
         }catch(TokenExpiredException $e) {
+            return response([
+                'message' => 'Token Expired'
+            ], 403);
+        }catch(TokenBlacklistedException $e) {
             return response([
                 'message' => 'Token Expired'
             ], 403);

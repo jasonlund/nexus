@@ -4,7 +4,8 @@ namespace App\Transformers;
 
 use League\Fractal\TransformerAbstract;
 use App\Models\Reply;
-use Purify;
+use App\Services\PurifyService;
+use App\Services\RepliesService;
 
 class ReplyTransformer extends TransformerAbstract
 {
@@ -20,9 +21,11 @@ class ReplyTransformer extends TransformerAbstract
      */
     public function transform(Reply $reply)
     {
+//        $service = new RepliesService();
         $data = [
             'id' => (int) $reply->id,
-            'body' => (string) Purify::clean($reply->body),
+            'body' => (string) PurifyService::clean($reply->body),
+//            'new' => $service->isNew($reply),
             'created_at' => (string) $reply->created_at->format('Y-m-d H:i:s'),
             'updated_at' => (string) $reply->updated_at->format('Y-m-d H:i:s'),
             'edited_at' => $reply->edited_at ? $reply->edited_at->format('Y-m-d H:i:s') : null

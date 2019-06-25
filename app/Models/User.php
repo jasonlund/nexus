@@ -129,4 +129,11 @@ class User extends Authenticatable implements BannableContract, JWTSubject
             ->using('App\Models\ViewedThread')
             ->withPivot('timestamp');
     }
+
+    public function getRoleAttribute()
+    {
+        $role = $this->roles()->first();
+
+        return $role ? $role->name : 'user';
+    }
 }

@@ -45,12 +45,7 @@ class CreateTest extends TestCase
                 'title' => $thread['title'],
                 'body' => $thread['body'],
                 'owner' => [
-                    'name' => $user->name,
                     'username' => $user->username,
-                    'email' => $user->email,
-                    'role' => 'user',
-                    'avatar' => null,
-                    'signature' => null
                 ]
             ]);
     }

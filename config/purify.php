@@ -54,7 +54,7 @@ return [
         |
         */
 
-        'HTML.Doctype' => null,
+        'HTML.Doctype' => 'XHTML 1.0 Transitional',
 
         /*
         |--------------------------------------------------------------------------
@@ -67,7 +67,7 @@ return [
         |
         */
 
-        'HTML.Allowed' => 'h3,strong,em,s,u,a[href],ul,ol,li,p,blockquote',
+        'HTML.Allowed' => 'h3,strong,em,s,u,a[href],ul,ol,li,p,blockquote,img[src],div[class]',
 
         /*
         |--------------------------------------------------------------------------
@@ -98,7 +98,7 @@ return [
         |
         */
 
-        'CSS.AllowedProperties' => 'font,font-size,font-weight,font-style,font-family,text-decoration,padding-left,color,background-color,text-align',
+        'CSS.AllowedProperties' => '',
 
         /*
         |--------------------------------------------------------------------------
@@ -129,6 +129,8 @@ return [
         */
 
         'AutoFormat.RemoveEmpty' => false,
+
+        'Attr.DefaultImageAlt' => null
 
     ],
 

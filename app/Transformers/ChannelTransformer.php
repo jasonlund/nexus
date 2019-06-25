@@ -7,11 +7,12 @@ use App\Services\ChannelsService;
 use League\Fractal\TransformerAbstract;
 use App\Models\Channel;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use App\Services\PurifyService;
 
 class ChannelTransformer extends TransformerAbstract
 {
     protected $availableIncludes = [
-        'threads', 'latest_thread', 'latest_reply'
+        'latest_thread', 'latest_reply'
     ];
 
     /**
@@ -28,7 +29,7 @@ class ChannelTransformer extends TransformerAbstract
             'order' => (int) $channel->order,
             'name' => (string) $channel->name,
             'slug' => (string) $channel->slug,
-            'description' => (string) $channel->description,
+            'description' => (string) PurifyService::simple($channel->description),
             'locked' => (boolean) $channel->locked,
             'new' => $service->hasNewReplies($channel),
             'moderators' => (array) $channel->moderators->sortBy('username')->pluck('username')->toArray(),

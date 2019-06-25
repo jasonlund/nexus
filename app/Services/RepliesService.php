@@ -40,4 +40,17 @@ class RepliesService
             'edited_by' => auth()->user()->id
         ]);
     }
+
+    public function isNew($reply)
+    {
+        if(!auth()->check()) return false;
+
+        $view = $reply->thread->viewedBy()->where('user_id', auth()->user()->id)->first();
+
+        if(!$view) {
+            return true;
+        }else{
+            return $reply->created_at >= $view->pivot->timestamp;
+        }
+    }
 }

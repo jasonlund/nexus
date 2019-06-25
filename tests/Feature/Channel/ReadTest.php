@@ -53,12 +53,7 @@ class ReadTest extends TestCase
         $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
             ->assertJsonFragment([
-                'name' => $this->channel->name,
-                'description' => $this->channel->description,
-                'created_at' => $this->channel->created_at->format('Y-m-d H:i:s'),
-                'updated_at' => $this->channel->fresh()->updated_at->format('Y-m-d H:i:s'),
-                'thread_count' => 2,
-                'reply_count' => 4
+                'name' => $this->channel->name
             ]);
     }
 
@@ -68,13 +63,7 @@ class ReadTest extends TestCase
         $this->json('GET', $this->routeShow([$this->channel->slug]))
             ->assertStatus(200)
             ->assertJson([
-                'name' => $this->channel->name,
-                'slug' => $this->channel->slug,
-                'description' => $this->channel->description,
-                'created_at' => $this->channel->created_at->format('Y-m-d H:i:s'),
-                'updated_at' => $this->channel->fresh()->updated_at->format('Y-m-d H:i:s'),
-                'thread_count' => 2,
-                'reply_count' => 4
+                'name' => $this->channel->name
             ]);
     }
 

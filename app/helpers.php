@@ -57,9 +57,9 @@ if (! function_exists('paginated_response')) {
 
 if (! function_exists('strip_html_whitespace')) {
     function strip_html_whitespace($string) {
+        $string = strip_tags($string, '<iframe><img>');
         $string = preg_replace('/\s/', '', $string);
         $string = preg_replace('~\x{00a0}~','', $string);
-        $string = strip_tags($string);
 
         return $string;
     }

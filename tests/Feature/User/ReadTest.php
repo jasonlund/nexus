@@ -5,6 +5,7 @@ namespace Tests\Feature\User;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Bouncer;
+use Carbon\Carbon;
 
 class ReadTest extends TestCase
 {
@@ -30,6 +31,11 @@ class ReadTest extends TestCase
     protected function routeShowSelf()
     {
         return route('self.show');
+    }
+
+    protected function routeChannelsIndex()
+    {
+        return route('channels.index');
     }
 
     /** @test */
@@ -112,6 +118,34 @@ class ReadTest extends TestCase
         $this->apiAs($user,'GET', $this->routeIndex())
             ->assertStatus(200)
             ->assertJson(['data' => $users]);
+    }
+
+    /** @test */
+    function a_guest_can_list_all_active_users()
+    {
+        $users = create('User', [],10);
+        $now = Carbon::now()->addMinutes(20);
+        Carbon::setTestNow($now);
+
+        $this->apiAs($users[0], 'GET', $this->routeShowSelf());
+        $this->apiAs($users[1], 'GET', $this->routeShowSelf());
+        $this->apiAs($users[2], 'GET', $this->routeShowSelf());
+        $this->apiAs($users[3], 'GET', $this->routeShowSelf());
+
+        $active = collect($users)->take(4)
+            ->sortBy('username')
+            ->map(function($item){
+                return ['username' => $item->username];
+            })
+            ->values()
+            ->all();
+
+        $response = $this->json('GET', $this->routeIndex() . '?active')
+            ->assertStatus(200)
+            ->assertJsonCount(4)
+            ->assertJson(
+                $active
+            );
     }
 
     /** @test */

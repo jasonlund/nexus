@@ -2,9 +2,10 @@
 
 namespace Tests\Feature\Reply;
 
+use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Purify;
+use App\Services\PurifyService;
 
 class ReadTest extends TestCase
 {
@@ -26,6 +27,11 @@ class ReadTest extends TestCase
         return route('replies.index', $params);
     }
 
+    protected function routeShowThread($params = [])
+    {
+        return route('threads.show', $params);
+    }
+
     /** @test */
     function anyone_can_view_all_replies_in_a_thread()
     {
@@ -34,36 +40,41 @@ class ReadTest extends TestCase
             ->assertJson([
                 'data' => [
                     [
-                        'id' => $this->reply->id,
-                        'body' => $this->reply->body,
-                        'created_at' => $this->reply->created_at->format('Y-m-d H:i:s'),
-                        'updated_at' => $this->reply->updated_at->format('Y-m-d H:i:s'),
-                        'owner' => [
-                            'name' => $this->reply->owner->name,
-                            'username' => $this->reply->owner->username,
-                        ]
+                        'id' => $this->reply->id
                     ]
                 ]
             ]);
     }
 
-    /** @test */
-    function the_body_is_formatted_as_escaped_html()
-    {
-        $reply = create('Reply', [
-            'body' => $this->sampleHTML
-        ]);
-
-        $this->json('GET', $this->routeIndex([$reply->thread->channel->slug, $reply->thread->slug]))
-            ->assertStatus(200)
-            ->assertJson([
-                'data' => [
-                    [
-                        'body' => Purify::clean($reply->body)
-                    ]
-                ]
-            ]);
-    }
+//    /** @test */
+//    function a_reply_is_marked_as_read_per_user()
+//    {
+//        $this->withoutExceptionHandling();
+//        $user = create('User');
+//        Carbon::setTestNow(Carbon::now()->addMinutes(20));
+//
+//        $this->apiAs($user, 'GET', $this->routeIndex([$this->reply->thread->channel->slug, $this->reply->thread->slug]))
+//            ->assertStatus(200)
+//            ->assertJson([
+//                'data' => [
+//                    [
+//                        'new' => true
+//                    ]
+//                ]
+//            ]);
+//
+//        $this->apiAs($user, 'GET', $this->routeShowThread([$this->reply->thread->channel->slug, $this->reply->thread->slug]));
+//
+//        $this->apiAs($user, 'GET', $this->routeIndex([$this->reply->thread->channel->slug, $this->reply->thread->slug]))
+//            ->assertStatus(200)
+//            ->assertJson([
+//                'data' => [
+//                    [
+//                        'new' => false
+//                    ]
+//                ]
+//            ]);
+//    }
 
     /** @test */
     function replies_are_paginated()

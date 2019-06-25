@@ -6,7 +6,7 @@ use App\Services\ThreadsService;
 use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use Purify;
+use App\Services\PurifyService;
 
 class ReadTest extends TestCase
 {
@@ -48,15 +48,7 @@ class ReadTest extends TestCase
             ->assertJson([
                 'data' => [
                     [
-                        'slug' => $this->thread->slug,
-                        'title' => $this->thread->title,
-                        'body' => $this->thread->body,
-                        'created_at' => $this->thread->created_at->format('Y-m-d H:i:s'),
-                        'updated_at' => $this->thread->updated_at->format('Y-m-d H:i:s'),
-                        'owner' => [
-                            'name' => $this->thread->owner->name,
-                            'username' => $this->thread->owner->username,
-                        ]
+                        'slug' => $this->thread->slug
                     ]
                 ]
             ]);
@@ -93,36 +85,13 @@ class ReadTest extends TestCase
         $this->json('GET', $this->routeShow([$this->thread->channel->slug, $this->thread->slug]))
             ->assertStatus(200)
             ->assertJson([
-                'slug' => $this->thread->slug,
-                'title' => $this->thread->title,
-                'body' => $this->thread->body,
-                'created_at' => $this->thread->created_at->format('Y-m-d H:i:s'),
-                'updated_at' => $this->thread->updated_at->format('Y-m-d H:i:s'),
-                'owner' => [
-                    'name' => $this->thread->owner->name,
-                    'username' => $this->thread->owner->username,
-                ]
-            ]);
-    }
-
-    /** @test */
-    function the_threads_body_is_formatted_as_escaped_html()
-    {
-        $thread = create('Thread', [
-            'body' => $this->sampleHTML
-        ]);
-
-        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->slug]))
-            ->assertStatus(200)
-            ->assertJson([
-                'body' => Purify::clean($thread->body)
+                'slug' => $this->thread->slug
             ]);
     }
 
     /** @test */
     function a_thread_is_marked_as_viewed_per_user()
     {
-        $this->withoutExceptionHandling();
         $user = create('User');
         Carbon::setTestNow(Carbon::now()->addMinutes(20));
 

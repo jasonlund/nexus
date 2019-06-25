@@ -6,6 +6,7 @@ use App\Rules\RichTextRequired;
 use Carbon\Carbon;
 use Cache;
 use App\Models\ViewedThread;
+use App\Transformers\ReplyTransformer;
 
 class ThreadsService
 {
@@ -69,11 +70,19 @@ class ThreadsService
         $view = $thread->viewedBy()->where('user_id', auth()->user()->id)->first();
 
         if(!$view) {
-            return $thread->replies()->first() ?? true;
+            $reply = $thread->replies()->first();
+
+            return $reply !== null ? fractal()
+                ->item($reply)
+                ->transformWith(new ReplyTransformer()) : true;
         }else if($thread->latest_reply_at < $view->pivot->timestamp){
             return false;
         }else{
-            return $thread->replies()->where('created_at', '>', $view->pivot->timestamp)->first();
+            $reply = $thread->replies()->where('created_at', '>', $view->pivot->timestamp)->first();
+
+            return $reply !== null ? fractal()
+                ->item($reply)
+                ->transformWith(new ReplyTransformer()) : true;
         }
     }
 

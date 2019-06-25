@@ -3,6 +3,7 @@ namespace App\Services;
 
 use App\Models\Channel;
 use App\Models\User;
+use App\Rules\RichTextRequired;
 use Cache;
 use App\Models\ViewedThread;
 use Carbon\Carbon;
@@ -15,7 +16,7 @@ class ChannelsService
     {
         $rules = collect([
             'name' => ['required', 'string', 'max:100'],
-            'description' => ['required', 'string', 'max:1000'],
+            'description' => [new RichTextRequired, 'max:1000'],
             'moderators' => ['array', 'exists:users,username'],
             'order' => ['required', 'array', 'exists:channels,slug'],
             'locked' => ['sometimes', 'boolean']

@@ -11,7 +11,8 @@ abstract class TestCase extends BaseTestCase
     protected $sampleHTML =
         "<p>Hello World</p>\n" .
         "<h1><s>Test</s> <u>diff<strong>erent</strong></u> <em>Styles</em></h1>\n\n" .
-        "<blockquote>Foobar</blockquote>\n"
+        "<blockquote>Foobar</blockquote>\n" .
+        "<img src=\"http://www.google.com/image.jpg\" alt=\"image.jpg\">"
     ;
 
     protected $nullHTML = '<p><strong> </strong><em><s> </s> </em></p><p> <u> </u></p> <p></p>';

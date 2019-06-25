@@ -208,6 +208,7 @@ class UpdateTest extends TestCase
     /** @test */
     function an_authorized_user_can_optionally_set_the_signature_of_users()
     {
+        $this->withoutExceptionHandling();
         $user = create('User');
         $authorizedUser = create('User');
         Bouncer::allow($authorizedUser)->to('update-users');

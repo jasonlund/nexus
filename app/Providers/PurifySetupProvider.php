@@ -5,6 +5,7 @@ namespace App\Providers;
 use HTMLPurifier_HTMLDefinition;
 use Stevebauman\Purify\Facades\Purify;
 use Illuminate\Support\ServiceProvider;
+use HTMLPurifier_HTML5Config;
 
 class PurifySetupProvider extends ServiceProvider
 {
@@ -22,11 +23,15 @@ class PurifySetupProvider extends ServiceProvider
         $purifier = Purify::getPurifier();
 
         /** @var \HTMLPurifier_Config $config */
-        $config = $purifier->config;
+        $config = HTMLPurifier_HTML5Config::createDefault();
 
         $config->set('HTML.DefinitionID', static::DEFINITION_ID);
         $config->set('HTML.DefinitionRev', static::DEFINITION_REV);
-        // $config->set('Cache.DefinitionImpl', null);      // disable cache for testing
+        if(app()->environment() === 'local') $config->set('Cache.DefinitionImpl', null);
+                                                            // disable cache for testing
+
+        $config->set('HTML.SafeIframe', true);
+        $config->set('URI.SafeIframeRegexp', '%^(http://|https://|//)(www.youtube.com/embed/|player.twitch.tv/|clips.twitch.tv/)%');
 
         if ($def = $config->maybeGetRawHTMLDefinition()) {
             $this->setupDefinitions($def);
@@ -46,8 +51,7 @@ class PurifySetupProvider extends ServiceProvider
     }
 
     /**
-     * Adds elements and attributes to the HTML purifier
-     * definition required by the trix editor.
+     * Adds elements and attributes to the HTML purifier definition.
      *
      * @param HTMLPurifier_HTMLDefinition $def
      */

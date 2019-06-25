@@ -25,7 +25,7 @@ class LastActiveTest extends TestCase
     {
         $user = create('User');
 
-        $now = Carbon::now()->addMinutes(1);
+        $now = Carbon::now()->addMinutes(20);
         Carbon::setTestNow($now);
 
         $this->apiAs($user, 'GET', $this->routeChannelsIndex());
