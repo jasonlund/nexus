@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Auth;
 use Illuminate\Validation\ValidationException;
-use App\Http\Controllers\Controller;
-use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
 
 class TokenController extends Controller
 {
@@ -20,9 +19,9 @@ class TokenController extends Controller
     {
         $credentials = request(['email', 'password']);
 
-        if (! $token = auth()->attempt($credentials)) {
+        if (!$token = auth()->attempt($credentials)) {
             throw ValidationException::withMessages([
-                'email' => [ 'These credentials do not match our records.' ],
+                'email' => ['These credentials do not match our records.'],
             ]);
         }
 
@@ -48,13 +47,13 @@ class TokenController extends Controller
      */
     public function refresh()
     {
-        try{
+        try {
             return $this->respondWithToken(auth()->refresh());
-        }catch(TokenExpiredException $e) {
+        } catch (TokenExpiredException $e) {
             return response([
                 'message' => 'Token Expired'
             ], 403);
-        }catch(TokenBlacklistedException $e) {
+        } catch (TokenBlacklistedException $e) {
             return response([
                 'message' => 'Token Expired'
             ], 403);
@@ -64,7 +63,7 @@ class TokenController extends Controller
     /**
      * Get the token array structure.
      *
-     * @param  string $token
+     * @param string $token
      *
      * @return \Illuminate\Http\JsonResponse
      */

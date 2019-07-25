@@ -18,7 +18,7 @@ class Channel extends Model implements Sortable
      *
      * @var array
      */
-    protected $fillable = ['name', 'description', 'locked'];
+    protected $fillable = ['name', 'description', 'image', 'locked'];
 
     protected $casts = [
         'locked' => 'boolean'

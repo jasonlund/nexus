@@ -8,16 +8,27 @@ use App\Http\Requests\User\UserDestroyRequest;
 use App\Http\Requests\User\UserShowRequest;
 use App\Http\Requests\User\UserUnbanRequest;
 use App\Http\Requests\User\UserUpdateRequest;
-use App\Services\UsersService;
 use App\Models\User;
+use App\Services\UsersService;
 
 class UsersController extends Controller
 {
-    protected $service;
+    /**
+     * The Users Service
+     *
+     * @var UsersService
+     */
+//    protected $service;
 
+    /**
+     * UsersController constructor.
+     *
+     * @param UsersService $service
+     */
     public function __construct(UsersService $service)
     {
-        $this->service = $service;
+//        $this->service = $service;
+        parent::__construct();
     }
 
     /**
@@ -27,22 +38,7 @@ class UsersController extends Controller
      */
     public function index()
     {
-        // TODO -- clean this up. a new controller method for listing by role?
-        $paginated = true;
-        $query = User::query();
-        if(request()->has('role')
-            && in_array(request('role'), ['admin', 'super-moderator', 'moderator'])){
-            $paginated = false;
-            $query->whereIs(request('role'));
-        }else if(request()->has('active')){
-            $paginated = false;
-            $query->where('last_active_at', '>=', now()->subMinutes(10));
-        }
-
-        $query->orderBy('username');
-
-        return $paginated ? paginated_response($query, 'UserTransformer') :
-            collection_response($query, 'UserTransformer');
+        return $this->service->index();
     }
 
     /**
@@ -115,6 +111,13 @@ class UsersController extends Controller
         return item_response($user->fresh(), 'UserTransformer');
     }
 
+    /**
+     * Update the user's avatar.
+     *
+     * @param UserAvatarRequest $request
+     * @param User $user
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function avatar(UserAvatarRequest $request, User $user)
     {
         $this->service->avatar($user, request());

@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Feature\Reply;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -9,17 +9,9 @@ class TransformerTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $channel;
-    protected $thread;
-    protected $replies;
-
     public function setUp()
     {
         parent::setUp();
-
-        $this->channel = create('Channel');
-        $this->thread = create('Thread', ['channel_id' => $this->channel->id]);
-        $this->replies = create('Reply', ['thread_id' => $this->thread->id], 10);
 
         $this->withExceptionHandling();
     }
@@ -32,24 +24,28 @@ class TransformerTest extends TestCase
     /** @test */
     function a_reply_includes_its_id()
     {
-        $this->json('GET', $this->routeIndex([$this->channel->slug, $this->thread->slug]))
+        $reply = create('Reply');
+
+        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
             ->assertStatus(200)
             ->assertJson([
-                'data' => $this->replies->pluck('id')->map(function($item){
-                    return ['id' => $item];
-                })->toArray()
+                'data' => [
+                    ['id' => $reply->id]
+                ]
             ]);
     }
 
     /** @test */
     function a_reply_includes_its_body()
     {
-        $this->json('GET', $this->routeIndex([$this->channel->slug, $this->thread->slug]))
+        $reply = create('Reply');
+
+        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
             ->assertStatus(200)
             ->assertJson([
-                'data' => $this->replies->pluck('body')->map(function($item){
-                    return ['body' => $item];
-                })->toArray()
+                'data' => [
+                    ['body' => $reply->body]
+                ]
             ]);
     }
 
@@ -57,45 +53,49 @@ class TransformerTest extends TestCase
     function a_reply_body_is_formatted_as_rich_text()
     {
         $body = $this->sampleHTML;
-        $thread = create('Reply', ['thread_id' => $this->thread->id, 'body' => $body]);
+        $reply = create('Reply', ['body' => $body]);
 
-        $this->json('GET', $this->routeIndex([$this->channel->slug, $this->thread->slug]))
+        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
             ->assertStatus(200)
             ->assertJson([
-                'data' => $this->replies->pluck('body')->map(function($item){
-                    return ['body' => $item];
-                })->toArray()
+                'data' => [
+                    ['body' => $body]
+                ]
             ]);
     }
 
     /** @test */
     function a_reply_includes_timestamps()
     {
-        $this->json('GET', $this->routeIndex([$this->channel->slug, $this->thread->slug]))
+        $reply = create('Reply');
+
+        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
             ->assertStatus(200)
             ->assertJson([
-                'data' => $this->replies->map(function($item){
-                    return [
-                        'created_at' => $item->created_at,
-                        'updated_at' => $item->updated_at
-                    ];
-                })->toArray()
+                'data' => [
+                    [
+                        'created_at' => $reply->created_at,
+                        'updated_at' => $reply->updated_at
+                    ]
+                ]
             ]);
     }
 
     /** @test */
     function a_reply_includes_its_owner()
     {
-        $this->json('GET', $this->routeIndex([$this->channel->slug, $this->thread->slug]))
+        $reply = create('Reply');
+
+        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
             ->assertStatus(200)
             ->assertJson([
-                'data' => $this->replies->map(function($item){
-                    return [
+                'data' => [
+                    [
                         'owner' => [
-                            'username' => $item->owner->username
+                            'username' => $reply->owner->username
                         ]
-                    ];
-                })->toArray()
+                    ]
+                ]
             ]);
     }
 
@@ -103,22 +103,33 @@ class TransformerTest extends TestCase
     function a_reply_includes_its_editor_if_one_exists()
     {
         $user = create('User');
+        $reply = create('Reply');
 
-        $this->replies[0]->edited_at = now();
-        $this->replies[0]->edited_by = $user->id;
-        $this->replies[0]->save();
-
-        $this->json('GET', $this->routeIndex([$this->channel->slug, $this->thread->slug]))
+        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
             ->assertStatus(200)
             ->assertJson([
-                'data' => $this->replies->map(function($item){
-                    return [
-                        'editor' => $item->editor ? [
-                            'username' => $item->editor->username
-                        ] : null,
-                        'edited_at' => $item->edited_at ?? null
-                    ];
-                })->toArray()
+                'data' => [
+                    [
+                        'editor' => null,
+                        'edited_at' => null
+                    ]
+                ]
+            ]);
+
+        $now = now();
+        $reply->edited_at = $now;
+        $reply->edited_by = $user->id;
+        $reply->save();
+
+        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    [
+                        'editor' => ['username' => $user->username],
+                        'edited_at' => $now->format('Y-m-d H:i:s')
+                    ]
+                ]
             ]);
     }
 }

@@ -87,6 +87,25 @@ class UsersService
         return $rules->toArray();
     }
 
+    public function index()
+    {
+        $paginated = true;
+        $query = User::query();
+        if(request()->has('role')
+            && in_array(request('role'), ['admin', 'super-moderator', 'moderator'])){
+            $paginated = false;
+            $query->whereIs(request('role'));
+        }else if(request()->has('active')){
+            $paginated = false;
+            $query->where('last_active_at', '>=', now()->subMinutes(10));
+        }
+
+        $query->orderBy('username');
+
+        return $paginated ? paginated_response($query, 'UserTransformer') :
+            collection_response($query, 'UserTransformer');
+    }
+
     public function update($user, $data)
     {
         $attr = [

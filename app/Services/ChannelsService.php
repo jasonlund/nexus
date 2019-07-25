@@ -67,16 +67,10 @@ class ChannelsService
 
     public function reorder($order)
     {
-        // TODO -- find a better way to do this. sqlite honors the array order but mysql does not. so a special query
-        //          is required for mysql.
-        if(app()->environment() !== 'testing') {
-            $imploded = implode("','", $order);
-            $channels = Channel::whereIn('slug', $order)
-                ->orderByRaw(DB::raw("FIELD(slug, '$imploded')"))
-                ->get();
-        }else{
-            $channels = Channel::whereIn('slug', $order)->get();
-        }
+        $channels = Channel::whereIn('slug', $order)->get()
+            ->sortBy(function($item) use ($order) {
+                return array_search($item->slug, $order);
+            });
 
         Channel::setNewOrder($channels->pluck('id')->toArray());
     }

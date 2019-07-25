@@ -7,19 +7,27 @@ use App\Http\Requests\Channel\ChannelDestroyRequest;
 use App\Http\Requests\Channel\ChannelReorderRequest;
 use App\Http\Requests\Channel\ChannelUpdateRequest;
 use App\Models\Channel;
-use Illuminate\Http\Request;
-use App\Transformers\ChannelTransformer;
-use App\Models\User;
-use DB;
 use App\Services\ChannelsService;
+use DB;
 
 class ChannelsController extends Controller
 {
-    protected $service;
+    /**
+     * The Channel Service
+     *
+     * @var ChannelsService
+     */
+//    protected $service;
 
+    /**
+     * ChannelsController constructor.
+     *
+     * @param ChannelsService $service
+     */
     public function __construct(ChannelsService $service)
     {
-        $this->service = $service;
+        parent::__construct();
+//        $this->service = $service;
     }
 
     /**
@@ -36,7 +44,7 @@ class ChannelsController extends Controller
     /**
      * Store a newly created channel in storage.
      *
-     * @param  ChannelCreateRequest $request
+     * @param ChannelCreateRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(ChannelCreateRequest $request)
@@ -63,7 +71,7 @@ class ChannelsController extends Controller
     /**
      * Display the specified Channel.
      *
-     * @param  \App\Models\Channel  $channel
+     * @param \App\Models\Channel $channel
      * @return \Illuminate\Http\JsonResponse
      */
     public function show(Channel $channel)
@@ -74,8 +82,8 @@ class ChannelsController extends Controller
     /**
      * Update the specified Channel in storage.
      *
-     * @param  ChannelUpdateRequest  $request
-     * @param  \App\Models\Channel  $channel
+     * @param ChannelUpdateRequest $request
+     * @param \App\Models\Channel $channel
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(ChannelUpdateRequest $request, Channel $channel)
@@ -86,6 +94,12 @@ class ChannelsController extends Controller
         return item_response($channel, 'ChannelTransformer');
     }
 
+    /**
+     * Mark all threads in the given channel as viewed.
+     *
+     * @param Channel $channel
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function markRead(Channel $channel)
     {
         $this->service->viewed($channel);

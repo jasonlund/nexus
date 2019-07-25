@@ -11,13 +11,17 @@ return [
     | to accept any value.
     |
     */
-   
+
     'supportsCredentials' => false,
-    'allowedOrigins' => [ 'http://localhost', 'https://nexus.thepylonshow.com' ],
-    'allowedOriginsPatterns' => [ '/localhost:\d/' ],
+    'allowedOrigins' => env('CORS_ALLOWED_ORIGINS')
+        ? explode(',', env('CORS_ALLOWED_ORIGINS'))
+        : ['https://nexus.thepylonshow.com'],
+    'allowedOriginsPatterns' => env('CORS_ALLOWED_ORIGINS_PATTERNS')
+        ? explode(',', env('CORS_ALLOWED_ORIGINS_PATTERNS'))
+        : [],
     'allowedHeaders' => ['*'],
     'allowedMethods' => ['*'],
-    'exposedHeaders' => [ 'Authorization' ],
+    'exposedHeaders' => ['Authorization'],
     'maxAge' => 0,
 
 ];

@@ -34,7 +34,7 @@ class UserTransformer extends TransformerAbstract
         ];
 
         $data['moderatable_channels'] = $data['role'] !== 'moderator' ? [] :
-            $user->moderatedChannels()->pluck('slug');
+            $user->moderatedChannels->sortBy('slug')->pluck('slug');
 
         /**
          * If the User is the currently authenticated User or the currently authenticated User has the ability to

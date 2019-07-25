@@ -6,16 +6,27 @@ use App\Http\Requests\Self\SelfAvatarRequest;
 use App\Http\Requests\Self\SelfDestroyRequest;
 use App\Http\Requests\Self\SelfUpdateRequest;
 use App\Services\UsersService;
-use Illuminate\Http\Request;
 
 class SelfController extends Controller
 {
-    protected $service;
+    /**
+     * The User Service
+     *
+     * @var UsersService
+     */
+//    protected $service;
+
+    /**
+     * The currently authenticated User
+     *
+     * @var \App\Models\User
+     */
     protected $user;
 
     public function __construct(UsersService $service)
     {
-        $this->service = $service;
+//        $this->service = $service;
+        parent::__construct();
         $this->user = auth()->user();
     }
 

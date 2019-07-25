@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Channel;
+namespace Tests\Feature\Channel;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -10,15 +10,11 @@ class TransformerTest extends TestCase
 {
     use DatabaseMigrations;
 
-    protected $channels;
-
     public function setUp()
     {
         parent::setUp();
 
         $this->withExceptionHandling();
-
-        $this->channels = create('Channel', [], 5);
     }
 
     protected function routeIndex()
@@ -26,14 +22,10 @@ class TransformerTest extends TestCase
         return route('channels.index');
     }
 
-    protected function routeShow($params)
-    {
-        return route('channels.show', $params);
-    }
-
     /** @test */
     function a_channel_includes_its_order()
     {
+        $channels = create('Channel', [], 5);
         $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
             ->assertJson([
@@ -54,49 +46,49 @@ class TransformerTest extends TestCase
     /** @test */
     function a_channel_does_not_include_its_id()
     {
+        $channel = create('Channel', []);
+
         $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
-            ->assertJsonMissing(
-                $this->channels->pluck('id')->map(function($item){
-                    return ['id' => $item];
-                })->toArray()
-            );
+            ->assertJsonMissing([
+                ['id' => $channel->id]
+            ]);
     }
 
     /** @test */
     function a_channel_includes_its_name()
     {
+        $channel = create('Channel', []);
+
         $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
-            ->assertJson(
-                $this->channels->pluck('name')->map(function($item){
-                    return ['name' => $item];
-                })->toArray()
-            );
+            ->assertJson([
+                ['name' => $channel->name]
+            ]);
     }
 
     /** @test */
     function a_channel_includes_its_slug()
     {
+        $channel = create('Channel', []);
+
         $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
-            ->assertJson(
-                $this->channels->pluck('slug')->map(function($item){
-                    return ['slug' => $item];
-                })->toArray()
-            );
+            ->assertJson([
+                ['slug' => $channel->slug]
+            ]);
     }
 
     /** @test */
     function a_channel_includes_its_description()
     {
+        $channel = create('Channel', []);
+
         $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
-            ->assertJson(
-                $this->channels->pluck('description')->map(function($item){
-                    return ['description' => $item];
-                })->toArray()
-            );
+            ->assertJson([
+                ['description' => $channel->description]
+            ]);
     }
 
     /** @test */
@@ -105,115 +97,116 @@ class TransformerTest extends TestCase
         $description = '<p><strong>this</strong> is as <u>description</u></p>';
         $channel = create('Channel', ['description' => $description]);
 
-        $this->json('GET', $this->routeShow([$channel->slug]))
+        $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
             ->assertJson([
-                'description' => $description
+                ['description' => $description]
             ]);
     }
 
     /** @test */
     function a_channel_includes_its_locked_status()
     {
-        $this->channels[0]->locked = true;
-        $this->channels[0]->save();
+        $channel = create('Channel');
 
         $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
-            ->assertJson(
-                $this->channels->pluck('locked')->map(function($item){
-                    return ['locked' => $item];
-                })->toArray()
-            );
+            ->assertJson([
+                ['locked' => false]
+            ]);
+
+        $channel->locked = true;
+        $channel->save();
+
+        $this->json('GET', $this->routeIndex())
+            ->assertStatus(200)
+            ->assertJson([
+                ['locked' => true]
+            ]);
     }
 
     /** @test */
     function a_channel_includes_a_list_of_its_moderators_sorted_by_username()
     {
+        $channel = create('Channel');
         $moderators = create('User', [], 10);
-        foreach($this->channels as $channel) {
-            $channel->moderators()->sync($moderators->random(5));
-        }
+        $channel->moderators()->sync($moderators);
 
         $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
-            ->assertJson(
-                $this->channels->map(function($item){
-                    return ['moderators' => $item->moderators->sortBy('username')->pluck('username')->toArray()];
-                })->toArray()
-            );
+            ->assertJson([
+                [
+                    'moderators' => $moderators->sortBy('username')->pluck('username')->toArray()
+                ]
+            ]);
     }
 
     /** @test */
     function a_channel_includes_timestamps()
     {
+        $channel = create('Channel');
+
         $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
-            ->assertJson(
-                $this->channels->map(function($item){
-                    return [
-                        'created_at' => $item->created_at,
-                        'updated_at' => $item->updated_at
-                    ];
-                })->toArray()
-            );
+            ->assertJson([
+                [
+                    'created_at' => $channel->created_at,
+                    'updated_at' => $channel->updated_at
+                ]
+            ]);
     }
 
     /** @test */
     function a_channel_includes_its_thread_and_reply_count()
     {
-        foreach($this->channels as $channel) {
-            $threads = create('Thread', [
-                'channel_id' => $channel->id
-            ], rand(1, 5));
+        $channel = create('Channel');
 
-            foreach($threads as $thread) {
-                create('Reply', [
-                    'thread_id' => $thread->id
-                ], rand(1, 5));
-            }
+        $threads = create('Thread', [
+            'channel_id' => $channel->id
+        ], 5);
+
+        foreach($threads as $thread) {
+            create('Reply', [
+                'thread_id' => $thread->id
+            ], 5);
         }
 
         $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
-            ->assertJson(
-                $this->channels->map(function($item){
-                    return [
-                        'thread_count' => $item->threads()->count(),
-                        'reply_count' => $item->replies()->count()
-                    ];
-                })->toArray()
-            );
+            ->assertJson([
+                [
+                    'thread_count' => $channel->threads()->count(),
+                    'reply_count' => $channel->replies()->count()
+                ]
+            ]);
     }
 
     /** @test */
     function a_channel_includes_its_latest_thread_and_reply()
     {
-        foreach($this->channels as $channel) {
-            $threads = create('Thread', [
-                'channel_id' => $channel->id
-            ], rand(1, 5));
+        $channel = create('Channel');
 
-            foreach($threads as $thread) {
-                create('Reply', [
-                    'thread_id' => $thread->id
-                ], rand(1, 5));
-            }
+        $threads = create('Thread', [
+            'channel_id' => $channel->id
+        ], 5);
+
+        foreach($threads as $thread) {
+            create('Reply', [
+                'thread_id' => $thread->id
+            ], 5);
         }
 
         $response = $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
-            ->assertJson(
-                $this->channels->map(function($item){
-                    return [
-                        'latest_thread' => [
-                            'slug' => $item->threads()->latest()->first()->slug
-                        ],
-                        'latest_reply' => [
-                            'id' => $item->replies()->latest()->first()->id
-                        ]
-                    ];
-                })->toArray()
-            );
+            ->assertJson([
+                [
+                    'latest_thread' => [
+                        'slug' => $channel->threads()->latest()->first()->slug
+                    ],
+                    'latest_reply' => [
+                        'id' => $channel->replies()->latest()->first()->id
+                    ]
+                ]
+            ]);
     }
 }

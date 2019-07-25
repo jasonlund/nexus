@@ -5,20 +5,29 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Reply\ReplyCreateRequest;
 use App\Http\Requests\Reply\ReplyDestroyRequest;
 use App\Http\Requests\Reply\ReplyUpdateRequest;
+use App\Models\Channel;
 use App\Models\Reply;
 use App\Models\Thread;
-use App\Models\Channel;
 use App\Services\RepliesService;
-use Illuminate\Http\Request;
-use App\Transformers\ReplyTransformer;
 
 class RepliesController extends Controller
 {
-    protected $service;
+    /**
+     * The Replies Service
+     *
+     * @var RepliesService
+     */
+//    protected $service;
 
+    /**
+     * RepliesController constructor.
+     *
+     * @param RepliesService $service
+     */
     public function __construct(RepliesService $service)
     {
-        $this->service = $service;
+        parent::__construct();
+//        $this->service = $service;
     }
 
     /**
@@ -36,9 +45,9 @@ class RepliesController extends Controller
     /**
      * Store a newly created Reply in storage.
      *
-     * @param  \App\Http\Requests\ReplyCreateRequest  $request
-     * @param  \App\Models\Channel $channel
-     * @param  \App\Models\Thread $thread
+     * @param \App\Http\Requests\ReplyCreateRequest $request
+     * @param \App\Models\Channel $channel
+     * @param \App\Models\Thread $thread
      * @return \Illuminate\Http\JsonResponse
      */
     public function store(ReplyCreateRequest $request, Channel $channel, Thread $thread)
@@ -51,10 +60,10 @@ class RepliesController extends Controller
     /**
      * Update the specified Reply in storage.
      *
-     * @param  \App\Http\Requests\ReplyUpdateRequest $request
-     * @param  \App\Models\Channel $channel
-     * @param  \App\Models\Reply  $reply
-     * @param  \App\Models\Thread  $thread
+     * @param \App\Http\Requests\ReplyUpdateRequest $request
+     * @param \App\Models\Channel $channel
+     * @param \App\Models\Reply $reply
+     * @param \App\Models\Thread $thread
      * @return \Illuminate\Http\JsonResponse
      */
     public function update(ReplyUpdateRequest $request, Channel $channel, Thread $thread, Reply $reply)
@@ -68,9 +77,9 @@ class RepliesController extends Controller
      * Remove the specified Reply from storage.
      *
      * @param \App\Http\Requests\ReplyDestroyRequest $request
-     * @param  \App\Models\Channel $channel
-     * @param  \App\Models\Reply  $reply
-     * @param  \App\Models\Thread  $thread
+     * @param \App\Models\Channel $channel
+     * @param \App\Models\Reply $reply
+     * @param \App\Models\Thread $thread
      * @return \Illuminate\Http\JsonResponse
      * @throws \Exception
      */

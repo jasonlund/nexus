@@ -70,54 +70,33 @@ class ReadTest extends TestCase
             ->assertStatus(403);
     }
 
-    // /** @test */
+     /** @test */
     function a_user_can_list_all_users()
     {
-        // TODO -- this is broken because of sort order. Fix it.
-        // Also you do not need to be logged in to list users.
-
-        $user = create('User');
         $users = create('User', [], 10);
-        $valid = $users->map(function($item){
-            return [
-                'name' => $item->name,
-                'username' => $item->username
-            ];
-        })->toArray();
-        $valid = array_merge([$user->only(['name', 'username', 'email'])], $valid);
-        $invalid = $users->map(function($item){
-            return [
-                'email' => $item->email
-            ];
-        })->toArray();
 
-        $this->apiAs($user,'GET', $this->routeIndex())
+        $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
-            ->assertJson(['data' => $valid])
-            ->assertJsonMissing(['data' => $invalid]);
+            ->assertJson(['data' => $users->sortBy('username')->values()->map(function($item){
+                return ['username' => $item->username];
+            })->toArray()]);
     }
 
-    // /** @test */
+    /** @test */
     function an_authorized_user_can_list_all_users_with_emails()
     {
-        // TODO -- this is broken because of sort order. Fix it.
-
         $users = create('User', [], 10);
         $user = create('User');
         Bouncer::allow($user)->to('view-all-users');
+
         $users = $users->push($user);
-        $users = $users->map(function($item){
-            return [
-                'name' => $item->name,
-                'username' => $item->username,
-                'email' => $item->email
-            ];
-        })->toArray();
 
 
         $this->apiAs($user,'GET', $this->routeIndex())
             ->assertStatus(200)
-            ->assertJson(['data' => $users]);
+            ->assertJson(['data' => $users->sortBy('username')->values()->map(function($item){
+                return ['username' => $item->username];
+            })->toArray()]);
     }
 
     /** @test */

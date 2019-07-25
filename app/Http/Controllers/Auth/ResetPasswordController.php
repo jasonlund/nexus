@@ -3,16 +3,13 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Services\UsersService;
-use Illuminate\Foundation\Auth\ResetsPasswords;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Foundation\Auth\ResetsPasswords;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class ResetPasswordController extends Controller
 {
@@ -38,8 +35,8 @@ class ResetPasswordController extends Controller
     /**
      * Reset the given user's password.
      *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
-     * @param  string  $password
+     * @param \Illuminate\Contracts\Auth\CanResetPassword $user
+     * @param string $password
      * @return void
      */
     protected function resetPassword($user, $password)
@@ -58,8 +55,8 @@ class ResetPasswordController extends Controller
     /**
      * Return the newly generated token for the user.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $response
+     * @param \Illuminate\Http\Request $request
+     * @param string $response
      * @return \Illuminate\Http\JsonResponse
      */
     protected function sendResetResponse(Request $request, $response)
@@ -74,8 +71,8 @@ class ResetPasswordController extends Controller
     /**
      * Get the response for a failed password reset.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  string  $response
+     * @param \Illuminate\Http\Request $request
+     * @param string $response
      */
     protected function sendResetFailedResponse(Request $request, $response)
     {
