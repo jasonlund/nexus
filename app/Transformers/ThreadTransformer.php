@@ -6,6 +6,7 @@ use App\Services\ThreadsService;
 use League\Fractal\TransformerAbstract;
 use App\Models\Thread;
 use App\Services\PurifyService;
+use Illuminate\Support\Str;
 
 class ThreadTransformer extends TransformerAbstract
 {
@@ -27,6 +28,7 @@ class ThreadTransformer extends TransformerAbstract
         $data = [
             'title' => (string) $thread->title,
             'slug' => (string) $thread->slug,
+            'preview' => (string) Str::limit(nl2br(PurifyService::strip($thread->body)), 250),
             'body' => (string) PurifyService::clean($thread->body),
             'locked' => (boolean) $thread->locked,
             'replies' => $thread->replies()->pluck('id'),

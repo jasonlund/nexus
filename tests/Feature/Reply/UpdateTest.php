@@ -35,7 +35,7 @@ class UpdateTest extends TestCase
         $reply = create('Reply', ['user_id' => $user->id]);
         $oldData = $reply->only('body');
         $newData = [
-            'body' => 'FooBar'
+            'body' => '<p>FooBar</p>'
         ];
 
         $this->apiAs($user,'PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), $newData)
@@ -62,7 +62,7 @@ class UpdateTest extends TestCase
         $reply = create('Reply');
         $oldData = $reply->only('body');
         $newData = [
-            'body' => 'FooBar'
+            'body' => '<p>FooBar</p>'
         ];
 
         $this->apiAs($user, 'PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), $newData)
@@ -90,7 +90,7 @@ class UpdateTest extends TestCase
         $notInChannel = create('Reply');
         $inChannel->thread->channel->moderators()->attach($user);
         $newData = [
-            'body' => 'FooBar'
+            'body' => '<p>FooBar</p>'
         ];
 
         $this->apiAs($user,'PATCH', $this->routeUpdate([$inChannel->channel->slug, $inChannel->thread->slug, $inChannel->id]), $newData)
@@ -132,7 +132,7 @@ class UpdateTest extends TestCase
         $reply = create('Reply', ['thread_id' => $thread->id]);
         $oldData = $reply->only('body');
         $newData = [
-            'body' => 'FooBar'
+            'body' => '<p>FooBar</p>'
         ];
 
         $this->apiAs($user, 'PATCH', $this->routeUpdate([$reply->channel->slug, $reply->thread->slug, $reply->id]), $newData)
@@ -161,7 +161,7 @@ class UpdateTest extends TestCase
         $notInChannel = create('Reply', ['thread_id' => $threads[1]->id]);
         $threads[0]->channel->moderators()->attach($user);
         $newData = [
-            'body' => 'FooBar'
+            'body' => '<p>FooBar</p>'
         ];
 
         $this->apiAs($user,'PATCH', $this->routeUpdate([$inChannel->channel->slug, $inChannel->thread->slug, $inChannel->id]), $newData)

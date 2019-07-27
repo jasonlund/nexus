@@ -26,7 +26,7 @@ class SelfController extends Controller
     public function __construct(UsersService $service)
     {
 //        $this->service = $service;
-        parent::__construct();
+        parent::__construct('Users');
         $this->user = auth()->user();
     }
 

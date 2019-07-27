@@ -10,9 +10,9 @@ abstract class TestCase extends BaseTestCase
 
     protected $sampleHTML =
         "<p>Hello World</p>\n" .
-        "<h1><s>Test</s> <u>diff<strong>erent</strong></u> <em>Styles</em></h1>\n\n" .
+        "<h3><s>Test</s> <u>diff<strong>erent</strong></u> <em>Styles</em></h3>\n" .
         "<blockquote>Foobar</blockquote>\n" .
-        "<img src=\"http://www.google.com/image.jpg\" alt=\"image.jpg\">"
+        "<p><img src=\"http://www.google.com/image.jpg\" alt=\"image.jpg\"></p>"
     ;
 
     protected $nullHTML = '<p><strong> </strong><em><s> </s> </em></p><p> <u> </u></p> <p></p>';

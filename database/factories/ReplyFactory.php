@@ -11,6 +11,6 @@ $factory->define(Reply::class, function (Faker $faker) {
         'thread_id' => function() {
             return factory('App\Models\Thread')->create()->id;
         },
-        'body' => '<p>' . implode('</p><p>', $faker->paragraphs(rand(2, 10))) . '</p>'
+        'body' => "<p>" . implode("</p>\n<p>", $faker->paragraphs(rand(2, 10))) . "</p>"
     ];
 });
