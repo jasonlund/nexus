@@ -7,10 +7,6 @@ class PurifyService
 {
     public static function clean($string)
     {
-        // $config = ['HTML.Allowed' => 'h3,strong,em,s,u,a[href],ul,ol,li,p,blockquote,img[src],div,iframe'];
-
-        // return Purify::clean($string, $config);
-
         return Purifier::clean($string);
     }
 

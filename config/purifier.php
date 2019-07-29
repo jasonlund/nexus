@@ -24,7 +24,7 @@ return [
     'settings'      => [
         'default' => [
             'HTML.Doctype'             => 'HTML 4.01 Transitional',
-            'HTML.Allowed'             => 'div[class],h3,strong,em,u,s,a[href|title],ul,ol,li,p,blockquote,img[width|height|alt|src],iframe[src|frameborder]',
+            'HTML.Allowed'             => 'div[class],strong,em,u,s,a[href|title],ul,ol,li,p,blockquote,img[width|height|alt|src],iframe[src|frameborder]',
             'CSS.AllowedProperties'    => '',
             'AutoFormat.AutoParagraph' => true,
             // 'AutoFormat.RemoveEmpty'   => true,

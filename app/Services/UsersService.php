@@ -9,6 +9,7 @@ use Storage;
 use App\Models\User;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
+use Image;
 
 class UsersService
 {
@@ -175,7 +176,15 @@ class UsersService
         if($user->avatar_path)
             Storage::disk('public')->delete($user->avatar_path);
 
-        $file_path = $data->file('avatar') !== null ? $data->file('avatar')->store('avatars', 'public') : null;
+        if($data->file('avatar') === null){
+            $file_path = null;
+        }else{
+            $file = $data->file('avatar');
+            $image = Image::make($file)
+                ->fit(300);
+            $file_path = 'avatars/' . $file->hashName();
+            Storage::disk('public')->put($file_path, $image->stream());
+        }
 
         return $user->update([
             'avatar_path' => $file_path

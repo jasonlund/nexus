@@ -185,4 +185,21 @@ class AvatarTest extends TestCase
         Storage::disk('public')->assertAbsent('avatars/' . $oldFile->hashName());
         Storage::disk('public')->assertPresent('avatars/' . $newFile->hashName());
     }
+
+    /** @test */
+    function an_non_square_avatar_is_cropped_to_be_square()
+    {
+        $user = create('User');
+
+        Storage::fake('public');
+
+        $this->apiAs($user, 'POST', $this->routeSelf(), [
+            'avatar' => $file = UploadedFile::fake()->image('avatar.png', 100, 200)
+        ]);
+
+        $size = getimagesize(storage_path('framework/testing/disks/public/avatars/' . $file->hashName()));
+
+        $this->assertEquals(300, $size[0]);
+        $this->assertEquals(300, $size[1]);
+    }
 }
