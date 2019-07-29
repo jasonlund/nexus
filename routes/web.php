@@ -1,7 +1,7 @@
 <?php
 
 Route::get('/test', function() {
-    abort(500, 'this is a test');
+    throw new Exception('this is a test');
 });
 
 Route::get('/debug-sentry', function () {
