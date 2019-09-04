@@ -65,7 +65,7 @@ class ForgotPasswordTest extends TestCase
 
         $user = create('User');
 
-        $this->apiAs($user,'post', $this->routePasswordEmail(), ['email' => $user->email])
+        $this->apiAs($user, 'post', $this->routePasswordEmail(), ['email' => $user->email])
             ->assertStatus(403);
 
         Notification::assertNotSentTo($user, ResetPassword::class);

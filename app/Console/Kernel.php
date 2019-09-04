@@ -19,18 +19,20 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param \Illuminate\Console\Scheduling\Schedule $schedule
-     * @return void
+     * @param   Schedule  $schedule
+     *
+     * @return  void
      */
     protected function schedule(Schedule $schedule)
     {
+        // Remove expired bans.
         $schedule->command('ban:delete-expired')->everyMinute();
     }
 
     /**
      * Register the commands for the application.
      *
-     * @return void
+     * @return  void
      */
     protected function commands()
     {

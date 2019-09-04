@@ -1,28 +1,30 @@
 <?php
+
 namespace App\Http\Middleware;
 
 use Closure;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Tymon\JWTAuth\Http\Middleware\RefreshToken as BaseMiddleware;
+use Illuminate\Http\Request;
 
 class RefreshToken extends BaseMiddleware
 {
     /**
-     * Handle an incoming request.
+     * Refresh the JWT if it exists and is valid.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param   Request  $request
+     * @param   Closure  $next
      *
-     * @throws \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
+     * @return  Closure
      *
-     * @return mixed
+     * @throws  UnauthorizedHttpException
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         try {
             $this->checkForToken($request);
-        }catch(\Exception $e) {
+        } catch (\Exception $e) {
             return $next($request);
         }
 
@@ -36,6 +38,5 @@ class RefreshToken extends BaseMiddleware
 
         // Send the refreshed token back to the client.
         return $this->setAuthenticationHeader($response, $token);
-
     }
 }

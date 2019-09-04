@@ -29,13 +29,13 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param \Exception $exception
-     * @return void
-     * @throws \Exception
+     * @param   Exception  $exception
+     *
+     * @return  void
      */
     public function report(Exception $exception)
     {
-        if (app()->bound('sentry') && $this->shouldReport($exception)){
+        if (app()->bound('sentry') && $this->shouldReport($exception)) {
             app('sentry')->captureException($exception);
         }
 
@@ -45,9 +45,10 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \Exception $exception
-     * @return \Illuminate\Http\Response
+     * @param   \Illuminate\Http\Request    $request
+     * @param   Exception                   $exception
+     *
+     * @return  \Illuminate\Http\Response
      */
     public function render($request, Exception $exception)
     {

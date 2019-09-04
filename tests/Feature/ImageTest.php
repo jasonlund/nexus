@@ -47,12 +47,12 @@ class ImageTest extends TestCase
         $user = create('User');
 
         $this->apiAs($user, 'POST', $this->route(), [
-            'file' => $file = UploadedFile::fake()->image('file.png')->size(1000)
+            'file' => $file = UploadedFile::fake()->image('file.png')->size(1024)
         ])
             ->assertStatus(200);
 
         $this->apiAs($user, 'POST', $this->route(), [
-            'file' => $file = UploadedFile::fake()->image('file.png')->size(1001)
+            'file' => $file = UploadedFile::fake()->image('file.png')->size(1025)
         ])
             ->assertJsonValidationErrors(['file']);
     }
@@ -68,7 +68,7 @@ class ImageTest extends TestCase
             'file' => $file = UploadedFile::fake()->image('image.png')
         ]);
 
-        Storage::disk('public')->assertPresent('images/' . $file->hashName());
+        Storage::disk('public')->assertExists('images/' . $file->hashName());
 
         $data = $response->decodeResponseJson();
 

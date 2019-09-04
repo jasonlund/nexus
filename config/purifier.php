@@ -24,9 +24,9 @@ return [
     'settings'      => [
         'default' => [
             'HTML.Doctype'             => 'HTML 4.01 Transitional',
-            'HTML.Allowed'             => 'div[class],strong,em,u,s,a[href|title|rel],ul,ol,li,p,blockquote,img[width|height|alt|src],iframe[src|frameborder]',
+            'HTML.Allowed'             => 'div[class],span[class|data-emote],br,strong,em,u,s,a[href|title|rel],ul,ol,li,p,blockquote,img[width|height|alt|src],iframe[src|frameborder]',
             'CSS.AllowedProperties'    => '',
-            'AutoFormat.AutoParagraph' => true,
+            // 'AutoFormat.AutoParagraph' => true,
             // 'AutoFormat.RemoveEmpty'   => true,
             "HTML.SafeIframe"      => 'true',
             "URI.SafeIframeRegexp" => "%^(http://|https://|//)(www.youtube.com/embed/|player.twitch.tv/|clips.twitch.tv/)%",
@@ -99,7 +99,7 @@ return [
             ],
         ],
         'custom_attributes' => [
-            ['a', 'target', 'Enum#_blank,_self,_target,_top'],
+            ['span', 'data-emote', 'Text']
         ],
         'custom_elements' => [
             ['u', 'Inline', 'Inline', 'Common'],

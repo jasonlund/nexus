@@ -34,7 +34,7 @@ class UpdateTest extends TestCase
         $user = create('User');
         $oldData = $user->only(['name', 'username']);
 
-        $this->apiAs($user,'PATCH', $this->routeUpdateSelf(), [
+        $this->apiAs($user, 'PATCH', $this->routeUpdateSelf(), [
             'name' => 'John Doe',
             'username' => 'johndoe',
             'email' => 'john@email.com'
@@ -49,7 +49,8 @@ class UpdateTest extends TestCase
         $user = create('User');
         $password = 'FooBar123';
 
-        $data = array_merge($user->only(['name', 'username', 'email']),
+        $data = array_merge(
+            $user->only(['name', 'username', 'email']),
             [
                 'password' => $password,
                 'password_confirmation' => $password
@@ -68,7 +69,8 @@ class UpdateTest extends TestCase
         $user = create('User');
         $signature = 'this is a signature 123';
 
-        $data = array_merge($user->only(['name', 'username', 'email']),
+        $data = array_merge(
+            $user->only(['name', 'username', 'email']),
             [
                 'signature' => $signature
             ]
@@ -160,7 +162,7 @@ class UpdateTest extends TestCase
         $otherUser = create('User');
         $oldData = $otherUser->only(['name', 'username']);
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate($otherUser->username), [
+        $this->apiAs($user, 'PATCH', $this->routeUpdate($otherUser->username), [
             'name' => 'John Doe',
             'username' => 'johndoe',
             'email' => 'john@email.com',
@@ -179,19 +181,21 @@ class UpdateTest extends TestCase
 
         $otherUser = create('User');
 
-        $data = array_merge($otherUser->only(['name', 'username', 'email']),
+        $data = array_merge(
+            $otherUser->only(['name', 'username', 'email']),
             [
                 'password' => null,
                 'role' => 'user'
             ]
         );
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate($otherUser->username), $data)
+        $this->apiAs($user, 'PATCH', $this->routeUpdate($otherUser->username), $data)
             ->assertStatus(200);
 
         $this->assertTrue(Hash::check('secret', $otherUser->fresh()->password));
 
-        $data = array_merge($otherUser->only(['name', 'username', 'email']),
+        $data = array_merge(
+            $otherUser->only(['name', 'username', 'email']),
             [
                 'password' => $password,
                 'password_confirmation' => $password,
@@ -199,7 +203,7 @@ class UpdateTest extends TestCase
             ]
         );
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate($otherUser->username), $data)
+        $this->apiAs($user, 'PATCH', $this->routeUpdate($otherUser->username), $data)
             ->assertStatus(200);
 
         $this->assertTrue(Hash::check($password, $otherUser->fresh()->password));
@@ -215,7 +219,8 @@ class UpdateTest extends TestCase
 
         $signature = 'this is a signature 123';
 
-        $data = array_merge($user->only(['name', 'username', 'email']),
+        $data = array_merge(
+            $user->only(['name', 'username', 'email']),
             [
                 'signature' => $signature,
                 'role' => 'user'
@@ -251,7 +256,8 @@ class UpdateTest extends TestCase
 
         $timezone = 'America/Los_Angeles';
 
-        $data = array_merge($otherUser->only(['name', 'username', 'email']),
+        $data = array_merge(
+            $otherUser->only(['name', 'username', 'email']),
             [
                 'role' => 'user'
             ]
@@ -281,7 +287,8 @@ class UpdateTest extends TestCase
 
         $location = 'Miami, Florida';
 
-        $data = array_merge($otherUser->only(['name', 'username', 'email']),
+        $data = array_merge(
+            $otherUser->only(['name', 'username', 'email']),
             [
                 'role' => 'user'
             ]
@@ -472,21 +479,21 @@ class UpdateTest extends TestCase
 
     private function updateSelf($data, $user = null)
     {
-        if(!$user) $user = create('User');
+        if (!$user) $user = create('User');
 
         $data = array_merge($user->only(['name', 'username', 'email']), $data);
 
-        return $this->apiAs($user,'PATCH', $this->routeUpdateSelf(), $data);
+        return $this->apiAs($user, 'PATCH', $this->routeUpdateSelf(), $data);
     }
 
     private function update($data, $user = null)
     {
-        if(!$user) $user = create('User');
+        if (!$user) $user = create('User');
         Bouncer::allow($user)->to('update-users');
 
         $data = array_merge($user->only(['name', 'username', 'email']), $data);
         $data['role'] = 'user';
 
-        return $this->apiAs($user,'PATCH', $this->routeUpdate($user), $data);
+        return $this->apiAs($user, 'PATCH', $this->routeUpdate($user), $data);
     }
 }

@@ -54,7 +54,7 @@ class ResetPasswordTest extends TestCase
             ])
             ->assertJson([
                 'token_type' => 'bearer',
-                'expires_in' => (int)config('jwt.ttl') * 60
+                'expires_in' => (int) config('jwt.ttl') * 60
             ]);
 
         Event::assertDispatched(PasswordReset::class, function ($event) use ($user) {

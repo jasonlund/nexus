@@ -19,8 +19,9 @@ class RegisterController extends Controller
     /**
      * Handle a registration request for the application.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param   Request  $request
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
     public function register(Request $request)
     {
@@ -34,8 +35,9 @@ class RegisterController extends Controller
     /**
      * Get a validator for an incoming registration request.
      *
-     * @param array $data
-     * @return \Illuminate\Contracts\Validation\Validator
+     * @param   array  $data
+     *
+     * @return  Validator
      */
     protected function validator(array $data)
     {
@@ -45,8 +47,9 @@ class RegisterController extends Controller
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param array $data
-     * @return \App\Models\User
+     * @param   array  $data
+     *
+     * @return  User
      */
     protected function create(array $data)
     {
@@ -62,11 +65,12 @@ class RegisterController extends Controller
     /**
      * Generate and return a token for the newly registered user.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param mixed $user
-     * @return mixed
+     * @param   Request  $request
+     * @param   User     $user
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
-    protected function registered(Request $request, $user)
+    protected function registered(Request $request, User $user)
     {
         return response()->json([
             'access_token' => \JWTAuth::fromUser($user),

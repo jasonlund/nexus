@@ -1,7 +1,17 @@
 <?php
 
-if (! function_exists('item_response')) {
-    function item_response($item, $transformer, $includes = []) {
+if (!function_exists('item_response')) {
+    /**
+     * Transform a given item and return a JSON response.
+     *
+     * @param   mixed  $item
+     * @param   mixed  $transformer
+     * @param   array  $includes
+     *
+     * @return  \Illuminate\Http\JsonResponse
+     */
+    function item_response($item, $transformer, $includes = [])
+    {
         $transformer = "\\App\\Transformers\\{$transformer}";
 
         return response()->json(fractal()
@@ -11,8 +21,18 @@ if (! function_exists('item_response')) {
     }
 }
 
-if (! function_exists('collection_response')) {
-    function collection_response($data, $transformer, $includes = []) {
+if (!function_exists('collection_response')) {
+    /**
+     * Transform a given collection and return a JSON response.
+     *
+     * @param   array  $data
+     * @param   mixed  $transformer
+     * @param   array  $includes
+     *
+     * @return  \Illuminate\Http\JsonResponse
+     */
+    function collection_response($data, $transformer, $includes = [])
+    {
         $data = $data->get();
         $transformer = "\\App\\Transformers\\{$transformer}";
 
@@ -23,20 +43,22 @@ if (! function_exists('collection_response')) {
     }
 }
 
-if (! function_exists('paginated_response')) {
+if (!function_exists('paginated_response')) {
     /**
-     * Paginate a query, transform it with the defined Transformer and return it as a JSON response.
+     * Transform and paginate a given collection and return a JSON response.
      *
-     * @param $data
-     * @param $transformer
-     * @param array $includes
-     * @return \Illuminate\Http\JsonResponse
+     * @param   array  $data
+     * @param   mixed  $transformer
+     * @param   array  $includes
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
-    function paginated_response($data, $transformer, $includes = []) {
+    function paginated_response($data, $transformer, $includes = [])
+    {
         $limit = 25;
-        if(request()->has('limit')) {
-            $input = (int)request('limit');
-            if($input < 101 && $input > 9){
+        if (request()->has('limit')) {
+            $input = (int) request('limit');
+            if ($input < 101 && $input > 9) {
                 $limit = $input;
             }
         }
@@ -55,11 +77,19 @@ if (! function_exists('paginated_response')) {
     }
 }
 
-if (! function_exists('strip_html_whitespace')) {
-    function strip_html_whitespace($string) {
+if (!function_exists('strip_html_whitespace')) {
+    /**
+     * Strip all HTML from the given string.
+     *
+     * @param   string  $string
+     *
+     * @return  string
+     */
+    function strip_html_whitespace($string)
+    {
         $string = strip_tags($string, '<iframe><img>');
         $string = preg_replace('/\s/', '', $string);
-        $string = preg_replace('~\x{00a0}~','', $string);
+        $string = preg_replace('~\x{00a0}~', '', $string);
 
         return $string;
     }

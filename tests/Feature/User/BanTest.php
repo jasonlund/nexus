@@ -39,7 +39,7 @@ class BanTest extends TestCase
         $nowDate = Carbon::now();
         $expiryDate = $nowDate->copy()->addMonth();
 
-        $this->apiAs($user,'PATCH', $this->routeBan($bannedUser->username), [
+        $this->apiAs($user, 'PATCH', $this->routeBan($bannedUser->username), [
             'comment' => 'FooBar',
             'expired_at' => $expiryDate->format('Y-m-d H:i:s')
         ])
@@ -59,7 +59,7 @@ class BanTest extends TestCase
         Bouncer::allow($user)->to('ban-users');
         Bouncer::allow($user)->to('view-all-users');
 
-        $this->apiAs($user,'PATCH', $this->routeBan($bannedUser->username))
+        $this->apiAs($user, 'PATCH', $this->routeBan($bannedUser->username))
             ->assertStatus(200)
             ->assertJson(array_merge($bannedUser->only(['username', 'name', 'email']), [
                 'banned' => true,
@@ -74,7 +74,7 @@ class BanTest extends TestCase
         $user = create('User');
         $bannedUser = create('User');
 
-        $this->apiAs($user,'PATCH', $this->routeBan($bannedUser->username))
+        $this->apiAs($user, 'PATCH', $this->routeBan($bannedUser->username))
             ->assertStatus(403);
     }
 
@@ -100,7 +100,7 @@ class BanTest extends TestCase
             'ban_comment' => 'FooBar'
         ]);
 
-        $this->apiAs($user,'PATCH', $this->routeUnban($bannedUser->username))
+        $this->apiAs($user, 'PATCH', $this->routeUnban($bannedUser->username))
             ->assertStatus(200)
             ->assertJson(array_merge($bannedUser->only(['username', 'name', 'email']), [
                 'banned' => false,
@@ -116,7 +116,7 @@ class BanTest extends TestCase
         $user = create('User');
         $bannedUser = create('User');
 
-        $this->apiAs($user,'PATCH', $this->routeUnban($bannedUser->username))
+        $this->apiAs($user, 'PATCH', $this->routeUnban($bannedUser->username))
             ->assertStatus(403);
     }
 
@@ -139,15 +139,15 @@ class BanTest extends TestCase
 
         $expiryDate = Carbon::now()->addMonth();
 
-        $this->apiAs($user,'PATCH', $this->routeBan($bannedUser->username), [
+        $this->apiAs($user, 'PATCH', $this->routeBan($bannedUser->username), [
             'expired_at' => $expiryDate->format('Y-m-d H:i:s')
         ])
             ->assertStatus(200);
 
-        $this->apiAs($user,'PATCH', $this->routeBan($bannedUser->username), ['expired_at' => null])
+        $this->apiAs($user, 'PATCH', $this->routeBan($bannedUser->username), ['expired_at' => null])
             ->assertStatus(200);
 
-        $this->apiAs($user,'PATCH', $this->routeBan($bannedUser->username), ['expired_at' => 'notadatettime'])
+        $this->apiAs($user, 'PATCH', $this->routeBan($bannedUser->username), ['expired_at' => 'notadatettime'])
             ->assertJsonValidationErrors(['expired_at']);
     }
 
@@ -159,7 +159,7 @@ class BanTest extends TestCase
         Bouncer::allow($user)->to('ban-users');
         Bouncer::assign('admin')->to($bannedUser);
 
-        $this->apiAs($user,'PATCH', $this->routeBan($bannedUser->username))
+        $this->apiAs($user, 'PATCH', $this->routeBan($bannedUser->username))
             ->assertStatus(403);
     }
 
@@ -171,7 +171,7 @@ class BanTest extends TestCase
         Bouncer::allow($user)->to('ban-users');
         Bouncer::assign('super-moderator')->to($bannedUser);
 
-        $this->apiAs($user,'PATCH', $this->routeBan($bannedUser->username))
+        $this->apiAs($user, 'PATCH', $this->routeBan($bannedUser->username))
             ->assertStatus(403);
     }
 
@@ -183,7 +183,7 @@ class BanTest extends TestCase
         Bouncer::allow($user)->to('ban-users');
         Bouncer::assign('moderator')->to($bannedUser);
 
-        $this->apiAs($user,'PATCH', $this->routeBan($bannedUser->username))
+        $this->apiAs($user, 'PATCH', $this->routeBan($bannedUser->username))
             ->assertStatus(403);
     }
 }

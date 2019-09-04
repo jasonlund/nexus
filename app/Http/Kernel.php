@@ -40,7 +40,7 @@ class Kernel extends HttpKernel
 
         'api' => [
             \Barryvdh\Cors\HandleCors::class,
-            'throttle:60,1',
+            'throttle:120,1',
             'bindings',
             \App\Http\Middleware\ForbidBannedUser::class,
             \App\Http\Middleware\LastActive::class
@@ -55,7 +55,6 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
-        'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
@@ -64,7 +63,8 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'auth' => \Tymon\JWTAuth\Http\Middleware\Authenticate::class,
-        'refresh' => \Tymon\JWTAuth\Http\Middleware\RefreshToken::class
+        'refresh' => \Tymon\JWTAuth\Http\Middleware\RefreshToken::class,
+        'limit.actions' => \App\Http\Middleware\LimitActions::class
     ];
 
     /**

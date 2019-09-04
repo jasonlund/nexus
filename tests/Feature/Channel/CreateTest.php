@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Channel;
 
-use App\Models\Channel;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Bouncer;
@@ -11,21 +10,25 @@ class CreateTest extends TestCase
 {
     use DatabaseMigrations;
 
+    protected $category;
+
     public function setUp()
     {
         parent::setUp();
 
+        $this->category = create('ChannelCategory');
+
         $this->withExceptionHandling();
     }
 
-    protected function routeStore()
+    protected function routeStore($params)
     {
-        return route('channels.store');
+        return route('channels.store', $params);
     }
 
-    protected function routeIndex()
+    protected function routeIndex($params)
     {
-        return route('channels.index');
+        return route('channels.index', $params);
     }
 
     /** @test */
@@ -36,10 +39,10 @@ class CreateTest extends TestCase
 
         $channel = raw('Channel', ['name' => 'FooBar']);
 
-        $this->apiAs($user, 'PUT', $this->routeStore(), $channel)
+        $this->apiAs($user, 'PUT', $this->routeStore([$this->category->slug]), $channel)
             ->assertStatus(200);
 
-        $this->json('GET', $this->routeIndex())
+        $this->json('GET', $this->routeIndex([$this->category->slug]))
             ->assertStatus(200)
             ->assertJsonFragment([
                 'name' => 'FooBar',
@@ -56,12 +59,13 @@ class CreateTest extends TestCase
 
         $channel = raw('Channel', []);
 
-        $this->apiAs($user, 'PUT', $this->routeStore(), array_merge($channel,
+        $this->apiAs($user, 'PUT', $this->routeStore([$this->category->slug]), array_merge(
+            $channel,
             ['moderators' => $mods->pluck('username')->toArray()]
         ))
             ->assertStatus(200);
 
-        $this->json('GET', $this->routeIndex())
+        $this->json('GET', $this->routeIndex([$this->category->slug]))
             ->assertStatus(200)
             ->assertJsonFragment([
                 'moderators' => $mods->sortBy('username')->pluck('username')->toArray()
@@ -71,14 +75,14 @@ class CreateTest extends TestCase
     /** @test */
     function a_guest_and_an_unauthorized_user_can_not_create_a_channel()
     {
-        $this->json('PUT', $this->routeStore(), [])
+        $this->json('PUT', $this->routeStore([$this->category->slug]), [])
             ->assertStatus(401);
 
         $user = create('User');
 
         $channel = raw('Channel', ['name' => 'FooBar']);
 
-        $this->apiAs($user, 'PUT', $this->routeStore(), $channel)
+        $this->apiAs($user, 'PUT', $this->routeStore([$this->category->slug]), $channel)
             ->assertStatus(403);
     }
 
@@ -90,7 +94,7 @@ class CreateTest extends TestCase
 
         $channel = raw('Channel', ['locked' => true]);
 
-        $this->apiAs($user, 'PUT', $this->routeStore(), $channel)
+        $this->apiAs($user, 'PUT', $this->routeStore([$this->category->slug]), $channel)
             ->assertStatus(200)
             ->assertJson([
                 'locked' => true
@@ -118,6 +122,6 @@ class CreateTest extends TestCase
 
         $channel = raw('Channel', $overrides);
 
-        return $this->apiAs($user,'PUT', $this->routeStore(), $channel);
+        return $this->apiAs($user, 'PUT', $this->routeStore([$this->category->slug]), $channel);
     }
 }

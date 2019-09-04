@@ -1,12 +1,20 @@
 <?php
+
 namespace App\Services;
 
 class ImagesService
 {
+    /**
+     * Get the request validation rules given an optional action.
+     *
+     * @param   string|null  $action
+     *
+     * @return  array
+     */
     public static function validationRules($action = null)
     {
         $rules = collect([
-            'file' => ['required', 'image', 'max:1000']
+            'file' => ['bail', 'required', 'image', 'max:1024']
         ]);
 
         switch ($action) {
@@ -18,10 +26,15 @@ class ImagesService
         return $rules->toArray();
     }
 
+    /**
+     * Store the image in the given request and return it's file path.
+     *
+     * @param   App\Http\Requests\Image\ImageCreateRequest  $data
+     *
+     * @return  string
+     */
     public function create($data)
     {
-        $file_path = $data->file('file')->store('images', 'public');
-
-        return $file_path;
+        return $data->file('file')->store('images', 'public');
     }
 }

@@ -33,8 +33,8 @@ class DestroyTest extends TestCase
     {
         $user = create('User');
 
-        $this->apiAs($user,'DELETE', $this->routeDestroySelf())
-            ->assertStatus(200);
+        $this->apiAs($user, 'DELETE', $this->routeDestroySelf())
+            ->assertStatus(204);
 
         $this->assertCount(0, User::all());
     }
@@ -54,8 +54,8 @@ class DestroyTest extends TestCase
 
         $otherUser = create('User');
 
-        $this->apiAs($user,'DELETE', $this->routeDestroy($otherUser->username))
-            ->assertStatus(200);
+        $this->apiAs($user, 'DELETE', $this->routeDestroy($otherUser->username))
+            ->assertStatus(204);
 
         $this->assertCount(1, User::all());
     }
@@ -69,7 +69,7 @@ class DestroyTest extends TestCase
             ->assertStatus(401);
 
         $user = create('User');
-        $this->apiAs($user,'DELETE', $this->routeDestroy($otherUser->username))
+        $this->apiAs($user, 'DELETE', $this->routeDestroy($otherUser->username))
             ->assertStatus(403);
     }
 }

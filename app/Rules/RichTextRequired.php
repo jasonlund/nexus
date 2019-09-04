@@ -7,27 +7,18 @@ use Illuminate\Contracts\Validation\Rule;
 class RichTextRequired implements Rule
 {
     /**
-     * Create a new rule instance.
+     * Strip all HTML and check if the string has length.
      *
-     * @return void
-     */
-    public function __construct()
-    {
-        //
-    }
-
-    /**
-     * Determine if the validation rule passes.
+     * @param   string  $attribute
+     * @param   mixed   $value
      *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
+     * @return  boolean
      */
     public function passes($attribute, $value)
     {
         $value = strip_html_whitespace($value);
 
-        if($value === '') return false;
+        if ($value === '') return false;
 
         return true;
     }
@@ -35,7 +26,7 @@ class RichTextRequired implements Rule
     /**
      * Get the validation error message.
      *
-     * @return string
+     * @return  string
      */
     public function message()
     {

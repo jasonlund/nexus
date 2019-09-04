@@ -5,7 +5,6 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Bouncer;
-use App\Models\Channel;
 
 class RoleTest extends TestCase
 {
@@ -36,6 +35,11 @@ class RoleTest extends TestCase
 
         $this->assertTrue(Bouncer::can('moderate-channels'));
         $this->assertTrue(Bouncer::can('view-private-channels'));
+
+        $this->assertTrue(Bouncer::can('create-emotes'));
+        $this->assertTrue(Bouncer::can('delete-emotes'));
+
+        $this->assertTrue(Bouncer::can('unlimited-actions'));
     }
 
     /** @test */
@@ -47,6 +51,11 @@ class RoleTest extends TestCase
 
         $this->assertTrue(Bouncer::can('moderate-channels'));
         $this->assertTrue(Bouncer::can('view-private-channels'));
+
+        $this->assertTrue(Bouncer::can('create-emotes'));
+        $this->assertTrue(Bouncer::can('delete-emotes'));
+
+        $this->assertTrue(Bouncer::can('unlimited-actions'));
     }
 
     /** @test */

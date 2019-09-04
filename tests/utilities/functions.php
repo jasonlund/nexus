@@ -19,4 +19,3 @@ function factoryAction($action, $class, $attributes, $count)
 {
     return factory("App\\Models\\" . $class, $count)->{$action}($attributes);
 }
-

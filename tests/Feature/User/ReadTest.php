@@ -43,7 +43,7 @@ class ReadTest extends TestCase
     {
         $user = create('User');
 
-        $this->apiAs($user,'GET', $this->routeShowSelf())
+        $this->apiAs($user, 'GET', $this->routeShowSelf())
             ->assertStatus(200)
             ->assertJson($user->only(['name', 'username', 'email']));
     }
@@ -55,7 +55,7 @@ class ReadTest extends TestCase
         Bouncer::allow($user)->to('view-all-users');
         $otherUser = create('User');
 
-        $this->apiAs($user,'GET', $this->routeShow([$otherUser->username]))
+        $this->apiAs($user, 'GET', $this->routeShow([$otherUser->username]))
             ->assertStatus(200)
             ->assertJson($otherUser->only(['name', 'username', 'email']));
     }
@@ -66,18 +66,18 @@ class ReadTest extends TestCase
         $user = create('User');
         $otherUser = create('User');
 
-        $this->apiAs($user,'GET', $this->routeShow([$otherUser->username]))
+        $this->apiAs($user, 'GET', $this->routeShow([$otherUser->username]))
             ->assertStatus(403);
     }
 
-     /** @test */
+    /** @test */
     function a_user_can_list_all_users()
     {
         $users = create('User', [], 10);
 
         $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
-            ->assertJson(['data' => $users->sortBy('username')->values()->map(function($item){
+            ->assertJson(['data' => $users->sortBy('username')->values()->map(function ($item) {
                 return ['username' => $item->username];
             })->toArray()]);
     }
@@ -92,9 +92,9 @@ class ReadTest extends TestCase
         $users = $users->push($user);
 
 
-        $this->apiAs($user,'GET', $this->routeIndex())
+        $this->apiAs($user, 'GET', $this->routeIndex())
             ->assertStatus(200)
-            ->assertJson(['data' => $users->sortBy('username')->values()->map(function($item){
+            ->assertJson(['data' => $users->sortBy('username')->values()->map(function ($item) {
                 return ['username' => $item->username];
             })->toArray()]);
     }
@@ -102,7 +102,7 @@ class ReadTest extends TestCase
     /** @test */
     function a_guest_can_list_all_active_users()
     {
-        $users = create('User', [],10);
+        $users = create('User', [], 10);
         $now = Carbon::now()->addMinutes(20);
         Carbon::setTestNow($now);
 
@@ -113,7 +113,7 @@ class ReadTest extends TestCase
 
         $active = collect($users)->take(4)
             ->sortBy('username')
-            ->map(function($item){
+            ->map(function ($item) {
                 return ['username' => $item->username];
             })
             ->values()
@@ -130,9 +130,9 @@ class ReadTest extends TestCase
     /** @test */
     function users_are_paginated()
     {
-        create('User', [],49);
+        create('User', [], 49);
         $user = create('User');
-        $response = $this->apiAs($user,'GET', $this->routeIndex())
+        $response = $this->apiAs($user, 'GET', $this->routeIndex())
             ->assertJson([
                 'current_page' => 1,
                 'from' => 1,
@@ -143,7 +143,7 @@ class ReadTest extends TestCase
 
         $response = $response->decodeResponseJson();
 
-        $this->apiAs($user,'GET', $response['next_page_url'])
+        $this->apiAs($user, 'GET', $response['next_page_url'])
             ->assertJson([
                 'current_page' => 2,
                 'from' => 26,

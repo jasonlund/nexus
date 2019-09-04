@@ -9,32 +9,23 @@ use App\Http\Requests\User\UserShowRequest;
 use App\Http\Requests\User\UserUnbanRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Models\User;
-use App\Services\UsersService;
 
 class UsersController extends Controller
 {
     /**
-     * The Users Service
-     *
-     * @var UsersService
-     */
-//    protected $service;
-
-    /**
      * UsersController constructor.
      *
-     * @param UsersService $service
+     * @return  void
      */
-    public function __construct(UsersService $service)
+    public function __construct()
     {
-//        $this->service = $service;
         parent::__construct();
     }
 
     /**
      * Display a listing of the Users.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return  \Illuminate\Http\JsonResponse
      */
     public function index()
     {
@@ -44,9 +35,10 @@ class UsersController extends Controller
     /**
      * Display the specified User.
      *
-     * @param UserShowRequest $request
-     * @param User $user
-     * @return \Illuminate\Http\JsonResponse
+     * @param   UserShowRequest  $request
+     * @param   User             $user
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
     public function show(UserShowRequest $request, User $user)
     {
@@ -56,13 +48,14 @@ class UsersController extends Controller
     /**
      * Update the specified User in storage.
      *
-     * @param UserUpdateRequest $request
-     * @param User $user
-     * @return \Illuminate\Http\JsonResponse
+     * @param   UserUpdateRequest  $request
+     * @param   User               $user
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
     public function update(UserUpdateRequest $request, User $user)
     {
-        $this->service->update($user, request()->all());
+        $this->service->update($user, $request->all());
         $this->service->assignRole($user, request('role'));
 
         return item_response($user, 'UserTransformer');
@@ -71,28 +64,29 @@ class UsersController extends Controller
     /**
      * Remove the specified User from storage.
      *
-     * @param UserDestroyRequest $request
-     * @param User $user
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
+     * @param   UserDestroyRequest  $request
+     * @param   User                $user
+     *
+     * @return  \Illuminate\Http\Response
      */
     public function destroy(UserDestroyRequest $request, User $user)
     {
         $this->service->delete($user, auth()->user());
 
-        return response()->json([]);
+        return response('', 204);
     }
 
     /**
      * Restrict the specified user from participating.
      *
-     * @param UserBanRequest $request
-     * @param User $user
-     * @return \Illuminate\Http\JsonResponse
+     * @param   UserBanRequest  $request
+     * @param   User            $user
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
     public function ban(UserBanRequest $request, User $user)
     {
-        $this->service->ban($user, request()->all());
+        $this->service->ban($user, $request->all());
 
         return item_response($user->fresh(), 'UserTransformer');
     }
@@ -100,9 +94,10 @@ class UsersController extends Controller
     /**
      * Derestrict the specified user from participating.
      *
-     * @param UserUnbanRequest $request
-     * @param User $user
-     * @return \Illuminate\Http\JsonResponse
+     * @param   UserUnbanRequest  $request
+     * @param   User              $user
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
     public function unban(UserUnbanRequest $request, User $user)
     {
@@ -114,13 +109,14 @@ class UsersController extends Controller
     /**
      * Update the user's avatar.
      *
-     * @param UserAvatarRequest $request
-     * @param User $user
-     * @return \Illuminate\Http\JsonResponse
+     * @param   UserAvatarRequest  $request
+     * @param   User               $user
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
     public function avatar(UserAvatarRequest $request, User $user)
     {
-        $this->service->avatar($user, request());
+        $this->service->avatar($user, $request);
 
         return item_response($user, 'UserTransformer');
     }

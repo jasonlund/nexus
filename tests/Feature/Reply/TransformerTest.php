@@ -26,7 +26,9 @@ class TransformerTest extends TestCase
     {
         $reply = create('Reply');
 
-        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
+        $this->json('GET', $this->routeIndex(
+            [$reply->channel->category->slug, $reply->channel->slug, $reply->thread->slug]
+        ))
             ->assertStatus(200)
             ->assertJson([
                 'data' => [
@@ -40,7 +42,9 @@ class TransformerTest extends TestCase
     {
         $reply = create('Reply');
 
-        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
+        $this->json('GET', $this->routeIndex(
+            [$reply->channel->category->slug, $reply->channel->slug, $reply->thread->slug]
+        ))
             ->assertStatus(200)
             ->assertJson([
                 'data' => [
@@ -55,7 +59,9 @@ class TransformerTest extends TestCase
         $body = $this->sampleHTML;
         $reply = create('Reply', ['body' => $body]);
 
-        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
+        $this->json('GET', $this->routeIndex(
+            [$reply->channel->category->slug, $reply->channel->slug, $reply->thread->slug]
+        ))
             ->assertStatus(200)
             ->assertJson([
                 'data' => [
@@ -69,7 +75,9 @@ class TransformerTest extends TestCase
     {
         $reply = create('Reply');
 
-        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
+        $this->json('GET', $this->routeIndex(
+            [$reply->channel->category->slug, $reply->channel->slug, $reply->thread->slug]
+        ))
             ->assertStatus(200)
             ->assertJson([
                 'data' => [
@@ -86,7 +94,9 @@ class TransformerTest extends TestCase
     {
         $reply = create('Reply');
 
-        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
+        $this->json('GET', $this->routeIndex(
+            [$reply->channel->category->slug, $reply->channel->slug, $reply->thread->slug]
+        ))
             ->assertStatus(200)
             ->assertJson([
                 'data' => [
@@ -105,7 +115,9 @@ class TransformerTest extends TestCase
         $user = create('User');
         $reply = create('Reply');
 
-        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
+        $this->json('GET', $this->routeIndex(
+            [$reply->channel->category->slug, $reply->channel->slug, $reply->thread->slug]
+        ))
             ->assertStatus(200)
             ->assertJson([
                 'data' => [
@@ -121,7 +133,9 @@ class TransformerTest extends TestCase
         $reply->edited_by = $user->id;
         $reply->save();
 
-        $this->json('GET', $this->routeIndex([$reply->channel->slug, $reply->thread->slug]))
+        $this->json('GET', $this->routeIndex(
+            [$reply->channel->category->slug, $reply->channel->slug, $reply->thread->slug]
+        ))
             ->assertStatus(200)
             ->assertJson([
                 'data' => [

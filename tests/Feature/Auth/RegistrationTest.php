@@ -5,10 +5,8 @@ namespace Tests\Feature\Auth;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Event;
-use Hash;
 use Illuminate\Auth\Events\Registered;
 use App\Models\User;
-use Illuminate\Support\Str;
 
 class RegistrationTest extends TestCase
 {
@@ -34,7 +32,9 @@ class RegistrationTest extends TestCase
         Event::fake();
 
         $data = make('User', ['password' => 'FooBar123'])->only(['name', 'username', 'email', 'password']);
-        $data = array_merge($data, ['password_confirmation' => $data['password']]);
+        $data = array_merge($data, [
+            'password_confirmation' => $data['password'], 'recaptcha' => 'recaptcha-response', 'accept' => true
+        ]);
 
         $this->json('post', $this->routeRegister(), $data)
             ->assertStatus(200)
@@ -43,7 +43,7 @@ class RegistrationTest extends TestCase
             ])
             ->assertJson([
                 'token_type' => 'bearer',
-                'expires_in' => (int)config('jwt.ttl') * 60
+                'expires_in' => (int) config('jwt.ttl') * 60
             ]);
 
         $user = User::first();
@@ -57,7 +57,7 @@ class RegistrationTest extends TestCase
     {
         $user = create('User');
 
-        $this->apiAs($user,'post', $this->routeRegister(), [])
+        $this->apiAs($user, 'post', $this->routeRegister(), [])
             ->assertStatus(403);
     }
 
@@ -130,12 +130,23 @@ class RegistrationTest extends TestCase
         $this->validatePasswordStrength('12345678');    // letters
     }
 
+    /** @test */
+    function a_user_must_accept_terms()
+    {
+        $this->create(['accept' => false])
+            ->assertJsonValidationErrors('accept');
+    }
+
     private function create($overrides)
     {
         $user = raw('User', array_merge(['password' => 'FooBar123'], $overrides));
-        if(!isset($overrides['password_confirmation'])){
+        if (!isset($overrides['password_confirmation'])) {
             $user['password_confirmation'] = $user['password'];
         }
+        if (!isset($overrides['accept'])) {
+            $user['accept'] = true;
+        }
+        $user['recaptcha'] = 'recaptcha-response';
 
         return $this->json('post', $this->routeRegister(), $user);
     }

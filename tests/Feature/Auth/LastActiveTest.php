@@ -15,9 +15,9 @@ class LastActiveTest extends TestCase
         parent::setUp();
     }
 
-    protected function routeChannelsIndex()
+    protected function routeChannelsIndex($params)
     {
-        return route('channels.index');
+        return route('channels.index', $params);
     }
 
     /** @test */
@@ -28,7 +28,9 @@ class LastActiveTest extends TestCase
         $now = Carbon::now()->addMinutes(20);
         Carbon::setTestNow($now);
 
-        $this->apiAs($user, 'GET', $this->routeChannelsIndex());
+        $category = create('ChannelCategory');
+
+        $this->apiAs($user, 'GET', $this->routeChannelsIndex([$category->slug]));
 
         $this->assertEquals($user->fresh()->last_active_at, $now);
     }

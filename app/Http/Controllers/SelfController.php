@@ -5,17 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Self\SelfAvatarRequest;
 use App\Http\Requests\Self\SelfDestroyRequest;
 use App\Http\Requests\Self\SelfUpdateRequest;
-use App\Services\UsersService;
 
 class SelfController extends Controller
 {
-    /**
-     * The User Service
-     *
-     * @var UsersService
-     */
-//    protected $service;
-
     /**
      * The currently authenticated User
      *
@@ -23,9 +15,13 @@ class SelfController extends Controller
      */
     protected $user;
 
-    public function __construct(UsersService $service)
+    /**
+     * SelfController constructor.
+     *
+     * @return  void
+     */
+    public function __construct()
     {
-//        $this->service = $service;
         parent::__construct('Users');
         $this->user = auth()->user();
     }
@@ -33,7 +29,7 @@ class SelfController extends Controller
     /**
      * Display the authenticated User.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return  \Illuminate\Http\JsonResponse
      */
     public function show()
     {
@@ -43,12 +39,13 @@ class SelfController extends Controller
     /**
      * Update the authorized User in storage.
      *
-     * @param SelfUpdateRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param   SelfUpdateRequest  $request
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
     public function update(SelfUpdateRequest $request)
     {
-        $this->service->update($this->user, request()->all());
+        $this->service->update($this->user, $request->all());
 
         return item_response($this->user, 'UserTransformer');
     }
@@ -56,25 +53,27 @@ class SelfController extends Controller
     /**
      * Remove the authenticated User from storage.
      *
-     * @param SelfDestroyRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param   SelfDestroyRequest  $request
+     *
+     * @return  \Illuminate\Http\Response
      */
     public function destroy(SelfDestroyRequest $request)
     {
         $this->service->delete($this->user);
 
-        return response()->json([]);
+        return response('', 204);
     }
 
     /**
      * Update the authenticated user's avatar.
      *
-     * @param SelfAvatarRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param   SelfAvatarRequest  $request
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
     public function avatar(SelfAvatarRequest $request)
     {
-        $this->service->avatar($this->user, request());
+        $this->service->avatar($this->user, $request);
 
         return item_response($this->user, 'UserTransformer');
     }

@@ -2,11 +2,9 @@
 
 namespace Tests\Feature\Thread;
 
-use App\Services\ThreadsService;
 use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
-use App\Services\PurifyService;
 
 class ReadTest extends TestCase
 {
@@ -43,7 +41,7 @@ class ReadTest extends TestCase
     /** @test */
     function anyone_can_view_all_threads_in_a_channel()
     {
-        $this->json('GET', $this->routeIndex([$this->thread->channel->slug]))
+        $this->json('GET', $this->routeIndex([$this->thread->channel->category->slug, $this->thread->channel->slug]))
             ->assertStatus(200)
             ->assertJson([
                 'data' => [
@@ -58,7 +56,9 @@ class ReadTest extends TestCase
     function threads_are_paginated()
     {
         create('Thread', ['channel_id' => $this->thread->channel->id], 49);
-        $response = $this->json('GET', $this->routeIndex([$this->thread->channel->slug]))
+        $response = $this->json('GET', $this->routeIndex(
+            [$this->thread->channel->category->slug, $this->thread->channel->slug]
+        ))
             ->assertJson([
                 'current_page' => 1,
                 'from' => 1,
@@ -82,7 +82,9 @@ class ReadTest extends TestCase
     /** @test */
     function anyone_can_view_a_single_thread()
     {
-        $this->json('GET', $this->routeShow([$this->thread->channel->slug, $this->thread->slug]))
+        $this->json('GET', $this->routeShow(
+            [$this->thread->channel->category->slug, $this->thread->channel->slug, $this->thread->slug]
+        ))
             ->assertStatus(200)
             ->assertJson([
                 'slug' => $this->thread->slug
@@ -95,7 +97,9 @@ class ReadTest extends TestCase
         $user = create('User');
         Carbon::setTestNow(Carbon::now()->addMinutes(20));
 
-        $this->apiAs($user, 'GET', $this->routeIndex([$this->thread->channel->slug]))
+        $this->apiAs($user, 'GET', $this->routeIndex(
+            [$this->thread->channel->category->slug, $this->thread->channel->slug]
+        ))
             ->assertJson([
                 'data' => [
                     [
@@ -106,9 +110,13 @@ class ReadTest extends TestCase
                 ]
             ]);
 
-        $this->apiAs($user, 'GET', $this->routeShow([$this->thread->channel->slug, $this->thread->slug]));
+        $this->apiAs($user, 'GET', $this->routeShow(
+            [$this->thread->channel->category->slug, $this->thread->channel->slug, $this->thread->slug]
+        ));
 
-        $this->apiAs($user, 'GET', $this->routeIndex([$this->thread->channel->slug]))
+        $this->apiAs($user, 'GET', $this->routeIndex(
+            [$this->thread->channel->category->slug, $this->thread->channel->slug]
+        ))
             ->assertJson([
                 'data' => [
                     [

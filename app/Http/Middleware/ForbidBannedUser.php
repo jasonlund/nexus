@@ -3,38 +3,41 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Guard;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class ForbidBannedUser
 {
     /**
-     * Check if the authenticated user is banned and return a Forbidden response if true.
+     * Check if the authenticated user is banned and return a Forbidden response
+     * if true.
      *
-     * @param $request
-     * @param Closure $next
-     * @return mixed
+     * @param   Request  $request  [$request description]
+     * @param   Closure  $next     [$next description]
+     *
+     * @return  mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         $user = auth()->user();
 
-        if(!$user && request()->routeIs('auth.login', 'password.email', 'password.reset')) {
+        if (!$user && request()->routeIs('auth.login', 'password.email', 'password.reset')) {
             $user = User::where('email', request('email'))->first();
         }
 
         if ($user && $user->isBanned()) {
             $ban = $user->bans()->latest()->first();
 
-            if(auth()->checK()) auth()->logout();
+            if (auth()->check())
+                auth()->logout();
 
-            if($ban->isPermanent()){
+            if ($ban->isPermanent()) {
                 $message = 'Account permanently banned.';
-            }else{
+            } else {
                 $message = 'Account temporarily banned until ' . $ban->expired_at->diffForHumans() . '.';
             }
 
-            if($ban->comment) {
+            if ($ban->comment) {
                 $message .= ' Reason: ' . $ban->comment;
             }
 

@@ -14,8 +14,7 @@ class ThreadLockRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth() &&
-            (Bouncer::can('moderate-channels') ||
+        return auth() && (Bouncer::can('moderate-channels') ||
                 Bouncer::can('moderate-channels', request()->route('channel')));
     }
 

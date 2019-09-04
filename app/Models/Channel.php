@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Cviebrock\EloquentSluggable\Sluggable;
 use Askedio\SoftCascade\Traits\SoftCascadeTrait;
-use Bouncer;
 use Spatie\EloquentSortable\Sortable;
 use Spatie\EloquentSortable\SortableTrait;
 use Staudenmeir\EloquentHasManyDeep\HasRelationships;
+use Illuminate\Database\Eloquent\Builder;
 
 class Channel extends Model implements Sortable
 {
@@ -18,10 +18,18 @@ class Channel extends Model implements Sortable
      *
      * @var array
      */
-    protected $fillable = ['name', 'description', 'image', 'locked'];
+    protected $fillable = [
+        'name', 'description', 'channel_category_id', 'image', 'locked'
+    ];
 
+    /**
+     * The attributes that should be cast to native types.
+     *
+     * @var array
+     */
     protected $casts = [
-        'locked' => 'boolean'
+        'locked' => 'boolean',
+        'order' => 'integer'
     ];
 
     /**
@@ -29,7 +37,9 @@ class Channel extends Model implements Sortable
      *
      * @var array
      */
-    protected $softCascade = ['threads'];
+    protected $softCascade = [
+        'threads'
+    ];
 
     /**
      * Allow Channels to be ordered.
@@ -42,19 +52,23 @@ class Channel extends Model implements Sortable
     ];
 
     /**
-     * Fill gaps in sort order on delete.
+     * Channels slugs are unique to which ChannelCategory it belongs to.
+     *
+     * @param   Builder  $query
+     * @param   Model    $model
+     *
+     * @return  Builder
      */
-    protected static function boot() {
-        parent::boot();
-        static::deleted(function() {
-            self::setNewOrder(self::ordered()->pluck('id')->toArray());
-        });
+    public function buildSortQuery()
+    {
+        return static::query()
+            ->where('channel_category_id', $this->channel_category_id);
     }
 
     /**
      * Return the sluggable configuration array for this model.
      *
-     * @return array
+     * @return  array
      */
     public function sluggable()
     {
@@ -66,19 +80,48 @@ class Channel extends Model implements Sortable
     }
 
     /**
-     * Get the route key for the model.
+     * Thread slugs are unique to which Channel it belongs to.
      *
-     * @return string
+     * @param   Builder  $query
+     * @param   Model    $model
+     *
+     * @return  Builder
      */
-    public function getRouteKeyName()
+    public function scopeWithUniqueSlugConstraints(Builder $query, Model $model)
     {
-        return 'slug';
+        return $query->where('channel_category_id', $model->channel_category_id);
+    }
+
+    /**
+     * Scope Channel slug route binding to the ChannelCategory it belongs to.
+     *
+     * @param   string  $value
+     *
+     * @return  self
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public function resolveRouteBinding($value)
+    {
+        return $this->where('channel_category_id', request()->route('category')->id)
+            ->where('slug', $value)
+            ->first() ?? abort(404);
+    }
+
+    /**
+     * A Channel belongs to one Channel Category
+     *
+     * @return  \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function category()
+    {
+        return $this->belongsTo('App\Models\ChannelCategory', 'channel_category_id');
     }
 
     /**
      * A Channel has many Threads.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return  \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function threads()
     {
@@ -88,7 +131,7 @@ class Channel extends Model implements Sortable
     /**
      * A Channel has many Replies through Threads.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasManyThrough
+     * @return  \Illuminate\Database\Eloquent\Relations\HasManyThrough
      */
     public function replies()
     {
@@ -96,22 +139,30 @@ class Channel extends Model implements Sortable
     }
 
     /**
-     * A Channel has many Moderators (Users).
+     * A Channel belongs to many Moderators (Users).
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return  \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function moderators()
     {
-        return $this->belongsToMany('App\Models\User',
+        return $this->belongsToMany(
+            'App\Models\User',
             'channel_moderator',
             'channel_id',
-            'user_id');
+            'user_id'
+        );
     }
 
+    /**
+     * A Channel has many views (Users) through ViewedThread
+     *
+     * @return  \Staudenmeir\EloquentHasManyDeep\HasManyDeep
+     */
     public function viewedBy()
     {
         return $this->hasManyDeep(
-            'App\Models\User', ['App\Models\Thread', 'App\Models\ViewedThread'])
-            ->withIntermediate('App\Models\ViewedThread');
+            'App\Models\User',
+            ['App\Models\Thread', 'App\Models\ViewedThread']
+        )->withIntermediate('App\Models\ViewedThread');
     }
 }

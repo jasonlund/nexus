@@ -9,9 +9,10 @@ class ArraySerializer extends Base
     /**
      * Serialize into one array.
      *
-     * @param string $resourceKey
-     * @param array $data
-     * @return array
+     * @param   string $resourceKey
+     * @param   array  $data
+     *
+     * @return  array
      */
     public function collection($resourceKey, array $data)
     {
@@ -25,9 +26,10 @@ class ArraySerializer extends Base
     /**
      * Serialize into one array.
      *
-     * @param string $resourceKey
-     * @param array $data
-     * @return array
+     * @param   string $resourceKey
+     * @param   array  $data
+     *
+     * @return  array
      */
     public function item($resourceKey, array $data)
     {
@@ -35,10 +37,5 @@ class ArraySerializer extends Base
             return [$resourceKey => $data];
         }
         return $data;
-    }
-
-    public function null()
-    {
-        return null;
     }
 }

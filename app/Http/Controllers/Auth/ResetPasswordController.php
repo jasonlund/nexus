@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\User;
 use App\Http\Controllers\Controller;
 use App\Services\UsersService;
 use Illuminate\Auth\Events\PasswordReset;
@@ -18,14 +19,14 @@ class ResetPasswordController extends Controller
     /**
      * A newly generated token to be returned on successful password reset.
      *
-     * @var $freshToken
+     * @var string
      */
     protected $freshToken;
 
     /**
      * Get the password reset validation rules.
      *
-     * @return array
+     * @return  array
      */
     protected function rules()
     {
@@ -35,11 +36,12 @@ class ResetPasswordController extends Controller
     /**
      * Reset the given user's password.
      *
-     * @param \Illuminate\Contracts\Auth\CanResetPassword $user
-     * @param string $password
-     * @return void
+     * @param   User    $user
+     * @param   string  $password
+     *
+     * @return  void
      */
-    protected function resetPassword($user, $password)
+    protected function resetPassword(User $user, $password)
     {
         $user->password = Hash::make($password);
 
@@ -55,9 +57,10 @@ class ResetPasswordController extends Controller
     /**
      * Return the newly generated token for the user.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param string $response
-     * @return \Illuminate\Http\JsonResponse
+     * @param   Request  $request
+     * @param   string   $response
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
     protected function sendResetResponse(Request $request, $response)
     {
@@ -71,8 +74,12 @@ class ResetPasswordController extends Controller
     /**
      * Get the response for a failed password reset.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param string $response
+     * @param   Request  $request
+     * @param   string   $response
+     *
+     * @return  void
+     *
+     * @throws  ValidationException
      */
     protected function sendResetFailedResponse(Request $request, $response)
     {

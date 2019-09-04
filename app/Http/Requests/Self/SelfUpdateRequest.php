@@ -4,7 +4,6 @@ namespace App\Http\Requests\Self;
 
 use App\Services\UsersService;
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\User;
 
 class SelfUpdateRequest extends FormRequest
 {

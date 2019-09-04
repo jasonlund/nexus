@@ -37,9 +37,20 @@ class DevelopmentSeeder extends Seeder
         $users = factory('App\Models\User', 30)->create();
         $allUsers = $allUsers->merge($users);
 
-        // Make some channels, assign moderators & populate with Threads..
-        $this->command->info('Creating Channels & Threads..');
-        $channels = factory('App\Models\Channel', 10)->create();
+        // Make some categories & channels, assign moderators & populate with Threads..
+        $this->command->info('Creating Categories, Channels & Threads..');
+
+        $categories = factory('App\Models\ChannelCategory', 5)->create();
+
+        $channels = collect([]);
+        foreach($categories as $category) {
+            $data = factory('App\Models\Channel', rand(3,5))->create([
+                'channel_category_id' => $category->id
+            ]);
+
+            $channels = $channels->merge($data);
+        }
+
         $threads = collect([]);
         foreach($channels as $channel) {
             $mods = $moderators->random(3);

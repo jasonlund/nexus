@@ -6,6 +6,7 @@ use App\Models\Channel;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Tests\TestCase;
 use Bouncer;
+use Carbon\Carbon;
 
 class CreateTest extends TestCase
 {
@@ -36,7 +37,9 @@ class CreateTest extends TestCase
         $thread = create('Thread');
         $reply = raw('Reply');
 
-        $this->apiAs($user,'PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), $reply)
+        $this->apiAs($user, 'PUT', $this->routeStore(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), $reply)
             ->assertStatus(200)
             ->assertJson([
                 'body' => $reply['body'],
@@ -46,7 +49,9 @@ class CreateTest extends TestCase
                 ]
             ]);
 
-        $this->json('GET', $this->routeIndex([$thread->channel->slug, $thread->slug]))
+        $this->json('GET', $this->routeIndex(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ))
             ->assertStatus(200)
             ->assertJson([
                 'data' => [
@@ -66,7 +71,9 @@ class CreateTest extends TestCase
     {
         $thread = create('Thread');
 
-        $this->json('PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), [])
+        $this->json('PUT', $this->routeStore(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), [])
             ->assertStatus(401);
     }
 
@@ -77,7 +84,9 @@ class CreateTest extends TestCase
 
         $thread = create('Thread', ['locked' => true]);
 
-        $this->apiAs($user,'PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), [])
+        $this->apiAs($user, 'PUT', $this->routeStore(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), [])
             ->assertStatus(403);
     }
 
@@ -90,7 +99,9 @@ class CreateTest extends TestCase
         $thread = create('Thread', ['locked' => true]);
         $reply = raw('Reply');
 
-        $this->apiAs($user,'PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), $reply)
+        $this->apiAs($user, 'PUT', $this->routeStore(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), $reply)
             ->assertStatus(200)
             ->assertJson([
                 'body' => $reply['body'],
@@ -100,7 +111,9 @@ class CreateTest extends TestCase
                 ]
             ]);
 
-        $this->json('GET', $this->routeIndex([$thread->channel->slug, $thread->slug]))
+        $this->json('GET', $this->routeIndex(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ))
             ->assertStatus(200)
             ->assertJson([
                 'data' => [
@@ -126,7 +139,9 @@ class CreateTest extends TestCase
         $inChannel->channel->moderators()->attach($user);
         $reply = raw('Reply');
 
-        $this->apiAs($user,'PUT', $this->routeStore([$inChannel->channel->slug, $inChannel->slug]), $reply)
+        $this->apiAs($user, 'PUT', $this->routeStore(
+            [$inChannel->channel->category->slug, $inChannel->channel->slug, $inChannel->slug]
+        ), $reply)
             ->assertStatus(200)
             ->assertJson([
                 'body' => $reply['body'],
@@ -136,7 +151,9 @@ class CreateTest extends TestCase
                 ]
             ]);
 
-        $this->json('GET', $this->routeIndex([$inChannel->channel->slug, $inChannel->slug]))
+        $this->json('GET', $this->routeIndex(
+            [$inChannel->channel->category->slug, $inChannel->channel->slug, $inChannel->slug]
+        ))
             ->assertStatus(200)
             ->assertJson([
                 'data' => [
@@ -150,8 +167,62 @@ class CreateTest extends TestCase
                 ]
             ]);
 
-        $this->apiAs($user,'PUT', $this->routeStore([$notInChannel->channel->slug, $notInChannel->slug]), $reply)
+        Carbon::setTestNow(now()->addMinute());
+
+        $this->apiAs($user, 'PUT', $this->routeStore(
+            [$notInChannel->channel->category->slug, $notInChannel->channel->slug, $notInChannel->slug]
+        ), $reply)
             ->assertStatus(403);
+    }
+
+    /** @test */
+    function creation_of_a_reply_is_rate_limited()
+    {
+        $user = create('User');
+
+        $thread = create('Thread');
+        $reply = raw('Reply');
+
+        $this->apiAs($user, 'PUT', $this->routeStore(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), $reply)
+            ->assertStatus(200);
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(20));
+
+        $this->apiAs($user, 'PUT', $this->routeStore(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), $reply)
+            ->assertStatus(429);
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(11));
+
+        $this->apiAs($user, 'PUT', $this->routeStore(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), $reply)
+            ->assertStatus(200);
+    }
+
+    /** @test */
+    function auhorized_users_are_not_rate_limited()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->to('unlimited-actions');
+
+        $thread = create('Thread');
+        $reply = raw('Reply');
+
+        $this->apiAs($user, 'PUT', $this->routeStore(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), $reply)
+            ->assertStatus(200);
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(20));
+
+        $this->apiAs($user, 'PUT', $this->routeStore(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), $reply)
+            ->assertStatus(200);
     }
 
     /** @test */
@@ -162,7 +233,9 @@ class CreateTest extends TestCase
         $thread = create('Thread');
         $reply = raw('Reply', ['body' => null]);
 
-        $this->apiAS($user,'PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), $reply)
+        $this->apiAS($user, 'PUT', $this->routeStore(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), $reply)
             ->assertJsonValidationErrors(['body']);
     }
 
@@ -174,12 +247,18 @@ class CreateTest extends TestCase
         $thread = create('Thread');
         $reply = raw('Reply', ['body' => '']);
 
-        $this->apiAS($user,'PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), $reply)
+        $this->apiAS($user, 'PUT', $this->routeStore(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), $reply)
             ->assertJsonValidationErrors(['body']);
+
+        Carbon::setTestNow(now()->addMinute());
 
         $reply = raw('Reply', ['body' => $this->nullHTML]);
 
-        $this->apiAS($user,'PUT', $this->routeStore([$thread->channel->slug, $thread->slug]), $reply)
+        $this->apiAS($user, 'PUT', $this->routeStore(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), $reply)
             ->assertJsonValidationErrors(['body']);
     }
 }

@@ -33,26 +33,26 @@ class DestroyTest extends TestCase
         $user = create('User');
         Bouncer::allow($user)->to('delete-channels');
 
-        $thread = create('Thread');
+        $channel = create('Channel');
 
-        $this->apiAs($user,'DELETE', $this->routeDestroy([$thread->channel->slug]))
-            ->assertStatus(200);
+        $this->apiAs($user, 'DELETE', $this->routeDestroy([$channel->category->slug, $channel->slug]))
+            ->assertStatus(204);
 
-        $this->json('GET', $this->routeShow([$thread->channel->slug]))
+        $this->json('GET', $this->routeShow([$channel->category->slug, $channel->slug]))
             ->assertStatus(404);
     }
 
     /** @test */
     function a_guest_and_an_unauthorized_user_can_not_destroy_a_channel()
     {
-        $thread = create('Thread');
+        $channel = create('Channel');
 
-        $this->json('DELETE', $this->routeDestroy([$thread->channel->slug]))
+        $this->json('DELETE', $this->routeDestroy([$channel->category->slug, $channel->slug]))
             ->assertStatus(401);
 
         $user = create('User');
 
-        $this->apiAs($user,'DELETE', $this->routeDestroy([$thread->channel->slug]))
+        $this->apiAs($user, 'DELETE', $this->routeDestroy([$channel->category->slug, $channel->slug]))
             ->assertStatus(403);
     }
 }

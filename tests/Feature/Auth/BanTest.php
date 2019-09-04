@@ -58,7 +58,7 @@ class BanTest extends TestCase
     {
         $channel = create('Channel');
 
-        $this->apiAs($this->user, 'PUT', $this->routeStoreThread([$channel->slug]), [])
+        $this->apiAs($this->user, 'PUT', $this->routeStoreThread([$channel->category->slug, $channel->slug]), [])
             ->assertStatus(403);
     }
 

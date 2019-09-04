@@ -4,17 +4,19 @@ namespace App\Http\Middleware;
 
 use Closure;
 use App\Services\UsersService;
+use Illuminate\Http\Request;
 
 class LastActive
 {
     /**
-     * Handle an incoming request.
+     * Log the activity of an authenticated User.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
+     * @param   Request  $request
+     * @param   Closure  $next
+     *
+     * @return  Closure
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         if (!auth()->check()) {
             return $next($request);

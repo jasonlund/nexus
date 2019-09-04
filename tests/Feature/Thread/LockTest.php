@@ -40,7 +40,9 @@ class LockTest extends TestCase
 
         $this->assertFalse($this->thread->locked);
 
-        $this->apiAs($user, 'POST', $this->routeLock([$this->thread->channel, $this->thread->slug]))
+        $this->apiAs($user, 'POST', $this->routeLock(
+            [$this->thread->channel->category->slug, $this->thread->channel->slug, $this->thread->slug]
+        ))
             ->assertStatus(200)
             ->assertJson([
                 'locked' => true
@@ -48,7 +50,9 @@ class LockTest extends TestCase
 
         $this->assertTrue($this->thread->fresh()->locked);
 
-        $this->json('GET', $this->routeShow([$this->thread->channel, $this->thread->slug]))
+        $this->json('GET', $this->routeShow(
+            [$this->thread->channel->category->slug, $this->thread->channel->slug, $this->thread->slug]
+        ))
             ->assertStatus(200)
             ->assertJson([
                 'locked' => true
@@ -67,7 +71,9 @@ class LockTest extends TestCase
 
         $this->assertFalse($inChannel->locked);
 
-        $this->apiAs($user, 'POST', $this->routeLock([$inChannel->channel, $inChannel->slug]))
+        $this->apiAs($user, 'POST', $this->routeLock(
+            [$inChannel->channel->category->slug, $inChannel->channel->slug, $inChannel->slug]
+        ))
             ->assertStatus(200)
             ->assertJson([
                 'locked' => true
@@ -75,7 +81,9 @@ class LockTest extends TestCase
 
         $this->assertTrue($inChannel->fresh()->locked);
 
-        $this->json('GET', $this->routeShow([$inChannel->channel, $inChannel->slug]))
+        $this->json('GET', $this->routeShow(
+            [$inChannel->channel->category->slug, $inChannel->channel->slug, $inChannel->slug]
+        ))
             ->assertStatus(200)
             ->assertJson([
                 'locked' => true
@@ -83,12 +91,16 @@ class LockTest extends TestCase
 
         $this->assertFalse($notInChannel->locked);
 
-        $this->apiAs($user, 'POST', $this->routeLock([$notInChannel->channel, $notInChannel->slug]))
+        $this->apiAs($user, 'POST', $this->routeLock(
+            [$notInChannel->channel->category->slug, $notInChannel->channel->slug, $notInChannel->slug]
+        ))
             ->assertStatus(403);
 
         $this->assertFalse($notInChannel->fresh()->locked);
 
-        $this->json('GET', $this->routeShow([$notInChannel->channel, $notInChannel->slug]))
+        $this->json('GET', $this->routeShow(
+            [$notInChannel->channel->category->slug, $notInChannel->channel->slug, $notInChannel->slug]
+        ))
             ->assertStatus(200)
             ->assertJson([
                 'locked' => false
@@ -100,7 +112,9 @@ class LockTest extends TestCase
     {
         $this->assertFalse($this->thread->locked);
 
-        $this->json('POST', $this->routeLock([$this->thread->channel, $this->thread->slug]))
+        $this->json('POST', $this->routeLock(
+            [$this->thread->channel->category->slug, $this->thread->channel->slug, $this->thread->slug]
+        ))
             ->assertStatus(401);
 
         $this->assertFalse($this->thread->fresh()->locked);

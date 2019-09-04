@@ -4,23 +4,30 @@ namespace App\Listeners;
 
 use App\Events\ThreadViewed;
 use App\Services\ThreadsService;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class MarkThreadRead
 {
     protected $service;
 
+    /**
+     * MarkThreadRead constructor.
+     * Inject the service.
+     *
+     * @param   ThreadsService  $service
+     *
+     * @return  void
+     */
     public function __construct(ThreadsService $service)
     {
         $this->service = $service;
     }
 
     /**
-     * Handle the event.
+     * Mark the specified Thread as viewed by the authenticated User.
      *
-     * @param  ThreadViewed  $event
-     * @return void
+     * @param   ThreadViewed  $event
+     *
+     * @return  void
      */
     public function handle(ThreadViewed $event)
     {

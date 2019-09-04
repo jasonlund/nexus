@@ -2,16 +2,21 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Bouncer;
+use App\Models\Emote;
 use App\Models\Channel;
+use App\Models\ChannelCategory;
+use App\Observers\ChannelObserver;
+use App\Observers\ChannelCategoryObserver;
+use App\Observers\EmoteObserver;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
      *
-     * @return void
+     * @return  void
      */
     public function register()
     {
@@ -21,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      *
-     * @return void
+     * @return  void
      */
     public function boot()
     {
@@ -31,5 +36,11 @@ class AppServiceProvider extends ServiceProvider
         Bouncer::ownedVia(Channel::class, function ($channel, $user) {
             return $channel->moderators->where('id', $user->id)->count() !== 0;
         });
+
+        /**
+         * Register Model Observers.
+         */
+        ChannelCategory::observe(ChannelCategoryObserver::class);
+        Emote::observe(EmoteObserver::class);
     }
 }

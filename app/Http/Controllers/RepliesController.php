@@ -5,54 +5,55 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Reply\ReplyCreateRequest;
 use App\Http\Requests\Reply\ReplyDestroyRequest;
 use App\Http\Requests\Reply\ReplyUpdateRequest;
+use App\Models\ChannelCategory;
 use App\Models\Channel;
 use App\Models\Reply;
 use App\Models\Thread;
-use App\Services\RepliesService;
 
 class RepliesController extends Controller
 {
     /**
-     * The Replies Service
-     *
-     * @var RepliesService
-     */
-//    protected $service;
-
-    /**
      * RepliesController constructor.
      *
-     * @param RepliesService $service
+     * @return  void
      */
-    public function __construct(RepliesService $service)
+    public function __construct()
     {
+        $this->middleware('limit.actions')->only(['store']);
         parent::__construct();
-//        $this->service = $service;
     }
 
     /**
      * Display a paginated listing of a thread's replies in order.
      *
-     * @param Channel $channel
-     * @param Thread $thread
-     * @return \Illuminate\Http\JsonResponse
+     * @param   ChannelCategory $category
+     * @param   Channel         $channel
+     * @param   Thread          $thread
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
-    public function index(Channel $channel, Thread $thread)
+    public function index(ChannelCategory $category, Channel $channel, Thread $thread)
     {
-        return paginated_response($thread->replies(), 'ReplyTransformer', ['owner', 'editor']);
+        return paginated_response(
+            $thread->replies(),
+            'ReplyTransformer',
+            ['owner', 'editor']
+        );
     }
 
     /**
      * Store a newly created Reply in storage.
      *
-     * @param \App\Http\Requests\ReplyCreateRequest $request
-     * @param \App\Models\Channel $channel
-     * @param \App\Models\Thread $thread
-     * @return \Illuminate\Http\JsonResponse
+     * @param   ReplyCreateRequest  $request
+     * @param   ChannelCategory     $category
+     * @param   Channel             $channel
+     * @param   Thread              $thread
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
-    public function store(ReplyCreateRequest $request, Channel $channel, Thread $thread)
+    public function store(ReplyCreateRequest $request, ChannelCategory $category, Channel $channel, Thread $thread)
     {
-        $reply = $this->service->create($thread, request()->all());
+        $reply = $this->service->create($thread, $request->all());
 
         return item_response($reply, 'ReplyTransformer', ['owner', 'editor']);
     }
@@ -60,15 +61,22 @@ class RepliesController extends Controller
     /**
      * Update the specified Reply in storage.
      *
-     * @param \App\Http\Requests\ReplyUpdateRequest $request
-     * @param \App\Models\Channel $channel
-     * @param \App\Models\Reply $reply
-     * @param \App\Models\Thread $thread
-     * @return \Illuminate\Http\JsonResponse
+     * @param   ReplyUpdateRequest  $request
+     * @param   ChannelCategory     $category
+     * @param   Channel             $channel
+     * @param   Thread              $thread
+     * @param   Reply               $reply
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
-    public function update(ReplyUpdateRequest $request, Channel $channel, Thread $thread, Reply $reply)
-    {
-        $this->service->update($reply, request()->all());
+    public function update(
+        ReplyUpdateRequest $request,
+        ChannelCategory $category,
+        Channel $channel,
+        Thread $thread,
+        Reply $reply
+    ) {
+        $this->service->update($reply, $request->all());
 
         return item_response($reply, 'ReplyTransformer', ['owner', 'editor']);
     }
@@ -76,17 +84,23 @@ class RepliesController extends Controller
     /**
      * Remove the specified Reply from storage.
      *
-     * @param \App\Http\Requests\ReplyDestroyRequest $request
-     * @param \App\Models\Channel $channel
-     * @param \App\Models\Reply $reply
-     * @param \App\Models\Thread $thread
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
+     * @param   ReplyDestroyRequest  $request
+     * @param   ChannelCategory      $category
+     * @param   Channel              $channel
+     * @param   Thread               $thread
+     * @param   Reply                $reply
+     *
+     * @return  \Illuminate\Http\Response
      */
-    public function destroy(ReplyDestroyRequest $request, Channel $channel, Thread $thread, Reply $reply)
-    {
+    public function destroy(
+        ReplyDestroyRequest $request,
+        ChannelCategory $category,
+        Channel $channel,
+        Thread $thread,
+        Reply $reply
+    ) {
         $reply->delete();
 
-        return response()->json();
+        return response('', 204);
     }
 }

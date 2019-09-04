@@ -6,8 +6,6 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use App\Models\Channel;
 use App\Models\Thread;
-use Bouncer;
-use App\Services\ThreadsService;
 
 class ChannelTest extends TestCase
 {
@@ -20,6 +18,27 @@ class ChannelTest extends TestCase
         parent::setUp();
 
         $this->channel = create('Channel');
+    }
+
+    /** @test */
+    function it_belongs_to_a_channel_category()
+    {
+        $this->assertInstanceOf('App\Models\ChannelCategory', $this->channel->category);
+    }
+
+    /** @test */
+    function its_slug_is_unique_to_its_category()
+    {
+        $channels = create('Channel', ['name' => 'FooBar'], 2)->toArray();
+
+        $this->assertEquals($channels[0]['slug'], $channels[1]['slug']);
+
+        $channelInCategory = create('Channel', [
+            'name' => 'FooBar',
+            'channel_category_id' => $channels[0]['channel_category_id']
+        ])->toArray();
+
+        $this->assertNotEquals($channels[0]['slug'], $channelInCategory['slug']);
     }
 
     /** @test */

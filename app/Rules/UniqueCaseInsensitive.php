@@ -12,7 +12,10 @@ class UniqueCaseInsensitive implements Rule
     /**
      * Create a new rule instance.
      *
-     * @return void
+     * @param   mixed   $model
+     * @param   string  $ignore
+     *
+     * @return  void
      */
     public function __construct($model, $ignore)
     {
@@ -21,26 +24,26 @@ class UniqueCaseInsensitive implements Rule
     }
 
     /**
-     * Determine if the validation rule passes.
+     * Determine if the given value exists in the given Model's table regardless of case sensitivity.
      *
-     * @param  string  $attribute
-     * @param  mixed  $value
-     * @return bool
+     * @param   string  $attribute
+     * @param   string  $value
+     *
+     * @return  boolean
      */
     public function passes($attribute, $value)
     {
         if(strtolower($value) === strtolower($this->ignore)) return true;
-        return $this->model::whereRaw('lower(' . $attribute . ') like (?)',["{$value}"])
-                ->count() === 0;
+        return $this->model::whereRaw('lower(' . $attribute . ') like (?)',["{$value}"])->count() === 0;
     }
 
     /**
      * Get the validation error message.
      *
-     * @return string
+     * @return  string
      */
     public function message()
     {
-        return 'The username already exists.';
+        return 'The :attribute already exists.';
     }
 }

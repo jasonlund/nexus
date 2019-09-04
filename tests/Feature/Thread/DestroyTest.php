@@ -34,10 +34,14 @@ class DestroyTest extends TestCase
         $user = create('User');
         $thread = create('Thread', ['user_id' => $user->id]);
 
-        $this->apiAs($user,'DELETE', $this->routeDestroy([$thread->channel->slug, $thread->slug]))
-            ->assertStatus(200);
+        $this->apiAs($user, 'DELETE', $this->routeDestroy(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ))
+            ->assertStatus(204);
 
-        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->slug]))
+        $this->json('GET', $this->routeShow(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ))
             ->assertStatus(404);
     }
 
@@ -49,10 +53,14 @@ class DestroyTest extends TestCase
 
         $thread = create('Thread');
 
-        $this->apiAs($user,'DELETE', $this->routeDestroy([$thread->channel->slug, $thread->slug]))
-            ->assertStatus(200);
+        $this->apiAs($user, 'DELETE', $this->routeDestroy(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ))
+            ->assertStatus(204);
 
-        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->slug]))
+        $this->json('GET', $this->routeShow(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ))
             ->assertStatus(404);
     }
 
@@ -66,16 +74,24 @@ class DestroyTest extends TestCase
         $notInChannel = create('Thread');
         $inChannel->channel->moderators()->attach($user);
 
-        $this->apiAs($user,'DELETE', $this->routeDestroy([$inChannel->channel->slug, $inChannel->slug]))
-            ->assertStatus(200);
+        $this->apiAs($user, 'DELETE', $this->routeDestroy(
+            [$inChannel->channel->category->slug, $inChannel->channel->slug, $inChannel->slug]
+        ))
+            ->assertStatus(204);
 
-        $this->json('GET', $this->routeShow([$inChannel->channel->slug, $inChannel->slug]))
+        $this->json('GET', $this->routeShow(
+            [$inChannel->channel->category->slug, $inChannel->channel->slug, $inChannel->slug]
+        ))
             ->assertStatus(404);
 
-        $this->apiAs($user,'DELETE', $this->routeDestroy([$notInChannel->channel->slug, $notInChannel->slug]))
+        $this->apiAs($user, 'DELETE', $this->routeDestroy(
+            [$notInChannel->channel->category->slug, $notInChannel->channel->slug, $notInChannel->slug]
+        ))
             ->assertStatus(403);
 
-        $this->json('GET', $this->routeShow([$notInChannel->channel->slug, $notInChannel->slug]))
+        $this->json('GET', $this->routeShow(
+            [$notInChannel->channel->category->slug, $notInChannel->channel->slug, $notInChannel->slug]
+        ))
             ->assertStatus(200)
             ->assertJson($notInChannel->only(['title', 'body']));
     }
@@ -85,10 +101,14 @@ class DestroyTest extends TestCase
     {
         $thread = create('Thread');
 
-        $this->json('DELETE', $this->routeDestroy([$thread->channel->slug, $thread->slug]))
+        $this->json('DELETE', $this->routeDestroy(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ))
             ->assertStatus(401);
 
-        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->slug]))
+        $this->json('GET', $this->routeShow(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ))
             ->assertStatus(200)
             ->assertJson($thread->only(['title', 'body']));
     }
@@ -101,10 +121,14 @@ class DestroyTest extends TestCase
 
         $user = create('User');
 
-        $this->apiAs($user,'DELETE', $this->routeDestroy([$thread->channel->slug, $thread->slug]))
+        $this->apiAs($user, 'DELETE', $this->routeDestroy(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ))
             ->assertStatus(403);
 
-        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->slug]))
+        $this->json('GET', $this->routeShow(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ))
             ->assertStatus(200)
             ->assertJson($thread->only(['title', 'body']));
     }
@@ -115,10 +139,14 @@ class DestroyTest extends TestCase
         $user = create('User');
         $thread = create('Thread', ['user_id' => $user->id, 'locked' => true]);
 
-        $this->apiAs($user,'DELETE', $this->routeDestroy([$thread->channel->slug, $thread->slug]))
+        $this->apiAs($user, 'DELETE', $this->routeDestroy(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ))
             ->assertStatus(403);
 
-        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->slug]))
+        $this->json('GET', $this->routeShow(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ))
             ->assertStatus(200);
     }
 
@@ -130,10 +158,14 @@ class DestroyTest extends TestCase
 
         $thread = create('Thread', ['locked' => true]);
 
-        $this->apiAs($user,'DELETE', $this->routeDestroy([$thread->channel->slug, $thread->slug]))
-            ->assertStatus(200);
+        $this->apiAs($user, 'DELETE', $this->routeDestroy(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ))
+            ->assertStatus(204);
 
-        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->slug]))
+        $this->json('GET', $this->routeShow(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ))
             ->assertStatus(404);
     }
 
@@ -147,16 +179,24 @@ class DestroyTest extends TestCase
         $notInChannel = create('Thread', ['locked' => true]);
         $inChannel->channel->moderators()->attach($user);
 
-        $this->apiAs($user,'DELETE', $this->routeDestroy([$inChannel->channel->slug, $inChannel->slug]))
-            ->assertStatus(200);
+        $this->apiAs($user, 'DELETE', $this->routeDestroy(
+            [$inChannel->channel->category->slug, $inChannel->channel->slug, $inChannel->slug]
+        ))
+            ->assertStatus(204);
 
-        $this->json('GET', $this->routeShow([$inChannel->channel->slug, $inChannel->slug]))
+        $this->json('GET', $this->routeShow(
+            [$inChannel->channel->category->slug, $inChannel->channel->slug, $inChannel->slug]
+        ))
             ->assertStatus(404);
 
-        $this->apiAs($user,'DELETE', $this->routeDestroy([$notInChannel->channel->slug, $notInChannel->slug]))
+        $this->apiAs($user, 'DELETE', $this->routeDestroy(
+            [$notInChannel->channel->category->slug, $notInChannel->channel->slug, $notInChannel->slug]
+        ))
             ->assertStatus(403);
 
-        $this->json('GET', $this->routeShow([$notInChannel->channel->slug, $notInChannel->slug]))
+        $this->json('GET', $this->routeShow(
+            [$notInChannel->channel->category->slug, $notInChannel->channel->slug, $notInChannel->slug]
+        ))
             ->assertStatus(200)
             ->assertJson($notInChannel->only(['title', 'body']));
     }

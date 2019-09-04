@@ -38,20 +38,21 @@ class UpdateTest extends TestCase
         $newData = [
             'name' => 'FooBar',
             'slug' => 'foobar',
-            'description' => 'FooBaz'
+            'description' => 'FooBaz',
+            'channel_category' => $channel->category->slug
         ];
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate([$channel->slug]), $newData)
+        $this->apiAs($user, 'PATCH', $this->routeUpdate([$channel->category->slug, $channel->slug]), $newData)
             ->assertStatus(200)
-            ->assertJson($newData)
+            ->assertJson(collect($newData)->except(['channel_category'])->toArray())
             ->assertJsonMissing($oldData);
 
-        $this->json('GET', $this->routeShow([$channel->slug]))
+        $this->json('GET', $this->routeShow([$channel->category->slug, $channel->slug]))
             ->assertStatus(404);
 
-        $this->json('GET', $this->routeShow([$channel->fresh()->slug]))
+        $this->json('GET', $this->routeShow([$channel->category->slug, $channel->fresh()->slug]))
             ->assertStatus(200)
-            ->assertJson($newData);
+            ->assertJson(collect($newData)->except(['channel_category'])->toArray());
     }
 
     /** @test */
@@ -65,8 +66,9 @@ class UpdateTest extends TestCase
         $channel->moderators()->sync($oldMods);
         $newMods = create('User', [], 3);
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate([$channel->slug]), array_merge([
-            'moderators' => $newMods->pluck('username')->toArray()
+        $response = $this->apiAs($user, 'PATCH', $this->routeUpdate([$channel->category->slug, $channel->slug]), array_merge([
+            'moderators' => $newMods->pluck('username')->toArray(),
+            'channel_category' => $channel->category->slug
         ], $channel->only(['name', 'description'])))
             ->assertStatus(200)
             ->assertJson([
@@ -75,8 +77,7 @@ class UpdateTest extends TestCase
             ->assertJsonMissing([
                 'moderators' => $oldMods->sortBy('username')->pluck('username')->toArray()
             ]);
-
-        $this->json('GET', $this->routeShow([$channel->slug]))
+        $this->json('GET', $this->routeShow([$channel->category->slug, $channel->slug]))
             ->assertStatus(200)
             ->assertJson([
                 'moderators' => $newMods->sortBy('username')->pluck('username')->toArray()
@@ -90,9 +91,11 @@ class UpdateTest extends TestCase
         Bouncer::allow($user)->to('update-channels');
 
         $channel = create('Channel');
-        $data = array_merge($channel->only(['name', 'description']), ['locked' => true]);
+        $data = array_merge($channel->only(['name', 'description']), [
+            'locked' => true, 'channel_category' => $channel->category->slug
+        ]);
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate([$channel->slug]), $data)
+        $this->apiAs($user, 'PATCH', $this->routeUpdate([$channel->category->slug, $channel->slug]), $data)
             ->assertStatus(200)
             ->assertJson([
                 'locked' => true
@@ -101,9 +104,11 @@ class UpdateTest extends TestCase
                 'locked' => false
             ]);
 
-        $data = array_merge($channel->only(['name', 'description']), ['locked' => false]);
+        $data = array_merge($channel->only(['name', 'description']), [
+            'locked' => false, 'channel_category' => $channel->category->slug
+        ]);
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate([$channel->slug]), $data)
+        $this->apiAs($user, 'PATCH', $this->routeUpdate([$channel->category->slug, $channel->slug]), $data)
             ->assertStatus(200)
             ->assertJson([
                 'locked' => false
@@ -114,14 +119,14 @@ class UpdateTest extends TestCase
     }
 
     /** @test */
-    function a_guest_and_an_unauthorized_user_can_not_delete_a_channel()
+    function a_guest_and_an_unauthorized_user_can_not_update_a_channel()
     {
         $channel = create('Channel');
-        $this->json('PATCH', $this->routeUpdate([$channel->slug]), [])
+        $this->json('PATCH', $this->routeUpdate([$channel->category->slug, $channel->slug]), [])
             ->assertStatus(401);
 
         $user = create('User');
-        $this->apiAs($user,'PATCH', $this->routeUpdate([$channel->slug]), [])
+        $this->apiAs($user, 'PATCH', $this->routeUpdate([$channel->category->slug, $channel->slug]), [])
             ->assertStatus(403);
     }
 
@@ -139,6 +144,20 @@ class UpdateTest extends TestCase
             ->assertJsonValidationErrors(['description']);
     }
 
+    /** @test */
+    function a_channel_requires_a_channel_category()
+    {
+        $this->update(['channel_category' => null])
+            ->assertJsonValidationErrors(['channel_category']);
+    }
+
+    /** @test */
+    function a_channels_channel_category_must_exist()
+    {
+        $this->update(['channel_category' => 'not-a-cagetory'])
+            ->assertJsonValidationErrors(['channel_category']);
+    }
+
     function update($attributes)
     {
         $user = create('User');
@@ -146,6 +165,11 @@ class UpdateTest extends TestCase
 
         $channel = create('Channel');
 
-        return $this->apiAs($user, 'PATCH', $this->routeUpdate([$channel->slug]), $attributes);
+        return $this->apiAs(
+            $user,
+            'PATCH',
+            $this->routeUpdate([$channel->category->slug, $channel->slug]),
+            $attributes
+        );
     }
 }

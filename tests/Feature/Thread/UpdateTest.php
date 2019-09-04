@@ -41,12 +41,16 @@ class UpdateTest extends TestCase
             'body' => '<p>Bar</p>'
         ];
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate([$thread->channel->slug, $thread->slug]), $newData)
+        $this->apiAs($user, 'PATCH', $this->routeUpdate(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), $newData)
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($oldData);
 
-        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->fresh()->slug]))
+        $this->json('GET', $this->routeShow(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->fresh()->slug]
+        ))
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($oldData);
@@ -65,12 +69,16 @@ class UpdateTest extends TestCase
             'body' => '<p>Bar</p>'
         ];
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate([$thread->channel->slug, $thread->slug]), $newData)
+        $this->apiAs($user, 'PATCH', $this->routeUpdate(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), $newData)
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($oldData);
 
-        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->fresh()->slug]))
+        $this->json('GET', $this->routeShow(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->fresh()->slug]
+        ))
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($oldData);
@@ -90,19 +98,24 @@ class UpdateTest extends TestCase
             'body' => '<p>Bar</p>'
         ];
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate([$inChannel->channel->slug, $inChannel->slug]), $newData)
+        $this->apiAs($user, 'PATCH', $this->routeUpdate(
+            [$inChannel->channel->category->slug, $inChannel->channel->slug, $inChannel->slug]
+        ), $newData)
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($inChannel->only(['title', 'body']));
 
-        $this->json('GET', $this->routeShow([$inChannel->channel->slug, $inChannel->fresh()->slug]))
+        $this->json('GET', $this->routeShow(
+            [$inChannel->channel->category->slug, $inChannel->channel->slug, $inChannel->fresh()->slug]
+        ))
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($inChannel->only(['title', 'body']));
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate([$notInChannel->channel->slug, $notInChannel->slug]), $newData)
+        $this->apiAs($user, 'PATCH', $this->routeUpdate(
+            [$notInChannel->channel->category->slug, $notInChannel->channel->slug, $notInChannel->slug]
+        ), $newData)
             ->assertStatus(403);
-
     }
 
     /** @test */
@@ -118,12 +131,16 @@ class UpdateTest extends TestCase
             'body' => '<p>Bar</p>'
         ];
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate([$thread->channel->slug, $thread->slug]), $newData)
+        $this->apiAs($user, 'PATCH', $this->routeUpdate(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), $newData)
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($oldData);
 
-        $this->json('GET', $this->routeShow([$thread->channel->slug, $thread->fresh()->slug]))
+        $this->json('GET', $this->routeShow(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->fresh()->slug]
+        ))
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($oldData);
@@ -143,17 +160,23 @@ class UpdateTest extends TestCase
             'body' => '<p>Bar</p>'
         ];
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate([$inChannel->channel->slug, $inChannel->slug]), $newData)
+        $this->apiAs($user, 'PATCH', $this->routeUpdate(
+            [$inChannel->channel->category->slug, $inChannel->channel->slug, $inChannel->slug]
+        ), $newData)
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($inChannel->only(['title', 'body']));
 
-        $this->json('GET', $this->routeShow([$inChannel->channel->slug, $inChannel->fresh()->slug]))
+        $this->json('GET', $this->routeShow(
+            [$inChannel->channel->category->slug, $inChannel->channel->slug, $inChannel->fresh()->slug]
+        ))
             ->assertStatus(200)
             ->assertJson($newData)
             ->assertJsonMissing($inChannel->only(['title', 'body']));
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate([$notInChannel->channel->slug, $notInChannel->slug]), $newData)
+        $this->apiAs($user, 'PATCH', $this->routeUpdate(
+            [$notInChannel->channel->category->slug, $notInChannel->channel->slug, $notInChannel->slug]
+        ), $newData)
             ->assertStatus(403);
     }
 
@@ -163,7 +186,9 @@ class UpdateTest extends TestCase
         $user = create('User');
         $thread = create('Thread', ['user_id' => $user->id, 'locked' => true]);
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate([$thread->channel->slug, $thread->slug]), [])
+        $this->apiAs($user, 'PATCH', $this->routeUpdate(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), [])
             ->assertStatus(403);
     }
 
@@ -172,7 +197,9 @@ class UpdateTest extends TestCase
     {
         $thread = create('Thread');
 
-        $this->json('PATCH', $this->routeUpdate([$thread->channel->slug, $thread->slug]), [])
+        $this->json('PATCH', $this->routeUpdate(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), [])
             ->assertStatus(401);
     }
 
@@ -184,7 +211,9 @@ class UpdateTest extends TestCase
 
         $user = create('User');
 
-        $this->apiAs($user,'PATCH', $this->routeUpdate([$thread->channel->slug, $thread->slug]), [])
+        $this->apiAs($user, 'PATCH', $this->routeUpdate(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), [])
             ->assertStatus(403);
     }
 
@@ -218,6 +247,8 @@ class UpdateTest extends TestCase
 
         $thread = create('Thread', ['user_id' => $user->id]);
 
-        return $this->apiAs($user,'PATCH', $this->routeUpdate([$thread->channel->slug, $thread->slug]), $attributes);
+        return $this->apiAs($user, 'PATCH', $this->routeUpdate(
+            [$thread->channel->category->slug, $thread->channel->slug, $thread->slug]
+        ), $attributes);
     }
 }

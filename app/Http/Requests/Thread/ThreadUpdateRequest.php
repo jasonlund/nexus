@@ -5,7 +5,6 @@ namespace App\Http\Requests\Thread;
 use App\Services\ThreadsService;
 use Illuminate\Foundation\Http\FormRequest;
 use Bouncer;
-use App\Rules\RichTextRequired;
 
 class ThreadUpdateRequest extends FormRequest
 {
@@ -16,10 +15,10 @@ class ThreadUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth() &&
-            ((!request()->route('thread')->locked && request()->route('thread')->user_id == auth()->user()->id)
-                || Bouncer::can('moderate-channels')
-                || Bouncer::can('moderate-channels', request()->route('channel')));
+        return auth() && ((!request()->route('thread')->locked
+            && request()->route('thread')->user_id == auth()->user()->id)
+            || Bouncer::can('moderate-channels')
+            || Bouncer::can('moderate-channels', request()->route('channel')));
     }
 
     /**

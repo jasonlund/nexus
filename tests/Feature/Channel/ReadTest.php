@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Channel;
 
-use App\Services\ThreadsService;
 use Carbon\Carbon;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -11,6 +10,7 @@ class ReadTest extends TestCase
 {
     use DatabaseMigrations;
 
+    protected $category;
     protected $channel;
     protected $threads;
     protected $replies;
@@ -19,7 +19,8 @@ class ReadTest extends TestCase
     {
         parent::setUp();
 
-        $this->channel = create('Channel');
+        $this->category = create('ChannelCategory');
+        $this->channel = create('Channel', ['channel_category_id' => $this->category->id]);
         $this->threads = create('Thread', ['channel_id' => $this->channel->id], 2);
         create('Reply', ['thread_id' => $this->threads[0]->id], 2);
         create('Reply', ['thread_id' => $this->threads[1]->id], 2);
@@ -27,9 +28,9 @@ class ReadTest extends TestCase
         $this->withExceptionHandling();
     }
 
-    protected function routeIndex()
+    protected function routeIndex($params = [])
     {
-        return route('channels.index');
+        return route('channels.index', $params);
     }
 
     protected function routeShow($params = [])
@@ -50,7 +51,7 @@ class ReadTest extends TestCase
     /** @test */
     function anyone_can_view_all_channels()
     {
-        $this->json('GET', $this->routeIndex())
+        $this->json('GET', $this->routeIndex([$this->category->slug]))
             ->assertStatus(200)
             ->assertJsonFragment([
                 'name' => $this->channel->name
@@ -60,7 +61,7 @@ class ReadTest extends TestCase
     /** @test */
     function anyone_can_view_a_channel()
     {
-        $this->json('GET', $this->routeShow([$this->channel->slug]))
+        $this->json('GET', $this->routeShow([$this->category->slug, $this->channel->slug]))
             ->assertStatus(200)
             ->assertJson([
                 'name' => $this->channel->name
@@ -73,7 +74,7 @@ class ReadTest extends TestCase
         $user = create('User');
 
         Carbon::setTestNow(Carbon::now()->addMinutes(1));
-        $this->apiAs($user, 'GET', $this->routeIndex())
+        $this->apiAs($user, 'GET', $this->routeIndex([$this->category->slug]))
             ->assertJson([
                 [
                     'new' => true
@@ -81,8 +82,10 @@ class ReadTest extends TestCase
             ]);
 
         Carbon::setTestNow(Carbon::now()->addMinutes(1));
-        $this->apiAs($user, 'GET', $this->routeShowThread([$this->channel->slug, $this->threads[1]->slug]));
-        $this->apiAs($user, 'GET', $this->routeIndex())
+        $this->apiAs($user, 'GET', $this->routeShowThread([
+            $this->category->slug, $this->channel->slug, $this->threads[1]->slug
+        ]));
+        $this->apiAs($user, 'GET', $this->routeIndex([$this->category->slug]))
             ->assertJson([
                 [
                     'new' => true
@@ -90,8 +93,10 @@ class ReadTest extends TestCase
             ]);
 
         Carbon::setTestNow(Carbon::now()->addMinutes(1));
-        $this->apiAs($user, 'GET', $this->routeShowThread([$this->channel->slug, $this->threads[0]->slug]));
-        $this->apiAs($user, 'GET', $this->routeIndex())
+        $this->apiAs($user, 'GET', $this->routeShowThread([
+            $this->category->slug, $this->channel->slug, $this->threads[0]->slug
+        ]));
+        $this->apiAs($user, 'GET', $this->routeIndex([$this->category->slug]))
             ->assertJson([
                 [
                     'new' => false
@@ -105,16 +110,16 @@ class ReadTest extends TestCase
         $user = create('User');
 
         Carbon::setTestNow(Carbon::now()->addMinutes(1));
-        $this->apiAs($user, 'GET', $this->routeIndex())
+        $this->apiAs($user, 'GET', $this->routeIndex([$this->category->slug]))
             ->assertJson([
                 [
                     'new' => true
                 ]
             ]);
 
-        $this->apiAs($user, 'GET', $this->routeRead($this->channel->slug));
+        $this->apiAs($user, 'GET', $this->routeRead([$this->category->slug, $this->channel->slug]));
         Carbon::setTestNow(Carbon::now()->addMinutes(1));
-        $this->apiAs($user, 'GET', $this->routeIndex())
+        $this->apiAs($user, 'GET', $this->routeIndex([$this->category->slug]))
             ->assertJson([
                 [
                     'new' => false

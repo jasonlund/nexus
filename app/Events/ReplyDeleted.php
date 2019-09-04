@@ -11,10 +11,17 @@ class ReplyDeleted
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    /**
+     * The Reply that triggered the event.
+     *
+     * @var Reply
+     */
     public $reply;
 
     /**
      * Create a new event instance.
+     *
+     * @param   Reply  $reply
      *
      * @return void
      */

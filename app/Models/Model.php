@@ -9,9 +9,11 @@ class Model extends BaseModel
     use SoftDeletes;
 
     /**
-     * Cast Soft Deletes timestamp as a date.
+     * The attributes that should be mutated to dates.
      *
      * @var array
      */
-    protected $dates = ['deleted_at'];
+    protected $dates = [
+        'deleted_at'
+    ];
 }

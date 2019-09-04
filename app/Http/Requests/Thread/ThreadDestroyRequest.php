@@ -14,10 +14,10 @@ class ThreadDestroyRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth() &&
-            ((!request()->route('thread')->locked && request()->route('thread')->user_id == auth()->user()->id)
-                || Bouncer::can('moderate-channels')
-                || Bouncer::can('moderate-channels', request()->route('channel')));
+        return auth() && ((!request()->route('thread')->locked
+            && request()->route('thread')->user_id == auth()->user()->id)
+            || Bouncer::can('moderate-channels')
+            || Bouncer::can('moderate-channels', request()->route('channel')));
     }
 
     /**

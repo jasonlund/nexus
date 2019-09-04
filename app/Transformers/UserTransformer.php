@@ -13,8 +13,9 @@ class UserTransformer extends TransformerAbstract
     /**
      * Transform Users.
      *
-     * @param \App\Models\User $user
-     * @return array
+     * @param   User  $user
+     *
+     * @return  array
      */
     public function transform(User $user)
     {
@@ -33,30 +34,31 @@ class UserTransformer extends TransformerAbstract
             'last_active_at' => (string) $user->last_active_at->format('Y-m-d H:i:s')
         ];
 
-        $data['moderatable_channels'] = $data['role'] !== 'moderator' ? [] :
-            $user->moderatedChannels->sortBy('slug')->pluck('slug');
+        $data['moderatable_channels'] = $data['role'] !== 'moderator' ? []
+            : $user->moderatedChannels->sortBy('slug')->pluck('slug');
 
         /**
          * If the User is the currently authenticated User or the currently authenticated User has the ability to
          * view other users include the email.
          */
-        if((auth()->check() && auth()->user()->id === $user->id
+        if ((auth()->check() && auth()->user()->id === $user->id
                 && strpos(request()->route()->getName(), 'self.') !== false)
-            || Bouncer::can('view-all-users')){
+            || Bouncer::can('view-all-users')
+        ) {
             $data['email'] = (string) $user->email;
         }
 
         /**
-         * If the currently authenticated User has the ability to view other users include the User's ban status.
+         * If the currently authenticated User has the ability to ban users include the User's ban status.
          */
-        if(Bouncer::can('view-all-users'))
-        {
+        if (Bouncer::can('ban-users')) {
             $data['banned'] = (bool) $user->isBanned();
             $data['banned_at'] = (string) $user->banned_at;
-            if($data['banned']){
-                $data['banned_until'] = $user->bans->first()->expired_at ? (string) $user->bans->first()->expired_at->format('Y-m-d H:i:s') : null;
+            if ($data['banned']) {
+                $data['banned_until'] = $user->bans->first()->expired_at ?
+                    (string) $user->bans->first()->expired_at->format('Y-m-d H:i:s') : null;
                 $data['ban_comment'] = $user->bans->first()->comment ? (string) $user->bans->first()->comment : null;
-            }else{
+            } else {
                 $data['banned_until'] = null;
                 $data['ban_comment'] = null;
             }

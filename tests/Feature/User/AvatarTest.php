@@ -60,7 +60,7 @@ class AvatarTest extends TestCase
 
         $this->assertEquals('avatars/' . $file->hashName(), $user->fresh()->avatar_path);
 
-        Storage::disk('public')->assertPresent('avatars/' . $file->hashName());
+        Storage::disk('public')->assertExists('avatars/' . $file->hashName());
     }
 
     /** @test */
@@ -78,7 +78,7 @@ class AvatarTest extends TestCase
             'avatar' => null
         ]);
 
-        Storage::disk('public')->assertAbsent('avatars/' . $oldFile->hashName());
+        Storage::disk('public')->assertMissing('avatars/' . $oldFile->hashName());
 
         $this->assertEquals(null, $user->fresh()->avatar_path);
     }
@@ -100,8 +100,8 @@ class AvatarTest extends TestCase
 
         $this->assertEquals('avatars/' . $newFile->hashName(), $user->fresh()->avatar_path);
 
-        Storage::disk('public')->assertAbsent('avatars/' . $oldFile->hashName());
-        Storage::disk('public')->assertPresent('avatars/' . $newFile->hashName());
+        Storage::disk('public')->assertMissing('avatars/' . $oldFile->hashName());
+        Storage::disk('public')->assertExists('avatars/' . $newFile->hashName());
     }
 
     /** @test */
@@ -138,7 +138,7 @@ class AvatarTest extends TestCase
 
         $this->assertEquals('avatars/' . $file->hashName(), $otherUser->fresh()->avatar_path);
 
-        Storage::disk('public')->assertPresent('avatars/' . $file->hashName());
+        Storage::disk('public')->assertExists('avatars/' . $file->hashName());
     }
 
     /** @test */
@@ -158,7 +158,7 @@ class AvatarTest extends TestCase
             'avatar' => null
         ]);
 
-        Storage::disk('public')->assertAbsent('avatars/' . $oldFile->hashName());
+        Storage::disk('public')->assertMissing('avatars/' . $oldFile->hashName());
 
         $this->assertEquals(null, $otherUser->fresh()->avatar_path);
     }
@@ -182,8 +182,8 @@ class AvatarTest extends TestCase
 
         $this->assertEquals('avatars/' . $newFile->hashName(), $otherUser->fresh()->avatar_path);
 
-        Storage::disk('public')->assertAbsent('avatars/' . $oldFile->hashName());
-        Storage::disk('public')->assertPresent('avatars/' . $newFile->hashName());
+        Storage::disk('public')->assertMissing('avatars/' . $oldFile->hashName());
+        Storage::disk('public')->assertExists('avatars/' . $newFile->hashName());
     }
 
     /** @test */

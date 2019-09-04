@@ -153,7 +153,7 @@ class TransformerTest extends TestCase
         $user = create('User');
 
         $threads = create('Thread', ['user_id' => $user->id], 5);
-        foreach($threads as $thread) {
+        foreach ($threads as $thread) {
             create('Reply', ['user_id' => $user->id, 'thread_id' => $thread->id], 5);
         }
 
@@ -245,7 +245,7 @@ class TransformerTest extends TestCase
 
         Bouncer::assign('moderator')->to($user);
 
-        foreach($channels as $channel) {
+        foreach ($channels as $channel) {
             $channel->moderators()->sync([$user->id]);
         }
 

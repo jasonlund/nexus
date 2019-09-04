@@ -2,36 +2,31 @@
 
 namespace App\Models;
 
-use App\Rules\UniqueCaseInsensitive;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Silber\Bouncer\Database\HasRolesAndAbilities;
-use Bouncer;
-use App\Models\Channel;
-use Illuminate\Validation\Rule;
 use Cog\Contracts\Ban\Bannable as BannableContract;
 use Cog\Laravel\Ban\Traits\Bannable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use Hash;
 use App\Notifications\ResetPassword as ResetPasswordNotification;
-use Cache;
-use Carbon\Carbon;
+use Askedio\SoftCascade\Traits\SoftCascadeTrait;
 
 class User extends Authenticatable implements BannableContract, JWTSubject
 {
-    use Notifiable, SoftDeletes, HasRolesAndAbilities, Bannable;
+    use Notifiable, SoftDeletes, SoftCascadeTrait, HasRolesAndAbilities, Bannable;
 
     /**
      * The attributes that can be mass assigned.
      *
      * @var array
      */
-    protected $fillable = ['name', 'username', 'email', 'signature', 'password', 'avatar_path', 'location', 'timezone', 'last_active_at'];
+    protected $fillable = [
+        'name', 'username', 'email', 'signature', 'password', 'avatar_path', 'location', 'timezone', 'last_active_at'
+    ];
 
     /**
-     * The attributes that should be hidden for arrays.
+     * The attributes that should be hidden from arrays.
      *
      * @var array
      */
@@ -40,30 +35,50 @@ class User extends Authenticatable implements BannableContract, JWTSubject
     ];
 
     /**
-     * Cast timestamps as a date.
+     * The attributes that should be mutated to dates.
      *
      * @var array
      */
-    protected $dates = ['deleted_at', 'email_verified_at', 'last_active_at'];
+    protected $dates = [
+        'deleted_at', 'email_verified_at', 'last_active_at'
+    ];
+
+    /**
+     * Cascade soft deletes to related Models.
+     *
+     * @var array
+     */
+    protected $softCascade = [
+        'threads', 'replies'
+    ];
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
-     * @return mixed
+     * @return  mixed
      */
-    public function getJWTIdentifier() {
+    public function getJWTIdentifier()
+    {
         return $this->getKey();
     }
 
     /**
      * Return a key value array, containing any custom claims to be added to the JWT.
      *
-     * @return array
+     * @return  array
      */
-    public function getJWTCustomClaims() {
+    public function getJWTCustomClaims()
+    {
         return [];
     }
 
+    /**
+     * Send the password reset notification.
+     *
+     * @param   string  $token
+     *
+     * @return  void
+     */
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPasswordNotification($token));
@@ -72,7 +87,7 @@ class User extends Authenticatable implements BannableContract, JWTSubject
     /**
      * Get the route key for the model.
      *
-     * @return string
+     * @return  string
      */
     public function getRouteKeyName()
     {
@@ -80,9 +95,19 @@ class User extends Authenticatable implements BannableContract, JWTSubject
     }
 
     /**
+     * A User owns many Emotes.
+     *
+     * @return  \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function emotes()
+    {
+        return $this->hasMany('App\Models\Emote');
+    }
+
+    /**
      * A User owns many Threads.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return  \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function threads()
     {
@@ -92,7 +117,7 @@ class User extends Authenticatable implements BannableContract, JWTSubject
     /**
      * A User owns many Replies.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return  \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function replies()
     {
@@ -102,7 +127,7 @@ class User extends Authenticatable implements BannableContract, JWTSubject
     /**
      * A User belongs to many Channels as a Moderator or VIP.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return  \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function channels()
     {
@@ -111,25 +136,42 @@ class User extends Authenticatable implements BannableContract, JWTSubject
     }
 
     /**
-     * A Users belongs to many Channels as a Moderator
+     * A User belongs to many Channels as a Moderator.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return  \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function moderatedChannels()
     {
-        return $this->belongsToMany('App\Models\Channel',
+        return $this->belongsToMany(
+            'App\Models\Channel',
             'channel_moderator',
             'user_id',
-            'channel_id');
+            'channel_id'
+        );
     }
 
+    /**
+     * A User belongs to many Threads through ViewedThread.
+     *
+     * @return  \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function viewed()
     {
-        return $this->belongsToMany('App\Models\Thread', 'viewed_threads', 'user_id', 'thread_id')
+        return $this->belongsToMany(
+            'App\Models\Thread',
+            'viewed_threads',
+            'user_id',
+            'thread_id'
+        )
             ->using('App\Models\ViewedThread')
             ->withPivot('timestamp');
     }
 
+    /**
+     * Get the User's role. If none exists, return base 'user' role.
+     *
+     * @return  string
+     */
     public function getRoleAttribute()
     {
         $role = $this->roles()->first();

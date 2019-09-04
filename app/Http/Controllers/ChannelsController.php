@@ -7,49 +7,81 @@ use App\Http\Requests\Channel\ChannelDestroyRequest;
 use App\Http\Requests\Channel\ChannelReorderRequest;
 use App\Http\Requests\Channel\ChannelUpdateRequest;
 use App\Models\Channel;
-use App\Services\ChannelsService;
-use DB;
+use App\Models\ChannelCategory;
 
 class ChannelsController extends Controller
 {
     /**
-     * The Channel Service
-     *
-     * @var ChannelsService
-     */
-//    protected $service;
-
-    /**
      * ChannelsController constructor.
      *
-     * @param ChannelsService $service
+     * @return  void
      */
-    public function __construct(ChannelsService $service)
+    public function __construct()
     {
         parent::__construct();
-//        $this->service = $service;
     }
 
     /**
-     * Display a listing of the channels in order.
+     * Display a listing of the Channels in order, grouped by ChannelCategory.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @param   ChannelCategory  $category
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(ChannelCategory $category)
     {
-        return collection_response(Channel::ordered(), 'ChannelTransformer',
-            ['latest_thread', 'latest_thread.owner', 'latest_reply', 'latest_reply.owner']);
+        return collection_response(
+            $category->channels()->ordered(),
+            'ChannelTransformer',
+            ['latest_thread', 'latest_thread.owner', 'latest_reply', 'latest_reply.owner']
+        );
     }
 
     /**
-     * Store a newly created channel in storage.
+     * Store a newly created Channel in storage.
      *
-     * @param ChannelCreateRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param   ChannelCreateRequest  $request
+     * @param   ChannelCategory       $category
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
-    public function store(ChannelCreateRequest $request)
+    public function store(ChannelCreateRequest $request, ChannelCategory $category)
     {
-        $channel = $this->service->create(request()->all());
+        $channel = $this->service->create($category, $request->all());
+        $this->service->assignModerators($channel, request('moderators'));
+
+        return item_response($channel, 'ChannelTransformer');
+    }
+
+    /**
+     * Display the specified Channel.
+     *
+     * @param   Channel          $channel
+     * @param   ChannelCategory  $category
+     *
+     * @return  \Illuminate\Http\JsonResponse
+     */
+    public function show(ChannelCategory $category, Channel $channel)
+    {
+        return item_response(
+            $channel,
+            'ChannelTransformer',
+            ['latest_thread', 'latest_thread.owner', 'latest_reply', 'latest_reply.owner']
+        );
+    }
+
+    /**
+     * Update the specified Channel in storage.
+     *
+     * @param   ChannelUpdateRequest  $request
+     * @param   ChannelCategory       $category
+     * @param   Channel               $channel
+     *
+     * @return  \Illuminate\Http\JsonResponse
+     */
+    public function update(ChannelUpdateRequest $request, ChannelCategory $category, Channel $channel)
+    {
+        $this->service->update($channel, $request->all());
         $this->service->assignModerators($channel, request('moderators'));
 
         return item_response($channel, 'ChannelTransformer');
@@ -58,67 +90,46 @@ class ChannelsController extends Controller
     /**
      * Reorder existing Channels.
      *
-     * @param ChannelReorderRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param   ChannelReorderRequest  $request
+     * @param   ChannelCategory        $category
+     *
+     * @return  \Illuminate\Http\JsonResponse
      */
-    public function reorder(ChannelReorderRequest $request)
+    public function reorder(ChannelReorderRequest $request, ChannelCategory $category)
     {
         $this->service->reorder(request('order'));
 
-        return collection_response(Channel::ordered(), 'ChannelTransformer');
-    }
-
-    /**
-     * Display the specified Channel.
-     *
-     * @param \App\Models\Channel $channel
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function show(Channel $channel)
-    {
-        return item_response($channel, 'ChannelTransformer');
-    }
-
-    /**
-     * Update the specified Channel in storage.
-     *
-     * @param ChannelUpdateRequest $request
-     * @param \App\Models\Channel $channel
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function update(ChannelUpdateRequest $request, Channel $channel)
-    {
-        $this->service->update($channel, request()->all());
-        $this->service->assignModerators($channel, request('moderators'));
-
-        return item_response($channel, 'ChannelTransformer');
+        return collection_response($category->channels()->ordered(), 'ChannelTransformer');
     }
 
     /**
      * Mark all threads in the given channel as viewed.
      *
-     * @param Channel $channel
-     * @return \Illuminate\Http\JsonResponse
+     * @param   ChannelCategory  $category
+     * @param   Channel          $channel
+     *
+     * @return  \Illuminate\Http\Response
      */
-    public function markRead(Channel $channel)
+    public function markRead(ChannelCategory $category, Channel $channel)
     {
         $this->service->viewed($channel);
 
-        return response()->json([]);
+        return response('', 204);
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param ChannelDestroyRequest $request
-     * @param Channel $channel
-     * @return \Illuminate\Http\JsonResponse
-     * @throws \Exception
+     * @param   ChannelDestroyRequest  $request
+     * @param   ChannelCategory        $category
+     * @param   Channel                $channel
+     *
+     * @return  \Illuminate\Http\Response
      */
-    public function destroy(ChannelDestroyRequest $request, Channel $channel)
+    public function destroy(ChannelDestroyRequest $request, ChannelCategory $category, Channel $channel)
     {
-        $channel->delete();
+        $this->service->destroy($channel);
 
-        return response()->json([]);
+        return response('', 204);
     }
 }

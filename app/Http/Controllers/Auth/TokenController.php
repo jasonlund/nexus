@@ -3,19 +3,23 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Auth;
 use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;
 use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use App\Http\Requests\User\UserLoginRequest;
 
 class TokenController extends Controller
 {
     /**
      * Get a JWT via given credentials.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @param  UserLoginRequest     $request
+     *
+     * @return  \Illuminate\Http\JsonResponse
+     *
+     * @throws  ValidationException
      */
-    public function login()
+    public function login(UserLoginRequest $request)
     {
         $credentials = request(['email', 'password']);
 
@@ -31,44 +35,41 @@ class TokenController extends Controller
     /**
      * Log the user out (Invalidate the token).
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return  \Illuminate\Http\Response
      */
     public function logout()
     {
         auth()->logout();
 
-        return response()->json(['message' => 'Successfully logged out']);
+        return response('', 204);
     }
 
     /**
      * Refresh a token.
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return  \Illuminate\Http\Response
      */
     public function refresh()
     {
         try {
             return $this->respondWithToken(auth()->refresh());
         } catch (TokenExpiredException $e) {
-            return response([
-                'message' => 'Token Expired'
-            ], 403);
+            return response(['message' => 'Token Expired'], 403);
         } catch (TokenBlacklistedException $e) {
-            return response([
-                'message' => 'Token Expired'
-            ], 403);
+            return response(['message' => 'Token Expired'], 403);
         }
     }
 
     /**
-     * Get the token array structure.
+     * Respond with a new token.
      *
-     * @param string $token
+     * @param   string  $token
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return  \Illuminate\Http\JsonResponse
      */
     protected function respondWithToken($token)
     {
-        return response()->json([])->header('Authorization', 'Bearer ' . $token);
+        return response()->json([])
+            ->header('Authorization', 'Bearer ' . $token);
     }
 }

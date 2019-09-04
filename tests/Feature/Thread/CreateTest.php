@@ -6,6 +6,7 @@ use App\Models\Channel;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Bouncer;
+use Carbon\Carbon;
 
 class CreateTest extends TestCase
 {
@@ -39,7 +40,7 @@ class CreateTest extends TestCase
 
         $thread = raw('Thread', ['channel_id' => $this->channel->id]);
 
-        $this->apiAs($user,'PUT', $this->routeStore([$this->channel->slug]), $thread)
+        $this->apiAs($user, 'PUT', $this->routeStore([$this->channel->category->slug, $this->channel->slug]), $thread)
             ->assertStatus(200)
             ->assertJson([
                 'title' => $thread['title'],
@@ -53,7 +54,7 @@ class CreateTest extends TestCase
     /** @test */
     function a_guest_can_not_create_new_threads()
     {
-        $this->json('PUT', $this->routeStore([$this->channel->slug]), [])
+        $this->json('PUT', $this->routeStore([$this->channel->category->slug, $this->channel->slug]), [])
             ->assertStatus(401);
     }
 
@@ -65,7 +66,7 @@ class CreateTest extends TestCase
 
         $thread = raw('Thread', ['channel_id' => $channel->id]);
 
-        $this->apiAs($user,'PUT', $this->routeStore([$channel->slug]), $thread)
+        $this->apiAs($user, 'PUT', $this->routeStore([$channel->category->slug, $channel->slug]), $thread)
             ->assertStatus(403);
     }
 
@@ -78,7 +79,7 @@ class CreateTest extends TestCase
 
         $thread = raw('Thread');
 
-        $this->apiAs($user,'PUT', $this->routeStore([$channel->slug]), $thread)
+        $this->apiAs($user, 'PUT', $this->routeStore([$channel->category->slug, $channel->slug]), $thread)
             ->assertStatus(200);
     }
 
@@ -94,11 +95,53 @@ class CreateTest extends TestCase
 
         $thread = raw('Thread');
 
-        $this->apiAs($user,'PUT', $this->routeStore([$authedChannel->slug]), $thread)
+        $this->apiAs($user, 'PUT', $this->routeStore([$authedChannel->category->slug, $authedChannel->slug]), $thread)
             ->assertStatus(200);
 
-        $this->apiAs($user,'PUT', $this->routeStore([$unauthedChannel->slug]), $thread)
+        Carbon::setTestNow(now()->addMinute());
+
+        $this->apiAs($user, 'PUT', $this->routeStore(
+            [$unauthedChannel->category->slug, $unauthedChannel->slug]
+        ), $thread)
             ->assertStatus(403);
+    }
+
+    /** @test */
+    function creation_of_a_thread_is_rate_limited()
+    {
+        $user = create('User');
+
+        $thread = raw('Thread', ['channel_id' => $this->channel->id]);
+
+        $this->apiAs($user, 'PUT', $this->routeStore([$this->channel->category->slug, $this->channel->slug]), $thread)
+            ->assertStatus(200);
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(20));
+
+        $this->apiAs($user, 'PUT', $this->routeStore([$this->channel->category->slug, $this->channel->slug]), $thread)
+            ->assertStatus(429);
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(11));
+
+        $this->apiAs($user, 'PUT', $this->routeStore([$this->channel->category->slug, $this->channel->slug]), $thread)
+            ->assertStatus(200);
+    }
+
+    /** @test */
+    function authorized_users_are_not_rate_limited()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->to('unlimited-actions');
+
+        $thread = raw('Thread', ['channel_id' => $this->channel->id]);
+
+        $this->apiAs($user, 'PUT', $this->routeStore([$this->channel->category->slug, $this->channel->slug]), $thread)
+            ->assertStatus(200);
+
+        Carbon::setTestNow(Carbon::now()->addSeconds(20));
+
+        $this->apiAs($user, 'PUT', $this->routeStore([$this->channel->category->slug, $this->channel->slug]), $thread)
+            ->assertStatus(200);
     }
 
     /** @test */
@@ -132,6 +175,6 @@ class CreateTest extends TestCase
         $channel = create('Channel');
         $thread = raw('Thread', array_merge($overrides, ['channel_id' => $channel->id]));
 
-        return $this->apiAs($user,'PUT', $this->routeStore([$channel->slug]), $thread);
+        return $this->apiAs($user, 'PUT', $this->routeStore([$channel->category->slug, $channel->slug]), $thread);
     }
 }

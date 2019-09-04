@@ -5,6 +5,9 @@ namespace Tests\Unit;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use App\Models\User;
+use App\Models\Thread;
+use App\Models\Reply;
+use App\Models\Emote;
 use Carbon\Carbon;
 use Cog\Contracts\Ban\BanService;
 
@@ -50,6 +53,28 @@ class UserTest extends TestCase
 
         $this->assertNull(User::find($data['id']));
         $this->assertNotNull(User::withTrashed()->find($data['id']));
+    }
+
+    /** @test */
+    function it_cascades_deletes_to_threads()
+    {
+        $id = $this->user->id;
+        create('Thread', ['user_id' => $id], 4);
+
+        $this->user->delete();
+
+        $this->assertCount(0, Thread::where('user_id', $id)->get());
+    }
+
+    /** @test */
+    function it_cascates_deletes_to_replies()
+    {
+        $id = $this->user->id;
+        create('Reply', ['user_id' => $id], 4);
+
+        $this->user->delete();
+
+        $this->assertCount(0, Reply::where('user_id', $id)->get());
     }
 
     /** @test */

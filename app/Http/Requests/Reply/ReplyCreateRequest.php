@@ -15,8 +15,7 @@ class ReplyCreateRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->check() &&
-            (!request()->route('thread')->locked
+        return auth()->check() && (!request()->route('thread')->locked
                 || Bouncer::can('moderate-channels')
                 || Bouncer::can('moderate-channels', request()->route('channel')));
     }
