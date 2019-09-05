@@ -35,7 +35,7 @@ class UsersService
 
         $rules = collect([
             'accept' => ['bail', 'required', 'boolean', 'accepted'],
-            'avatar' => ['bail', 'nullable', 'sometimes', 'image', 'max:2'],
+            'avatar' => ['bail', 'nullable', 'sometimes', 'image', 'max:1024'],
             'comment' => ['bail', 'nullable', 'string', 'max:1000'],
             'email' => ['bail', 'required', 'email', 'max:255', Rule::unique('users')->ignore($ignoreEmail, 'email')],
             'expired_at' => ['bail', 'nullable', 'date'],
