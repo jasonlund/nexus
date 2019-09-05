@@ -24,7 +24,7 @@ class Recaptcha implements Rule
             'https://www.google.com/recaptcha/api/siteverify',
             [
                 'form_params' => [
-                    'secret' => env('GOOGLE_RECAPTCHA_SECRET'),
+                    'secret' => config('services.recaptcha.secret'),
                     'response' => $value
                 ]
             ]
