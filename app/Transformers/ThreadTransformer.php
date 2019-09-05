@@ -78,6 +78,6 @@ class ThreadTransformer extends TransformerAbstract
      */
     public function includeLatestReply(Thread $thread)
     {
-        return $thread->latestReply ? $this->item($thread->latestReply, new ReplyTransformer) : $this->null();
+        return $thread->latestReply ? $this->item($thread->latestReply, new ReplyTransformer) : null;
     }
 }

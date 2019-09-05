@@ -56,7 +56,7 @@ class ChannelTransformer extends TransformerAbstract
     public function includeLatestThread(Channel $channel)
     {
         return $channel->threads()->count() !== 0 ?
-            $this->item($channel->threads()->latest()->first(), new ThreadTransformer()) : $this->null();
+            $this->item($channel->threads()->latest()->first(), new ThreadTransformer()) : null;
     }
 
     /**
@@ -69,6 +69,6 @@ class ChannelTransformer extends TransformerAbstract
     public function includeLatestReply(Channel $channel)
     {
         return $channel->replies()->count() !== 0 ?
-            $this->item($channel->replies()->latest()->first(), new ReplyTransformer()) : $this->null();
+            $this->item($channel->replies()->latest()->first(), new ReplyTransformer()) : null;
     }
 }
