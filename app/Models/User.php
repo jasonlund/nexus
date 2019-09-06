@@ -40,7 +40,7 @@ class User extends Authenticatable implements BannableContract, JWTSubject
      * @var array
      */
     protected $dates = [
-        'deleted_at', 'email_verified_at', 'last_active_at'
+        'email_verified_at', 'last_active_at'
     ];
 
     /**

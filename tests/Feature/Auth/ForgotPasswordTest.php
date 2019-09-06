@@ -13,7 +13,7 @@ class ForgotPasswordTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

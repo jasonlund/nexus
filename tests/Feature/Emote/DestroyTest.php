@@ -15,7 +15,7 @@ class DestroyTest extends TestCase
 
     protected $file;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

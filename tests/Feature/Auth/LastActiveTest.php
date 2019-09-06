@@ -10,7 +10,7 @@ class LastActiveTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
     }
@@ -32,6 +32,6 @@ class LastActiveTest extends TestCase
 
         $this->apiAs($user, 'GET', $this->routeChannelsIndex([$category->slug]));
 
-        $this->assertEquals($user->fresh()->last_active_at, $now);
+        $this->assertEquals($user->fresh()->last_active_at, $now->milliseconds(0));
     }
 }

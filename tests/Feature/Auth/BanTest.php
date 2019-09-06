@@ -12,7 +12,7 @@ class BanTest extends TestCase
 
     protected $user;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -81,8 +81,7 @@ class BanTest extends TestCase
     {
         $token = $this->generateValidToken($this->user);
 
-        $this->json('POST', $this->routeResetPassword(), [
-            'token' => $token,
+        $this->json('POST', $this->routeResetPassword([$token]), [
             'email' => $this->user->email,
             'password' => 'FooBaz123',
             'password_confirmation' => 'FooBaz123',

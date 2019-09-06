@@ -9,7 +9,7 @@ class TransformerTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -226,9 +226,9 @@ class TransformerTest extends TestCase
 
         $this->json('GET', $this->routeIndex([$thread->channel->category->slug, $thread->channel->slug]))
             ->assertStatus(200)
-            ->assertJson([
+            ->assertJsonMissing([
                 'data' => [
-                    ['latest_reply' => null]
+                    ['latest_reply']
                 ]
             ]);
 

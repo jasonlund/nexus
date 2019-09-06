@@ -14,7 +14,7 @@ class ReplyTest extends TestCase
 
     protected $reply;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -92,7 +92,7 @@ class ReplyTest extends TestCase
             'body' => 'body'
         ]);
 
-        $this->assertEquals($time, $this->reply->edited_at);
+        $this->assertEquals($time->milliseconds(0), $this->reply->edited_at);
         $this->assertEquals($user->id, $this->reply->edited_by);
     }
 }

@@ -45,7 +45,6 @@ class UsersService
             'recaptcha' => ['bail', 'required', 'string', new Recaptcha],
             'role' => ['bail', 'required', 'string'],
             'signature' => ['bail', 'nullable', 'string', 'max:1000'],
-            'token' => ['bail', 'required'],
             'timezone' => ['bail', 'sometimes', 'timezone', 'max:255'],
             'username' => [
                 'bail', 'required', 'min:3', 'max:20', 'alpha_dash',
@@ -65,7 +64,7 @@ class UsersService
                         array_pop($item);
                     return $item;
                 });
-                $rules = $rules->only(['token', 'email', 'password']);
+                $rules = $rules->only(['email', 'password']);
                 break;
             case "register":
                 $rules = $rules->map(function ($item, $key) {

@@ -17,7 +17,7 @@
         "fideloper/proxy": "^4.0",
         "guzzlehttp/guzzle": "^6.3",
         "intervention/image": "^2.5",
-        "laravel/framework": "^5.7",
+        "laravel/framework": "5.8.*",
         "laravel/tinker": "^1.0",
         "mews/purifier": "^2.1",
         "predis/predis": "^1.1",
@@ -28,7 +28,7 @@
         "spatie/laravel-fractal": "^5.4",
         "staudenmeir/belongs-to-through": "^2.4",
         "staudenmeir/eloquent-has-many-deep": "^1.7",
-        "tymon/jwt-auth": "1.0.0-rc.3",
+        "tymon/jwt-auth": "1.0.0-rc.4.1",
         "xemlock/htmlpurifier-html5": "^0.1.10"
     },
     "require-dev": {

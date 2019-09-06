@@ -15,7 +15,7 @@ abstract class TestCase extends BaseTestCase
 
     protected $nullHTML = '<p><strong> </strong><em><s> </s> </em></p><p> <u> </u></p> <p></p>';
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

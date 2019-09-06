@@ -15,7 +15,7 @@ class ThreadTest extends TestCase
 
     protected $thread;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -100,7 +100,7 @@ class ThreadTest extends TestCase
             'body' => 'body'
         ]);
 
-        $this->assertEquals($time, $this->thread->edited_at);
+        $this->assertEquals($time->milliseconds(0), $this->thread->edited_at);
         $this->assertEquals($user->id, $this->thread->edited_by);
     }
 }

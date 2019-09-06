@@ -13,7 +13,7 @@ class ChannelCategoryTest extends TestCase
 
     protected $channelCategory;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

@@ -15,7 +15,7 @@ class ReadTest extends TestCase
     protected $threads;
     protected $replies;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

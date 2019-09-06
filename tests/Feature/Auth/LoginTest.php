@@ -32,7 +32,7 @@ class LoginTest extends TestCase
         return route('self.show');
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

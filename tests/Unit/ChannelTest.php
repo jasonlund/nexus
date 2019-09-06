@@ -13,7 +13,7 @@ class ChannelTest extends TestCase
 
     protected $channel;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

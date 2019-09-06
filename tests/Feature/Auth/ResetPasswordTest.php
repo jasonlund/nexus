@@ -13,7 +13,7 @@ class ResetPasswordTest extends TestCase
 {
     use DatabaseMigrations;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -42,7 +42,7 @@ class ResetPasswordTest extends TestCase
         $user = create('User');
         $token = $this->generateValidToken($user);
 
-        $this->json('POST', $this->routeResetPassword(), [
+        $this->json('POST', $this->routeResetPassword([$token]), [
             'token' => $token,
             'email' => $user->email,
             'password' => 'FooBaz123',
@@ -68,7 +68,7 @@ class ResetPasswordTest extends TestCase
         $user = create('User', ['password' => bcrypt('a-password')]);
         $token = $this->generateInvalidToken();
 
-        $this->json('POST', $this->routeResetPassword(), [
+        $this->json('POST', $this->routeResetPassword([$token]), [
             'token' => $token,
             'email' => $user->email,
             'password' => 'FooBaz123',
@@ -131,7 +131,7 @@ class ResetPasswordTest extends TestCase
             'password_confirmation' => 'FooBaz123',
         ], $params);
 
-        return $this->json('POST', $this->routeResetPassword(), $data);
+        return $this->json('POST', $this->routeResetPassword([$token]), $data);
     }
 
     private function validatePasswordStrength($pw)
