@@ -43,7 +43,7 @@ class CreateTest extends TestCase
 
         $this->assertEquals('emotes/' . $emote->name . '.png', $emote->path);
 
-        Storage::disk('public')->assertExists('emotes/' . $emote->name . '.png');
+        Storage::disk('s3')->assertExists('emotes/' . $emote->name . '.png');
     }
 
     /** @test */
@@ -134,21 +134,21 @@ class CreateTest extends TestCase
     /** @test */
     function an_emote_is_stored_with_the_proper_file_extension()
     {
-        Storage::fake('public');
+        Storage::fake('s3');
 
         $this->create([
             'name' => 'fooBar',
             'file' => UploadedFile::fake()->image('fooBar.png', 128, 128)
         ]);
 
-        Storage::disk('public')->assertExists('emotes/fooBar.png');
+        Storage::disk('s3')->assertExists('emotes/fooBar.png');
 
         $this->create([
             'name' => 'fooBaz',
             'file' => UploadedFile::fake()->image('fooBaz.gif', 128, 128)
         ]);
 
-        Storage::disk('public')->assertExists('emotes/fooBaz.gif');
+        Storage::disk('s3')->assertExists('emotes/fooBaz.gif');
     }
 
     /** @test */

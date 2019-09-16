@@ -41,7 +41,7 @@ class DestroyTest extends TestCase
         Bouncer::allow($user)->to('create-emotes');
         Bouncer::allow($user)->to('delete-emotes');
 
-        Storage::fake();
+        Storage::fake('s3');
 
         $this->create([], $user);
 
@@ -50,7 +50,7 @@ class DestroyTest extends TestCase
         $this->apiAs($user, 'DELETE', $this->routeDestroy([$emote->name]))
             ->assertStatus(204);
 
-        Storage::disk('public')->assertMissing($emote->path);
+        Storage::disk('s3')->assertMissing($emote->path);
 
         $this->assertNull($emote->fresh());
     }
@@ -61,7 +61,7 @@ class DestroyTest extends TestCase
         $user = create('User');
         Bouncer::allow($user)->to('create-emotes');
 
-        Storage::fake();
+        Storage::fake('s3');
 
         $this->create([], $user);
 
@@ -70,7 +70,7 @@ class DestroyTest extends TestCase
         $this->json('DELETE', $this->routeDestroy([$emote->name]))
             ->assertStatus(401);
 
-        Storage::disk('public')->assertExists($emote->path);
+        Storage::disk('s3')->assertExists($emote->path);
 
         $this->assertNotNull($emote->fresh());
     }
@@ -82,7 +82,7 @@ class DestroyTest extends TestCase
         $authorizedUser = create('User');
         Bouncer::allow($authorizedUser)->to('create-emotes');
 
-        Storage::fake();
+        Storage::fake('s3');
 
         $this->create([], $authorizedUser);
 
@@ -91,7 +91,7 @@ class DestroyTest extends TestCase
         $this->apiAs($user, 'DELETE', $this->routeDestroy([$emote->name]))
             ->assertStatus(403);
 
-        Storage::disk('public')->assertExists($emote->path);
+        Storage::disk('s3')->assertExists($emote->path);
 
         $this->assertNotNull($emote->fresh());
     }

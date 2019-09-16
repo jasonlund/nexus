@@ -29,7 +29,7 @@ class EmoteObserver
      */
     public function deleting(Emote $emote)
     {
-        Storage::disk('public')->delete($emote->path);
+        Storage::delete($emote->path);
     }
 
     /**

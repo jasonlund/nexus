@@ -52,7 +52,7 @@ class AvatarTest extends TestCase
     {
         $user = create('User');
 
-        Storage::fake('public');
+        Storage::fake('s3');
 
         $this->apiAs($user, 'POST', $this->routeSelf(), [
             'avatar' => $file = UploadedFile::fake()->image('avatar.png')
@@ -60,7 +60,7 @@ class AvatarTest extends TestCase
 
         $this->assertEquals('avatars/' . $file->hashName(), $user->fresh()->avatar_path);
 
-        Storage::disk('public')->assertExists('avatars/' . $file->hashName());
+        Storage::disk('s3')->assertExists('avatars/' . $file->hashName());
     }
 
     /** @test */
@@ -68,7 +68,7 @@ class AvatarTest extends TestCase
     {
         $user = create('User');
 
-        Storage::fake('public');
+        Storage::fake('s3');
 
         $this->apiAs($user, 'POST', $this->routeSelf(), [
             'avatar' => $oldFile = UploadedFile::fake()->image('avatar.png')
@@ -78,7 +78,7 @@ class AvatarTest extends TestCase
             'avatar' => null
         ]);
 
-        Storage::disk('public')->assertMissing('avatars/' . $oldFile->hashName());
+        Storage::disk('s3')->assertMissing('avatars/' . $oldFile->hashName());
 
         $this->assertEquals(null, $user->fresh()->avatar_path);
     }
@@ -88,7 +88,7 @@ class AvatarTest extends TestCase
     {
         $user = create('User');
 
-        Storage::fake('public');
+        Storage::fake('s3');
 
         $this->apiAs($user, 'POST', $this->routeSelf(), [
             'avatar' => $oldFile = UploadedFile::fake()->image('avatar.png')
@@ -100,8 +100,8 @@ class AvatarTest extends TestCase
 
         $this->assertEquals('avatars/' . $newFile->hashName(), $user->fresh()->avatar_path);
 
-        Storage::disk('public')->assertMissing('avatars/' . $oldFile->hashName());
-        Storage::disk('public')->assertExists('avatars/' . $newFile->hashName());
+        Storage::disk('s3')->assertMissing('avatars/' . $oldFile->hashName());
+        Storage::disk('s3')->assertExists('avatars/' . $newFile->hashName());
     }
 
     /** @test */
@@ -130,7 +130,7 @@ class AvatarTest extends TestCase
         $otherUser = create('User');
         Bouncer::allow($user)->to('update-users');
 
-        Storage::fake('public');
+        Storage::fake('s3');
 
         $this->apiAs($user, 'POST', $this->route([$otherUser->username]), [
             'avatar' => $file = UploadedFile::fake()->image('avatar.png')
@@ -138,7 +138,7 @@ class AvatarTest extends TestCase
 
         $this->assertEquals('avatars/' . $file->hashName(), $otherUser->fresh()->avatar_path);
 
-        Storage::disk('public')->assertExists('avatars/' . $file->hashName());
+        Storage::disk('s3')->assertExists('avatars/' . $file->hashName());
     }
 
     /** @test */
@@ -148,7 +148,7 @@ class AvatarTest extends TestCase
         $otherUser = create('User');
         Bouncer::allow($user)->to('update-users');
 
-        Storage::fake('public');
+        Storage::fake('s3');
 
         $this->apiAs($otherUser, 'POST', $this->routeSelf(), [
             'avatar' => $oldFile = UploadedFile::fake()->image('avatar.png')
@@ -158,7 +158,7 @@ class AvatarTest extends TestCase
             'avatar' => null
         ]);
 
-        Storage::disk('public')->assertMissing('avatars/' . $oldFile->hashName());
+        Storage::disk('s3')->assertMissing('avatars/' . $oldFile->hashName());
 
         $this->assertEquals(null, $otherUser->fresh()->avatar_path);
     }
@@ -170,7 +170,7 @@ class AvatarTest extends TestCase
         $otherUser = create('User');
         Bouncer::allow($user)->to('update-users');
 
-        Storage::fake('public');
+        Storage::fake('s3');
 
         $this->apiAs($otherUser, 'POST', $this->routeSelf(), [
             'avatar' => $oldFile = UploadedFile::fake()->image('avatar.png')
@@ -182,8 +182,8 @@ class AvatarTest extends TestCase
 
         $this->assertEquals('avatars/' . $newFile->hashName(), $otherUser->fresh()->avatar_path);
 
-        Storage::disk('public')->assertMissing('avatars/' . $oldFile->hashName());
-        Storage::disk('public')->assertExists('avatars/' . $newFile->hashName());
+        Storage::disk('s3')->assertMissing('avatars/' . $oldFile->hashName());
+        Storage::disk('s3')->assertExists('avatars/' . $newFile->hashName());
     }
 
     /** @test */

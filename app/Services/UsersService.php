@@ -248,7 +248,7 @@ class UsersService
     public function avatar($user, $data)
     {
         if ($user->avatar_path)
-            Storage::disk('public')->delete($user->avatar_path);
+            Storage::delete($user->avatar_path);
 
         if ($data->file('avatar') === null) {
             $file_path = null;
@@ -257,7 +257,7 @@ class UsersService
             $image = Image::make($file)
                 ->fit(300);
             $file_path = 'avatars/' . $file->hashName();
-            Storage::disk('public')->put($file_path, $image->stream());
+            Storage::put($file_path, $image->stream());
         }
 
         $user->update([
