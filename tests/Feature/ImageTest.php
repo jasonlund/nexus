@@ -62,13 +62,13 @@ class ImageTest extends TestCase
     {
         $user = create('User');
 
-        Storage::fake('public');
+        Storage::fake('s3');
 
         $response = $this->apiAs($user, 'POST', $this->route(), [
             'file' => $file = UploadedFile::fake()->image('image.png')
         ]);
 
-        Storage::disk('public')->assertExists('images/' . $file->hashName());
+        Storage::disk('s3')->assertExists('images/' . $file->hashName());
 
         $data = $response->decodeResponseJson();
 

@@ -35,6 +35,6 @@ class ImagesService
      */
     public function create($data)
     {
-        return $data->file('file')->store('images', 'public');
+        return $data->file('file')->store('images');
     }
 }
