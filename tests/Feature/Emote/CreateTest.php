@@ -35,7 +35,7 @@ class CreateTest extends TestCase
         $user = create('User');
         Bouncer::allow($user)->to('create-emotes');
 
-        Storage::fake('public');
+        Storage::fake();
 
         $this->create([]);
 
@@ -43,7 +43,7 @@ class CreateTest extends TestCase
 
         $this->assertEquals('emotes/' . $emote->name . '.png', $emote->path);
 
-        Storage::disk('s3')->assertExists('emotes/' . $emote->name . '.png');
+        Storage::assertExists('emotes/' . $emote->name . '.png');
     }
 
     /** @test */

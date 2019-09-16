@@ -28,7 +28,7 @@ class EmoteTransformer extends TransformerAbstract
     {
         $data = [
             'name' => (string) $emote->name,
-            'url' => (string) url(Storage::url($emote->path)),
+            'url' => (string) Storage::url($emote->path),
             'owner' => (string) $emote->owner->username ?? ''
         ];
 
