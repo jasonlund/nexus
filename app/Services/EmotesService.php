@@ -47,7 +47,7 @@ class EmotesService
     {
         $fileName = $data['name'] . '.' . $data->file('file')->extension();
         $path = $data->file('file')
-            ->storeAs('emotes', $fileName, 'public');
+            ->storeAs('emotes', $fileName, 's3');
 
         return Emote::create([
             'name' => $data['name'],
