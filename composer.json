@@ -26,6 +26,7 @@
         "sentry/sentry-laravel": "1.1.0",
         "silber/bouncer": "v1.0.0-rc.5",
         "spatie/eloquent-sortable": "^3.4.4",
+        "spatie/laravel-cors": "^1.6",
         "spatie/laravel-fractal": "^5.4",
         "staudenmeir/belongs-to-through": "^2.4",
         "staudenmeir/eloquent-has-many-deep": "^1.7",
