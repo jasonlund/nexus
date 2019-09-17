@@ -39,7 +39,8 @@ class Kernel extends HttpKernel
         ],
 
         'api' => [
-            \Spatie\Cors\Cors::class,
+            // \Spatie\Cors\Cors::class,
+            \Barryvdh\Cors\HandleCors::class,
             'throttle:120,1',
             'bindings',
             \App\Http\Middleware\ForbidBannedUser::class,
