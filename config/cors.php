@@ -20,8 +20,8 @@ return [
         'allow_credentials' => false,
 
         'allow_origins' => env('CORS_ALLOWED_ORIGINS')
-            ? explode(',', env('CORS_ALLOWED_ORIGINS'))
-            : ['https://nexus.thepylonshow.com'],
+        ? explode(',', env('CORS_ALLOWED_ORIGINS'))
+        : ['https://nexus.thepylonshow.com'],
 
         'allow_methods' => [
             'POST',
