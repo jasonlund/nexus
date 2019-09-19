@@ -24,7 +24,7 @@ return [
     'settings'      => [
         'default' => [
             'HTML.Doctype'             => 'HTML 4.01 Transitional',
-            'HTML.Allowed'             => 'div[class],span[class|data-emote],br,strong,em,u,s,a[href|title|rel],ul,ol,li,p,blockquote,img[width|height|alt|src],iframe[src|frameborder]',
+            'HTML.Allowed'             => 'div[class],span[class|data-emote],br,strong,em,u,s,a[href|title|rel],ul,ol,li,p,blockquote[class],img[width|height|alt|src],iframe[src|frameborder]',
             'CSS.AllowedProperties'    => '',
             // 'AutoFormat.AutoParagraph' => true,
             // 'AutoFormat.RemoveEmpty'   => true,
