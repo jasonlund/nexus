@@ -99,7 +99,8 @@ return [
             ],
         ],
         'custom_attributes' => [
-            ['span', 'data-emote', 'Text']
+            ['span', 'data-emote', 'Text'],
+            ['blockquote', 'class', 'Text']
         ],
         'custom_elements' => [
             ['u', 'Inline', 'Inline', 'Common'],
