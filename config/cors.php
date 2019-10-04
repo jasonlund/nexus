@@ -10,9 +10,7 @@ return [
     |
     */
     'supportsCredentials' => false,
-    'allowedOrigins' => env('CORS_ALLOWED_ORIGINS')
-        ? explode(',', env('CORS_ALLOWED_ORIGINS'))
-        : ['https://nexus.thepylonshow.com'],
+    'allowedOrigins' => ['https://nexus.thepylonshow.com', 'http://localhost:8080'],
     'allowedOriginsPatterns' => env('CORS_ALLOWED_ORIGINS_PATTERNS')
         ? explode(',', env('CORS_ALLOWED_ORIGINS_PATTERNS'))
         : [],
