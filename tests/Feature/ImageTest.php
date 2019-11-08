@@ -46,6 +46,8 @@ class ImageTest extends TestCase
     {
         $user = create('User');
 
+        Storage::fake('s3');
+
         $this->apiAs($user, 'POST', $this->route(), [
             'file' => $file = UploadedFile::fake()->image('file.png')->size(1024)
         ])
@@ -72,6 +74,6 @@ class ImageTest extends TestCase
 
         $data = $response->decodeResponseJson();
 
-        $this->assertEquals($data['url'], url(Storage::url('images/' . $file->hashName())));
+        $this->assertEquals($data['url'], Storage::url('images/' . $file->hashName()));
     }
 }

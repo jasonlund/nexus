@@ -19,7 +19,7 @@ class Channel extends Model implements Sortable
      * @var array
      */
     protected $fillable = [
-        'name', 'description', 'channel_category_id', 'image', 'locked'
+        'name', 'description', 'channel_category_id', 'image_path', 'locked'
     ];
 
     /**

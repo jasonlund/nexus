@@ -6,6 +6,7 @@ use App\Services\ChannelsService;
 use League\Fractal\TransformerAbstract;
 use App\Models\Channel;
 use App\Services\PurifyService;
+use Storage;
 
 class ChannelTransformer extends TransformerAbstract
 {
@@ -29,11 +30,24 @@ class ChannelTransformer extends TransformerAbstract
     {
         $service = new ChannelsService();
 
+        if($channel->image_path) {
+            $file_name = explode('.', $channel->image_path)[0];
+            $images = [
+                'full' => Storage::url($file_name . '.png'),
+                '800' => Storage::url($file_name . '-800w.png'),
+                '600' => Storage::url($file_name . '-600w.png'),
+                'thumb' => Storage::url($file_name . '-thumb.png')
+            ];
+        }else{
+            $images = null;
+        }
+
         $data = [
             'order' => (int) $channel->order,
             'name' => (string) $channel->name,
             'slug' => (string) $channel->slug,
             'description' => (string) PurifyService::simple($channel->description),
+            'image' => $images,
             'locked' => (bool) $channel->locked,
             'new' => $service->hasNewReplies($channel),
             'moderators' => (array) $channel->moderators->sortBy('username')->pluck('username')->toArray(),

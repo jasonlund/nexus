@@ -14,6 +14,8 @@ class TransformerTest extends TestCase
     {
         parent::setUp();
 
+        Storage::fake('s3');
+
         $this->withExceptionHandling();
     }
 
@@ -51,7 +53,7 @@ class TransformerTest extends TestCase
 
         $this->json('GET', $this->route())
             ->assertJson([
-                ['url' => url(Storage::url('emotes/foo-bar.png'))]
+                ['url' => Storage::disk('s3')->url('emotes/foo-bar.png')]
             ]);
     }
 }

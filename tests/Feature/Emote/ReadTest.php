@@ -4,6 +4,7 @@ namespace Tests\Feature\Emote;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Storage;
 
 class ReadTest extends TestCase
 {
@@ -24,6 +25,7 @@ class ReadTest extends TestCase
     /** @test */
     function anyone_can_list_emotes()
     {
+        Storage::fake('s3');
         $emotes = create('Emote', [], 5);
 
         $this->json('GET', $this->route())

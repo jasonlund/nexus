@@ -7,6 +7,9 @@ use App\Models\ChannelCategory;
 use App\Models\User;
 use App\Rules\RichTextRequired;
 use App\Services\ThreadsService;
+use Storage;
+use Image;
+use Illuminate\Validation\Rule;
 
 class ChannelsService
 {
@@ -25,7 +28,11 @@ class ChannelsService
             'moderators' => ['bail', 'array', 'exists:users,username'],
             'order' => ['bail', 'required', 'array', 'exists:channels,slug'],
             'locked' => ['bail', 'sometimes', 'boolean'],
-            'channel_category' => ['bail', 'required', 'exists:channel_categories,slug']
+            'channel_category' => ['bail', 'required', 'exists:channel_categories,slug'],
+            'file' => [
+                'bail', 'nullable', 'sometimes', 'image', 'max:3072',
+                Rule::dimensions()->minWidth(1200)->minHeight(400)
+            ]
         ]);
 
         switch ($action) {
@@ -41,6 +48,9 @@ class ChannelsService
                 break;
             case "reorder":
                 $rules = $rules->only('order');
+                break;
+            case "image":
+                $rules = $rules->only('file');
                 break;
         }
 
@@ -58,9 +68,9 @@ class ChannelsService
     public function create(ChannelCategory $category, $data)
     {
         return $category->channels()->create([
-            'name' => $data['name'],
-            'description' => $data['description'],
-            'locked' => $data['locked'] ?? false
+            'name' => $data->input('name'),
+            'description' => $data->input('description'),
+            'locked' => $data->input('locked') ?? false
         ]);
     }
 
@@ -84,10 +94,38 @@ class ChannelsService
             'channel_category_id' => $category->id
         ]);
 
-        if($category->id !== $currentCategory->id){
+        if ($category->id !== $currentCategory->id) {
             Channel::setNewOrder($category->channels()->ordered()->pluck('id')->toArray());
             Channel::setNewOrder($currentCategory->channels()->ordered()->pluck('id')->toArray());
         }
+
+        return $channel;
+    }
+
+    public function image($channel, $request)
+    {
+        if ($request->file('file') === null) {
+            $file_path = null;
+        } else {
+            $file = $request->file('file');
+            $full_image = Image::make($file)
+                ->resize(1200, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                })
+                ->encode('png');
+            $file_name = explode('.', $file->hashName())[0];
+            $file_path = 'channels/' . $file_name . '.png';
+            Storage::put('channels/' . $file_name . '.png', $full_image->stream());
+            Storage::put('channels/' . $file_name . '-800w.png', $full_image->crop(800, $full_image->height())->stream());
+            Storage::put('channels/' . $file_name . '-600w.png', $full_image->crop(600, $full_image->height())->stream());
+            Storage::put('channels/' . $file_name . '-thumb.png', $full_image->resize(300, null, function ($constraint) {
+                $constraint->aspectRatio();
+            })->stream());
+        }
+
+        $channel->update([
+            'image_path' => $file_path
+        ]);
 
         return $channel;
     }

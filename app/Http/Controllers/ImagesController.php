@@ -33,7 +33,7 @@ class ImagesController extends Controller
 
         return response()->json([
             'success' => true,
-            'url' => url(Storage::url($path))
+            'url' => Storage::url($path)
         ]);
     }
 }

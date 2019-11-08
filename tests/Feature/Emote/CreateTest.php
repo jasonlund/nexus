@@ -35,7 +35,7 @@ class CreateTest extends TestCase
         $user = create('User');
         Bouncer::allow($user)->to('create-emotes');
 
-        Storage::fake();
+        Storage::fake('s3');
 
         $this->create([]);
 
@@ -43,7 +43,7 @@ class CreateTest extends TestCase
 
         $this->assertEquals('emotes/' . $emote->name . '.png', $emote->path);
 
-        Storage::assertExists('emotes/' . $emote->name . '.png');
+        Storage::disk('s3')->assertExists('emotes/' . $emote->name . '.png');
     }
 
     /** @test */
@@ -178,7 +178,7 @@ class CreateTest extends TestCase
     /** @test */
     function an_emote_must_be_square()
     {
-        $response = $this->create([
+        $this->create([
             'file' => UploadedFile::fake()->image('fooBar.png', 32, 33)
         ])->assertJsonValidationErrors(['file']);
     }
@@ -199,6 +199,7 @@ class CreateTest extends TestCase
     {
         $user = create('User');
         Bouncer::allow($user)->to('create-emotes');
+        Storage::fake('s3');
 
         $data = array_merge([
             'name' => 'FooBar',

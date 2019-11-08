@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\Channel\ChannelCreateRequest;
 use App\Http\Requests\Channel\ChannelDestroyRequest;
+use App\Http\Requests\Channel\ChannelImageRequest;
 use App\Http\Requests\Channel\ChannelReorderRequest;
 use App\Http\Requests\Channel\ChannelUpdateRequest;
 use App\Models\Channel;
@@ -47,7 +48,7 @@ class ChannelsController extends Controller
      */
     public function store(ChannelCreateRequest $request, ChannelCategory $category)
     {
-        $channel = $this->service->create($category, $request->all());
+        $channel = $this->service->create($category, $request);
         $this->service->assignModerators($channel, request('moderators'));
 
         return item_response($channel, 'ChannelTransformer');
@@ -83,6 +84,13 @@ class ChannelsController extends Controller
     {
         $this->service->update($channel, $request->all());
         $this->service->assignModerators($channel, request('moderators'));
+
+        return item_response($channel, 'ChannelTransformer');
+    }
+
+    public function image(ChannelImageRequest $request, ChannelCategory $category, Channel $channel)
+    {
+        $this->service->image($channel, $request);
 
         return item_response($channel, 'ChannelTransformer');
     }

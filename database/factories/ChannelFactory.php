@@ -9,6 +9,6 @@ $factory->define(Channel::class, function (Faker $faker) {
         'description' => $faker->paragraph,
         'channel_category_id' => function() {
             return factory('App\Models\ChannelCategory')->create()->id;
-        },
+        }
     ];
 });

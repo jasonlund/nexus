@@ -23,7 +23,7 @@ class UserTransformer extends TransformerAbstract
             'username' => (string) $user->username,
             'name' => (string) $user->name,
             'role' => $user->role,
-            'avatar' => $user->avatar_path ? url(Storage::url($user->avatar_path)) : null,
+            'avatar' => $user->avatar_path ? Storage::url($user->avatar_path) : null,
             'signature' => $user->signature ? (string) PurifyService::simple($user->signature) : null,
             'thread_count' => (int) $user->threads()->count(),
             'reply_count' => (int) $user->replies()->count(),

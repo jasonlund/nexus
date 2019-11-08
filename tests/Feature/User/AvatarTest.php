@@ -191,13 +191,13 @@ class AvatarTest extends TestCase
     {
         $user = create('User');
 
-        Storage::fake('public');
+        Storage::fake('s3');
 
         $this->apiAs($user, 'POST', $this->routeSelf(), [
             'avatar' => $file = UploadedFile::fake()->image('avatar.png', 100, 200)
         ]);
 
-        $size = getimagesize(storage_path('framework/testing/disks/public/avatars/' . $file->hashName()));
+        $size = getimagesize(storage_path('framework/testing/disks/s3/avatars/' . $file->hashName()));
 
         $this->assertEquals(300, $size[0]);
         $this->assertEquals(300, $size[1]);

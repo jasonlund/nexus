@@ -4,7 +4,9 @@ namespace Tests\Feature\Channel;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Http\UploadedFile;
 use Bouncer;
+use Storage;
 
 class CreateTest extends TestCase
 {

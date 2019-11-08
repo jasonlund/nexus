@@ -86,6 +86,7 @@ class TransformerTest extends TestCase
     function a_user_includes_its_avatar_if_one_exists()
     {
         $user = create('User');
+        Storage::fake('s3');
 
         $this->json('GET', $this->routeIndex())
             ->assertStatus(200)
@@ -102,7 +103,7 @@ class TransformerTest extends TestCase
             ->assertStatus(200)
             ->assertJson([
                 'data' => [
-                    ['avatar' => url(Storage::url($user->avatar_path))]
+                    ['avatar' => Storage::url($user->avatar_path)]
                 ]
             ]);
     }

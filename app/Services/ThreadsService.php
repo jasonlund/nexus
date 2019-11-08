@@ -124,7 +124,7 @@ class ThreadsService
             return $reply !== null ? fractal()
                 ->item($reply)
                 ->transformWith(new ReplyTransformer()) : true;
-        } else if ($thread->latest_reply_at < $view->pivot->timestamp) {
+        } else if ($thread->latest_reply_at <= $view->pivot->timestamp) {
             return false;
         } else {
             $reply = $thread->replies()->where('created_at', '>=', $view->pivot->timestamp)->first();
