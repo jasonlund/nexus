@@ -6,6 +6,7 @@ use App\Http\Requests\Thread\ThreadCreateRequest;
 use App\Http\Requests\Thread\ThreadDestroyRequest;
 use App\Http\Requests\Thread\ThreadLockRequest;
 use App\Http\Requests\Thread\ThreadUpdateRequest;
+use App\Http\Requests\Thread\ThreadPinRequest;
 use App\Models\ChannelCategory;
 use App\Models\Channel;
 use App\Models\Thread;
@@ -34,7 +35,8 @@ class ThreadsController extends Controller
     public function index(ChannelCategory $category, Channel $channel)
     {
         return paginated_response(
-            $channel->threads()->orderBy('updated_at', 'DESC'),
+            $channel->threads()->orderBy('pinned', 'DESC')
+            ->orderBy('updated_at', 'DESC'),
             'ThreadTransformer',
             ['owner', 'latest_reply', 'latest_reply.owner', 'editor']
         );
@@ -131,6 +133,27 @@ class ThreadsController extends Controller
     public function lock(ThreadLockRequest $request, ChannelCategory $category, Channel $channel, Thread $thread)
     {
         $this->service->toggleLock($thread);
+
+        return item_response(
+            $thread,
+            'ThreadTransformer',
+            ['owner', 'latest_reply', 'latest_reply.owner', 'editor']
+        );
+    }
+
+    /**
+     * Toggle the Pin status of the given Thread.
+     *
+     * @param   ThreadPinRequest   $request
+     * @param   ChannelCategory    $category
+     * @param   Channel            $channel
+     * @param   Thread             $thread
+     *
+     * @return  \Illuminate\Http\JsonResponse
+     */
+    public function pin(ThreadPinRequest $request, ChannelCategory $category, Channel $channel, Thread $thread)
+    {
+        $this->service->togglePin($thread);
 
         return item_response(
             $thread,

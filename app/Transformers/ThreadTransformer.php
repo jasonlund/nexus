@@ -34,6 +34,7 @@ class ThreadTransformer extends TransformerAbstract
             'slug' => (string) $thread->slug,
             'body' => (string) PurifyService::clean($thread->body),
             'locked' => (bool) $thread->locked,
+            'pinned' => (bool) $thread->pinned,
             'replies' => $thread->replies()->pluck('id'),
             'reply_count' => (int) $thread->replies()->count(),
             'new' => $service->hasNewReplies($thread),

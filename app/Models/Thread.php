@@ -16,7 +16,7 @@ class Thread extends Model
      * @var array
      */
     protected $fillable = [
-        'title', 'body', 'user_id', 'locked', 'edited_at', 'edited_by'
+        'title', 'body', 'user_id', 'locked', 'pinned', 'edited_at', 'edited_by'
     ];
 
     /**
@@ -53,6 +53,7 @@ class Thread extends Model
      */
     protected $casts = [
         'locked' => 'boolean',
+        'pinned' => 'boolean',
     ];
 
     /**

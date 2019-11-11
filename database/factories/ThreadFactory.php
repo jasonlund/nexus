@@ -13,6 +13,7 @@ $factory->define(Thread::class, function (Faker $faker) {
         },
         'title' => $faker->sentence,
         'body' => "<p>" . implode("</p>\n<p>", $faker->paragraphs(rand(2, 10))) . "</p>",
-        'locked' => false
+        'locked' => false,
+        'pinned' => false
     ];
 });

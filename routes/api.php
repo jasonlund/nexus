@@ -76,6 +76,8 @@ Route::group(['middleware' => ['auth', 'refresh']], function() {
         ['as' => 'threads.destroy', 'uses' => 'ThreadsController@destroy']);
     Route::post('threads/lock/{category}/{channel}/{thread}',
         ['as' => 'threads.lock', 'uses' => 'ThreadsController@lock']);
+    Route::post('threads/pin/{category}/{channel}/{thread}',
+        ['as' => 'threads.pin', 'uses' => 'ThreadsController@pin']);
 
     Route::delete('users/destroy/{user}',
         ['as' => 'users.destroy', 'uses' => 'UsersController@destroy']);

@@ -150,4 +150,19 @@ class ThreadsService
 
         return $thread;
     }
+
+    /**
+     * Toggle the pinned status of the given Thread.
+     *
+     * @param   Thread  $thread
+     *
+     * @return  Thread
+     */
+    public function togglePin($thread)
+    {
+        $thread->pinned = !$thread->pinned;
+        $thread->save();
+
+        return $thread;
+    }
 }

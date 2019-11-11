@@ -80,6 +80,28 @@ class ReadTest extends TestCase
     }
 
     /** @test */
+    function pinned_threads_are_listed_first()
+    {
+        create('Thread', ['channel_id' => $this->thread->channel->id], 48);
+        $pinned = create('Thread', ['channel_id' => $this->thread->channel->id, 'pinned' => true]);
+
+        $response = $this->json('GET', $this->routeIndex(
+            [$this->thread->channel->category->slug, $this->thread->channel->slug]
+        ))
+            ->assertJson([
+                'current_page' => 1,
+                'from' => 1,
+                'to' => 25,
+                'per_page' => 25,
+                'total' => 50
+            ]);
+
+        $response = $response->decodeResponseJson();
+
+        $this->assertEquals($response['data'][0]['slug'], $pinned->slug);
+    }
+
+    /** @test */
     function anyone_can_view_a_single_thread()
     {
         $this->json('GET', $this->routeShow(
