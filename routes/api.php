@@ -94,6 +94,9 @@ Route::group(['middleware' => ['auth', 'refresh']], function() {
 Route::get('emotes/index',
     ['as' => 'emotes.index', 'uses' => 'EmotesController@index']);
 
+Route::get('embed',
+    ['embed.show', 'uses' => 'EmbedController@show']);
+
 Route::get('categories/index',
     ['as' => 'categories.index', 'uses' => 'ChannelCategoriesController@index']);
 

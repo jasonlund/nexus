@@ -33,6 +33,20 @@ class PurifyService
     }
 
     /**
+     * Purify the given string with a simple configuration inlcuding emotes.
+     *
+     * @param   string  $string
+     *
+     * @return  string
+     */
+    public static function simpleWithEmotes($string)
+    {
+        $config = ['HTML.Allowed' => 'strong,em,s,u,p,span[class|data-emote]'];
+
+        return Purifier::clean($string, $config);
+    }
+
+    /**
      * Purify the given string stripping all HTML.
      *
      * @param   string  $string

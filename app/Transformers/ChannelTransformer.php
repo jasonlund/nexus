@@ -46,7 +46,7 @@ class ChannelTransformer extends TransformerAbstract
             'order' => (int) $channel->order,
             'name' => (string) $channel->name,
             'slug' => (string) $channel->slug,
-            'description' => (string) PurifyService::simple($channel->description),
+            'description' => (string) PurifyService::simpleWithEmotes($channel->description),
             'image' => $images,
             'locked' => (bool) $channel->locked,
             'new' => $service->hasNewReplies($channel),
