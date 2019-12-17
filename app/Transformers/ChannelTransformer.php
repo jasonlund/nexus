@@ -12,15 +12,6 @@ use Cache;
 class ChannelTransformer extends TransformerAbstract
 {
     /**
-     * The relationships that are available for inclusion
-     *
-     * @var array
-     */
-    protected $availableIncludes = [
-        'latest_thread', 'latest_reply'
-    ];
-
-    /**
      * Transform Channels.
      *
      * @param   Channel  $channel
@@ -51,12 +42,12 @@ class ChannelTransformer extends TransformerAbstract
         if(!$latest['thread'] && !$latest['reply']) {
             $latest = null;
         }else if($latest['thread'] && !$latest['reply']) {
-            $latest = $latest['thread']->created_at;
+            $latest = $latest['thread']->created_at->format('Y-m-d H:i:s');
         }else{
             if($latest['thread']->created_at > $latest['reply']->created_at) {
-                $latest = $latest['thread']->created_at;
+                $latest = $latest['thread']->created_at->format('Y-m-d H:i:s');
             }else{
-                $latest = $latest['reply']->created_at;
+                $latest = $latest['reply']->created_at->format('Y-m-d H:i:s');
             }
         }
 

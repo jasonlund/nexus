@@ -86,7 +86,7 @@ class UsersService
                     return $item;
                 });
                 $rules = $rules->only([
-                    'name', 'username', 'email', 'password', 'signature',
+                    'name', 'username', 'password', 'signature',
                     'timezone', 'location'
                 ]);
                 break;
@@ -128,8 +128,8 @@ class UsersService
 
         $query->orderBy('username');
 
-        return $paginated ? paginated_response($query, 'UserTransformer')
-            : collection_response($query, 'UserTransformer');
+        return $paginated ? paginated_response($query, 'UserSimpleTransformer')
+            : collection_response($query, 'UserSimpleTransformer');
     }
 
     /**
@@ -144,9 +144,12 @@ class UsersService
     {
         $attr = [
             'name' => $data['name'],
-            'username' => $data['username'],
-            'email' => $data['email']
+            'username' => $data['username']
         ];
+
+        if (array_key_exists('email', $data) && request()->route('users.update')) {
+            $attr['email'] = $data['email'];
+        }
 
         if (array_key_exists('signature', $data)) {
             $attr['signature'] = strip_html_whitespace($data['signature']) !== '' ? $data['signature'] : null;

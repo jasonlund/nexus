@@ -5,8 +5,6 @@ namespace App\Models;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Illuminate\Database\Eloquent\Builder;
 use Askedio\SoftCascade\Traits\SoftCascadeTrait;
-use App\Events\ThreadCreated;
-use App\Events\ThreadDeleted;
 
 class Thread extends Model
 {
@@ -56,16 +54,6 @@ class Thread extends Model
     protected $casts = [
         'locked' => 'boolean',
         'pinned' => 'boolean',
-    ];
-
-    /**
-     * The events that should be dispatched
-     *
-     * @var array
-     */
-    protected $dispatchesEvents = [
-        'created' => ThreadCreated::class,
-        'deleted' => ThreadDeleted::class
     ];
 
     /**

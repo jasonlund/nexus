@@ -17,25 +17,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         'App\Events\ThreadViewed' => [
             'App\Listeners\MarkThreadRead',
-        ],
-        'App\Events\ReplyCreated' => [
-            'App\Listeners\UpdateThreadReplyColumns',
-            'App\Listeners\CacheChannelReplyCount',
-            'App\Listeners\CacheThreadReplyCount'
-        ],
-        'App\Events\ReplyDeleted' => [
-            'App\Listeners\UpdateThreadReplyColumns',
-            'App\Listeners\CacheChannelReplyCount',
-            'App\Listeners\CacheThreadReplyCount'
-        ],
-        'App\Events\ThreadCreated' => [
-            'App\Listeners\CacheChannelThreadCount',
-            'App\Listeners\CreateThreadReplyCache'
-        ],
-        'App\Events\ThreadDeleted' => [
-            'App\Listeners\CacheChannelThreadCount',
-            'App\Listeners\RemoveThreadReplyCache'
-        ],
+        ]
     ];
 
     /**

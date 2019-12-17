@@ -7,6 +7,7 @@ use App\Models\User;
 use Bouncer;
 use Storage;
 use App\Services\PurifyService;
+use Cache;
 
 class UserTransformer extends TransformerAbstract
 {
@@ -25,13 +26,19 @@ class UserTransformer extends TransformerAbstract
             'role' => $user->role,
             'avatar' => $user->avatar_path ? Storage::url($user->avatar_path) : null,
             'signature' => $user->signature ? (string) PurifyService::simple($user->signature) : null,
-            'thread_count' => (int) $user->threads()->count(),
-            'reply_count' => (int) $user->replies()->count(),
+            'thread_count' => (int) Cache::rememberForever('user-thread-count-' . $user->id, function () use ($user) {
+                return $user->threads()->count();
+            }),
+            'reply_count' => (int) Cache::rememberForever('user-reply-count-' . $user->id, function () use ($user) {
+                return $user->replies()->count();
+            }),
             'timezone' => (string) $user->timezone,
             'location' => $user->location ? (string) $user->location : null,
             'created_at' => (string) $user->created_at,
             'updated_at' => (string) $user->updated_at,
-            'last_active_at' => (string) $user->last_active_at->format('Y-m-d H:i:s')
+            'last_active_at' => (string) $user->last_active_at->format('Y-m-d H:i:s'),
+            // 'verified' => (boolean) $user->hasVerifiedEmail()
+            'verified' => true
         ];
 
         $data['moderatable_channels'] = $data['role'] !== 'moderator' ? []

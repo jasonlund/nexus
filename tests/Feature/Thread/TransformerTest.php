@@ -220,7 +220,7 @@ class TransformerTest extends TestCase
     }
 
     /** @test */
-    function a_thread_includes_its_latest_reply_if_one_exists()
+    function a_thread_includes_its_latest_replys_timestamp_if_one_exists()
     {
         $thread = create('Thread');
 
@@ -239,9 +239,8 @@ class TransformerTest extends TestCase
             ->assertJson([
                 'data' => [
                     [
-                        'latest_reply' => [
-                            'id' => $reply->id
-                        ]
+                        'latest_reply' => $reply->created_at->format('Y-m-d H:i:s')
+
                     ]
                 ]
             ]);

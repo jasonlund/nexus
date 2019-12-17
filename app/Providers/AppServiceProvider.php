@@ -6,9 +6,15 @@ use Bouncer;
 use App\Models\Emote;
 use App\Models\Channel;
 use App\Models\ChannelCategory;
+use App\Models\User;
+use App\Models\Thread;
+use App\Models\Reply;
 use App\Observers\ChannelObserver;
 use App\Observers\ChannelCategoryObserver;
 use App\Observers\EmoteObserver;
+use App\Observers\UserObserver;
+use App\Observers\ThreadObserver;
+use App\Observers\ReplyObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -42,5 +48,8 @@ class AppServiceProvider extends ServiceProvider
          */
         ChannelCategory::observe(ChannelCategoryObserver::class);
         Emote::observe(EmoteObserver::class);
+        Reply::observe(ReplyObserver::class);
+        Thread::observe(ThreadObserver::class);
+        User::observe(UserObserver::class);
     }
 }

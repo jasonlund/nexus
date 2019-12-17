@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use App\Events\ReplyDeleted;
 use Znck\Eloquent\Traits\BelongsToThrough;
-use App\Events\ReplyCreated;
 
 class Reply extends Model
 {
@@ -26,16 +24,6 @@ class Reply extends Model
      */
     protected $dates = [
         'edited_at'
-    ];
-
-    /**
-     * The events that should be dispatched
-     *
-     * @var array
-     */
-    protected $dispatchesEvents = [
-        'created' => ReplyCreated::class,
-        'deleted' => ReplyDeleted::class
     ];
 
     /**

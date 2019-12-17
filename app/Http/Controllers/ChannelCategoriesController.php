@@ -47,7 +47,13 @@ class ChannelCategoriesController extends Controller
     {
         $category = $this->service->create($request->all());
 
-        return item_response($category, 'ChannelCategoryTransformer');
+        return item_response(
+            $category,
+            'ChannelCategoryTransformer',
+            [
+                'channels'
+            ]
+        );
     }
 
     /**
@@ -62,7 +68,13 @@ class ChannelCategoriesController extends Controller
     {
         $this->service->update($category, $request->all());
 
-        return item_response($category, 'ChannelCategoryTransformer');
+        return item_response(
+            $category,
+            'ChannelCategoryTransformer',
+            [
+                'channels'
+            ]
+        );
     }
 
     /**
@@ -78,7 +90,10 @@ class ChannelCategoriesController extends Controller
 
         return collection_response(
             ChannelCategory::ordered(),
-            'ChannelCategoryTransformer'
+            'ChannelCategoryTransformer',
+            [
+                'channels'
+            ]
         );
     }
 

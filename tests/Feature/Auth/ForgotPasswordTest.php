@@ -33,7 +33,7 @@ class ForgotPasswordTest extends TestCase
         $user = create('User');
 
         $this->json('post', $this->routePasswordEmail(), ['email' => $user->email])
-            ->assertStatus(200);
+            ->assertStatus(204);
 
         $token = DB::table('password_resets')->where('email', $user->email)->first();
         $this->assertNotNull($token);

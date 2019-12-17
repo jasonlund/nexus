@@ -11,8 +11,11 @@ use Cog\Laravel\Ban\Traits\Bannable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 use App\Notifications\ResetPassword as ResetPasswordNotification;
 use Askedio\SoftCascade\Traits\SoftCascadeTrait;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Notifications\VerifyEmail;
+use App\Events\UserDeleted;
 
-class User extends Authenticatable implements BannableContract, JWTSubject
+class User extends Authenticatable implements BannableContract, JWTSubject /*, MustVerifyEmail*/
 {
     use Notifiable, SoftDeletes, SoftCascadeTrait, HasRolesAndAbilities, Bannable;
 
@@ -178,4 +181,14 @@ class User extends Authenticatable implements BannableContract, JWTSubject
 
         return $role ? $role->name : 'user';
     }
+
+    /**
+     * Send the email verification notification.
+     *
+     * @return void
+     */
+    // public function sendEmailVerificationNotification()
+    // {
+    //     $this->notify(new VerifyEmail);
+    // }
 }

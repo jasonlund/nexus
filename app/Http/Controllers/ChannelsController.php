@@ -34,8 +34,7 @@ class ChannelsController extends Controller
     {
         return collection_response(
             $category->channels()->ordered(),
-            'ChannelTransformer',
-            ['latest_thread', 'latest_thread.owner', 'latest_reply', 'latest_reply.owner']
+            'ChannelTransformer'
         );
     }
 

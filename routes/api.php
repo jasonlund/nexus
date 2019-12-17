@@ -22,6 +22,22 @@ Route::group(['middleware' => ['auth']], function() {
 });
 
 Route::group(['middleware' => ['auth', 'refresh']], function() {
+    Route::get('email/resend',
+        ['as' => 'verification.resend', 'uses' => 'Auth\VerificationController@resend']);
+    Route::get('email/verify/{username}',
+        ['as' => 'verification.verify', 'uses' => 'Auth\VerificationController@verify']);
+
+    Route::get('profile/show',
+        ['as' => 'self.show', 'uses' => 'SelfController@show']);
+    Route::patch('profile/update',
+        ['as' => 'self.update', 'uses' => 'SelfController@update']);
+    Route::delete('profile/destroy',
+        ['as' => 'self.destroy', 'uses' => 'SelfController@destroy']);
+    Route::post('profile/avatar',
+        ['as' => 'self.avatar', 'uses' => 'SelfController@avatar']);
+});
+
+Route::group(['middleware' => ['auth', 'refresh', 'verified']], function() {
     Route::put('categories/store',
         ['as' => 'categories.store', 'uses' => 'ChannelCategoriesController@store']);
     Route::post('categories/reorder',
@@ -53,15 +69,6 @@ Route::group(['middleware' => ['auth', 'refresh']], function() {
 
     Route::post('images/store',
         ['as' => 'images.store', 'uses' => 'ImagesController@store']);
-
-    Route::get('profile/show',
-        ['as' => 'self.show', 'uses' => 'SelfController@show']);
-    Route::patch('profile/update',
-        ['as' => 'self.update', 'uses' => 'SelfController@update']);
-    Route::delete('profile/destroy',
-        ['as' => 'self.destroy', 'uses' => 'SelfController@destroy']);
-    Route::post('profile/avatar',
-        ['as' => 'self.avatar', 'uses' => 'SelfController@avatar']);
 
     Route::put('replies/store/{category}/{channel}/{thread}',
         ['as' => 'replies.store', 'uses' => 'RepliesController@store']);

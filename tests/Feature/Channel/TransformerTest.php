@@ -185,7 +185,7 @@ class TransformerTest extends TestCase
     }
 
     /** @test */
-    function a_channel_includes_its_latest_thread_and_reply()
+    function a_channel_includes_its_latest_posts_timestamp()
     {
         $channel = create('Channel', ['channel_category_id' => $this->category->id]);
 
@@ -203,12 +203,7 @@ class TransformerTest extends TestCase
             ->assertStatus(200)
             ->assertJson([
                 [
-                    'latest_thread' => [
-                        'slug' => $channel->threads()->latest()->first()->slug
-                    ],
-                    'latest_reply' => [
-                        'id' => $channel->replies()->latest()->first()->id
-                    ]
+                    'latest_post' => $channel->replies()->latest()->first()->created_at->format('Y-m-d H:i:s')
                 ]
             ]);
     }

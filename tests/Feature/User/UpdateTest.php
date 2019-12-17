@@ -404,13 +404,7 @@ class UpdateTest extends TestCase
     {
         $user = create('User');
 
-        $this->updateSelf(['email' => null])
-            ->assertJsonValidationErrors(['email']);
-
         $this->update(['email' => null], $user)
-            ->assertJsonValidationErrors(['email']);
-
-        $this->updateSelf(['email' => 'invalidemail'])
             ->assertJsonValidationErrors(['email']);
 
         $this->update(['email' => 'invalidemail'], $user)
@@ -424,14 +418,8 @@ class UpdateTest extends TestCase
         $otherUser = create('User', ['email' => 'user2@email.com']);
         $anotherUser = create('User', ['email' => 'user3@email.com']);
 
-        $this->updateSelf(['email' => $otherUser->email])
-            ->assertJsonValidationErrors(['email']);
-
         $this->update(['email' => $anotherUser->email], $otherUser)
             ->assertJsonValidationErrors(['email']);
-
-        $this->updateSelf(['email' => $user->email], $user)
-            ->assertStatus(200);
 
         $this->update(['email' => $otherUser->email], $otherUser)
             ->assertStatus(200);

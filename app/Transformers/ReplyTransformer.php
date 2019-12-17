@@ -48,7 +48,7 @@ class ReplyTransformer extends TransformerAbstract
      */
     public function includeOwner(Reply $reply)
     {
-        return $this->item($reply->owner, new UserTransformer);
+        return $this->item($reply->owner, new UserSimpleTransformer);
     }
 
     /**
@@ -60,6 +60,6 @@ class ReplyTransformer extends TransformerAbstract
      */
     public function includeEditor(Reply $reply)
     {
-        return $reply->editor ? $this->item($reply->editor, new UserTransformer) : $this->null();
+        return $reply->editor ? $this->item($reply->editor, new UserSimpleTransformer) : $this->null();
     }
 }

@@ -17,7 +17,7 @@ class ThreadTransformer extends TransformerAbstract
      * @var array
      */
     protected $availableIncludes = [
-        'owner', 'latest_reply', 'editor'
+        'owner', 'editor'
     ];
 
     /**
@@ -33,7 +33,7 @@ class ThreadTransformer extends TransformerAbstract
 
         $latest = $thread->replies()->latest()->first();
         if($latest) {
-            $latest = (string) $latest->created_at;
+            $latest = (string) $latest->created_at->format('Y-m-d H:i:s');
         }
 
         $data = [
@@ -43,7 +43,7 @@ class ThreadTransformer extends TransformerAbstract
             'locked' => (bool) $thread->locked,
             'pinned' => (bool) $thread->pinned,
             'replies' => $thread->replies()->pluck('id'),
-            'reply_count' => (int) Cache::rememberForever('thread-reply-count' . $thread->id, function () use ($thread) {
+            'reply_count' => (int) Cache::rememberForever('thread-reply-count-' . $thread->id, function () use ($thread) {
                 return $thread->replies()->count();
             }),
             'new' => $service->hasNewReplies($thread),
