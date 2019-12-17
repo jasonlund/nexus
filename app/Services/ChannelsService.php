@@ -105,6 +105,13 @@ class ChannelsService
     public function image($channel, $request)
     {
         if ($request->file('file') === null) {
+            if($channel->file_path !== null) {
+                $existing = explode('.', $channel->file_path)[0];
+                Storage::delete($channel->file_path);
+                Storage::delete($existing . '-800w.png');
+                Storage::delete($existing . '-600w.png');
+                Storage::delete($existing . '-thumb.png');
+            }
             $file_path = null;
         } else {
             $file = $request->file('file');

@@ -62,6 +62,28 @@ class ImageTest extends TestCase
     }
 
     /** @test */
+    function an_authorized_user_can_remove_a_channel_image()
+    {
+        $user = create('User');
+        Bouncer::allow($user)->to('create-channels');
+        Storage::fake('s3');
+
+        $file = UploadedFile::fake()->image('fooBar.png', 1280, 720);
+
+        $this->apiAs($user, 'POST', $this->route([$this->category->slug, $this->channel->slug]), ['file' => $file])
+            ->assertStatus(200);
+
+        Storage::disk('s3')->assertExists('channels/' . $file->hashName());
+
+        $file_path = $this->channel->fresh()->file_path;
+
+        $this->apiAs($user, 'DELETE', $this->route([$this->category->slug, $this->channel->slug]))
+            ->assertStatus(200);
+
+        Storage::disk('s3')->assertMissing($file_path);
+    }
+
+    /** @test */
     function a_valid_image_must_be_provided()
     {
         $user = create('User');

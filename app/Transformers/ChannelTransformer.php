@@ -7,6 +7,7 @@ use League\Fractal\TransformerAbstract;
 use App\Models\Channel;
 use App\Services\PurifyService;
 use Storage;
+use Cache;
 
 class ChannelTransformer extends TransformerAbstract
 {
@@ -42,6 +43,23 @@ class ChannelTransformer extends TransformerAbstract
             $images = null;
         }
 
+        $latest = [
+            'thread' => $channel->threads()->latest()->first(),
+            'reply' => $channel->replies()->latest()->first(),
+        ];
+
+        if(!$latest['thread'] && !$latest['reply']) {
+            $latest = null;
+        }else if($latest['thread'] && !$latest['reply']) {
+            $latest = $latest['thread']->created_at;
+        }else{
+            if($latest['thread']->created_at > $latest['reply']->created_at) {
+                $latest = $latest['thread']->created_at;
+            }else{
+                $latest = $latest['reply']->created_at;
+            }
+        }
+
         $data = [
             'order' => (int) $channel->order,
             'name' => (string) $channel->name,
@@ -53,36 +71,15 @@ class ChannelTransformer extends TransformerAbstract
             'moderators' => (array) $channel->moderators->sortBy('username')->pluck('username')->toArray(),
             'created_at' => (string) $channel->created_at->format('Y-m-d H:i:s'),
             'updated_at' => (string) $channel->updated_at->format('Y-m-d H:i:s'),
-            'thread_count' => (int) $channel->threads()->count(),
-            'reply_count' => (int) $channel->replies()->count()
+            'thread_count' => (int) Cache::rememberForever('channel-thread-count-' . $channel->id, function() use ($channel) {
+                return $channel->threads()->count();
+            }),
+            'reply_count' => (int) Cache::rememberForever('channel-reply-count-' . $channel->id, function() use ($channel) {
+                return $channel->replies()->count();
+            }),
+            'latest_post' => $latest
         ];
 
         return $data;
-    }
-
-    /**
-     * Include the latest Thread if it exists.
-     *
-     * @param   Channel  $channel
-     *
-     * @return  \League\Fractal\Resource\Item|\League\Fractal\Resource\NullResource
-     */
-    public function includeLatestThread(Channel $channel)
-    {
-        return $channel->threads()->count() !== 0 ?
-            $this->item($channel->threads()->latest()->first(), new ThreadTransformer()) : null;
-    }
-
-    /**
-     * Include the latest Reply if it exists.
-     *
-     * @param   Channel  $channel
-     *
-     * @return  \League\Fractal\Resource\Item|\League\Fractal\Resource\NullResource
-     */
-    public function includeLatestReply(Channel $channel)
-    {
-        return $channel->replies()->count() !== 0 ?
-            $this->item($channel->replies()->latest()->first(), new ReplyTransformer()) : null;
     }
 }

@@ -31,8 +31,7 @@ class ChannelCategoriesController extends Controller
             ChannelCategory::ordered(),
             'ChannelCategoryTransformer',
             [
-                'channels', 'channels.latest_thread', 'channels.latest_thread.owner', 'channels.latest_reply',
-                'channels.latest_reply.owner'
+                'channels'
             ]
         );
     }

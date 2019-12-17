@@ -39,6 +39,8 @@ Route::group(['middleware' => ['auth', 'refresh']], function() {
         ['as' => 'channels.update', 'uses' => 'ChannelsController@update']);
     Route::post('channels/image/{category}/{channel}',
         ['as' => 'channels.image', 'uses' => 'ChannelsController@image']);
+    Route::delete('channels/image/{category}/{channel}',
+        ['as' => 'channels.image', 'uses' => 'ChannelsController@imageDestroy']);
     Route::get('channels/read/{category}/{channel}',
         ['as' => 'channels.read', 'uses' => 'ChannelsController@markRead']);
     Route::delete('channels/destroy/{category}/{channel}',

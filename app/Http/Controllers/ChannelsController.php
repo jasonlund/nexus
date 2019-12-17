@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Channel\ChannelCreateRequest;
 use App\Http\Requests\Channel\ChannelDestroyRequest;
 use App\Http\Requests\Channel\ChannelImageRequest;
+use App\Http\Requests\Channel\ChannelImageDestroyRequest;
 use App\Http\Requests\Channel\ChannelReorderRequest;
 use App\Http\Requests\Channel\ChannelUpdateRequest;
 use App\Models\Channel;
@@ -66,8 +67,7 @@ class ChannelsController extends Controller
     {
         return item_response(
             $channel,
-            'ChannelTransformer',
-            ['latest_thread', 'latest_thread.owner', 'latest_reply', 'latest_reply.owner']
+            'ChannelTransformer'
         );
     }
 
@@ -89,6 +89,13 @@ class ChannelsController extends Controller
     }
 
     public function image(ChannelImageRequest $request, ChannelCategory $category, Channel $channel)
+    {
+        $this->service->image($channel, $request);
+
+        return item_response($channel, 'ChannelTransformer');
+    }
+
+    public function imageDestroy(ChannelImageDestroyRequest $request, ChannelCategory $category, Channel $channel)
     {
         $this->service->image($channel, $request);
 

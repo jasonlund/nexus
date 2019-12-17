@@ -38,7 +38,7 @@ class ThreadsController extends Controller
             $channel->threads()->orderBy('pinned', 'DESC')
             ->orderBy('updated_at', 'DESC'),
             'ThreadTransformer',
-            ['owner', 'latest_reply', 'latest_reply.owner', 'editor']
+            ['owner', 'editor']
         );
     }
 
@@ -78,7 +78,7 @@ class ThreadsController extends Controller
         return item_response(
             $thread,
             'ThreadTransformer',
-            ['owner', 'latest_reply', 'latest_reply.owner', 'editor']
+            ['owner', 'editor']
         );
     }
 

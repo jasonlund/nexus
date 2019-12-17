@@ -6,6 +6,7 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Bouncer;
 use Hash;
+use Carbon\Carbon;
 
 class UpdateTest extends TestCase
 {

@@ -56,26 +56,24 @@ class DevelopmentSeeder extends Seeder
             $mods = $moderators->random(3);
             $channel->moderators()->sync($mods->pluck('id'));
 
-            for($x = 0; $x < rand(20, 100); $x++) {
-                $thread =factory('App\Models\Thread')->create([
-                    'channel_id' => $channel->id,
-                    'user_id' => $allUsers->random()->id
-                ]);
-                $threads = $threads->push($thread);
-            }
+            $data = factory('App\Models\Thread', rand(75, 150))->create([
+                'channel_id' => $channel->id,
+                'user_id' => $allUsers->random()->id
+            ]);
+
+            $threads = $threads->merge($data);
         }
 
         // Populate Threads with Replies..
         $this->command->info('Creating Replies..');
         $replyCount = 0;
         foreach($threads as $thread) {
-            for($x = 0; $x < rand(25, 100); $x++) {
-                factory('App\Models\Reply')->create([
-                    'thread_id' => $thread->id,
-                    'user_id' => $allUsers->random()->id
-                ]);
-                $replyCount++;
-            }
+            $num = rand(100, 200);
+            factory('App\Models\Reply', $num)->create([
+                'thread_id' => $thread->id,
+                'user_id' => $allUsers->random()->id
+            ]);
+            $replyCount += $num;
         }
 
         $this->command->info('Complete. Seeded ' . $allUsers->count() . ' Users, ' . $channels->count() . ' Channels, ' . $threads->count() . ' Threads and ' . $replyCount . ' Replies.');
