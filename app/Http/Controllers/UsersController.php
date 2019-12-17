@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\User\UserAvatarRequest;
 use App\Http\Requests\User\UserBanRequest;
 use App\Http\Requests\User\UserDestroyRequest;
-use App\Http\Requests\User\UserShowRequest;
 use App\Http\Requests\User\UserUnbanRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Models\User;
@@ -35,12 +34,11 @@ class UsersController extends Controller
     /**
      * Display the specified User.
      *
-     * @param   UserShowRequest  $request
      * @param   User             $user
      *
      * @return  \Illuminate\Http\JsonResponse
      */
-    public function show(UserShowRequest $request, User $user)
+    public function show(User $user)
     {
         return item_response($user, 'UserTransformer');
     }
