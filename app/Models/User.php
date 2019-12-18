@@ -15,7 +15,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Notifications\VerifyEmail;
 use App\Events\UserDeleted;
 
-class User extends Authenticatable implements BannableContract, JWTSubject  MustVerifyEmail
+class User extends Authenticatable implements BannableContract, JWTSubject, MustVerifyEmail
 {
     use Notifiable, SoftDeletes, SoftCascadeTrait, HasRolesAndAbilities, Bannable;
 
