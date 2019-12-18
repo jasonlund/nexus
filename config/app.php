@@ -55,8 +55,6 @@ return [
     'url' => env('APP_URL', 'http://nexus.test'),
     'front_end_url' => env('APP_FRONT_END_URL', 'http://localhost:8080'),
 
-    'asset_url' => env('ASSET_URL', null),
-
     /*
     |--------------------------------------------------------------------------
     | Application Timezone
