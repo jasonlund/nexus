@@ -37,8 +37,7 @@ class UserTransformer extends TransformerAbstract
             'created_at' => (string) $user->created_at,
             'updated_at' => (string) $user->updated_at,
             'last_active_at' => (string) $user->last_active_at->format('Y-m-d H:i:s'),
-            // 'verified' => (boolean) $user->hasVerifiedEmail()
-            'verified' => true
+            'verified' => (boolean) $user->hasVerifiedEmail()
         ];
 
         $data['moderatable_channels'] = $data['role'] !== 'moderator' ? []
