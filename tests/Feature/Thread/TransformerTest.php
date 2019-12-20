@@ -240,7 +240,6 @@ class TransformerTest extends TestCase
                 'data' => [
                     [
                         'latest_reply' => $reply->created_at->format('Y-m-d H:i:s')
-
                     ]
                 ]
             ]);

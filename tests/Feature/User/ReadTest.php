@@ -49,7 +49,19 @@ class ReadTest extends TestCase
     }
 
     /** @test */
-    function an_authorized_user_can_view_another_user()
+    function anyone_can_view_another_user()
+    {
+        $user = create('User');
+        $otherUser = create('User');
+
+        $this->apiAs($user, 'GET', $this->routeShow([$otherUser->username]))
+            ->assertStatus(200)
+            ->assertJson($otherUser->only(['name', 'username']))
+            ->assertJsonMissing($otherUser->only(['email']));
+    }
+
+    /** @test */
+    function an_authorized_user_can_view_another_user_with_their_email()
     {
         $user = create('User');
         Bouncer::allow($user)->to('view-all-users');
@@ -58,16 +70,6 @@ class ReadTest extends TestCase
         $this->apiAs($user, 'GET', $this->routeShow([$otherUser->username]))
             ->assertStatus(200)
             ->assertJson($otherUser->only(['name', 'username', 'email']));
-    }
-
-    /** @test */
-    function an_unauthorized_user_can_not_view_another_user()
-    {
-        $user = create('User');
-        $otherUser = create('User');
-
-        $this->apiAs($user, 'GET', $this->routeShow([$otherUser->username]))
-            ->assertStatus(403);
     }
 
     /** @test */

@@ -25,23 +25,21 @@ class PurifyService
      *
      * @return  string
      */
-    public static function simple($string)
+    public static function simple($string, $includes = [])
     {
         $config = ['HTML.Allowed' => 'strong,em,s,u,p'];
 
-        return Purifier::clean($string, $config);
-    }
+        if(in_array('emotes', $includes)) {
+            $config['HTML.Allowed'] .= ',span[class|data-emote]';
+        }
 
-    /**
-     * Purify the given string with a simple configuration inlcuding emotes.
-     *
-     * @param   string  $string
-     *
-     * @return  string
-     */
-    public static function simpleWithEmotes($string)
-    {
-        $config = ['HTML.Allowed' => 'strong,em,s,u,p,span[class|data-emote]'];
+        if(in_array('links', $includes)) {
+            $config['HTML.Allowed'] .= ',a[href|title|rel]';
+        }
+
+        if(in_array('images', $includes)) {
+            $config['HTML.Allowed'] .= ',img[width|height|alt|src]';
+        }
 
         return Purifier::clean($string, $config);
     }

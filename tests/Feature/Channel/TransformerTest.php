@@ -4,6 +4,7 @@ namespace Tests\Feature\Channel;
 
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Carbon\Carbon;
 
 class TransformerTest extends TestCase
 {
@@ -185,25 +186,55 @@ class TransformerTest extends TestCase
     }
 
     /** @test */
-    function a_channel_includes_its_latest_posts_timestamp()
+    function a_channel_includes_its_latest_posts_timestamp_if_one_exists()
     {
         $channel = create('Channel', ['channel_category_id' => $this->category->id]);
-
-        $threads = create('Thread', [
-            'channel_id' => $channel->id
-        ], 5);
-
-        foreach ($threads as $thread) {
-            create('Reply', [
-                'thread_id' => $thread->id
-            ], 5);
-        }
 
         $this->json('GET', $this->routeIndex([$this->category->slug]))
             ->assertStatus(200)
             ->assertJson([
                 [
-                    'latest_post' => $channel->replies()->latest()->first()->created_at->format('Y-m-d H:i:s')
+                    'latest_post' => null
+                ]
+            ]);
+
+        $thread = create('Thread', [
+            'channel_id' => $channel->id
+        ]);
+
+        $this->json('GET', $this->routeIndex([$this->category->slug]))
+            ->assertStatus(200)
+            ->assertJson([
+                [
+                    'latest_post' => $thread->created_at->format('Y-m-d H:i:s')
+                ]
+            ]);
+
+        Carbon::setTestNow(now()->addMinutes(5));
+
+        $reply = create('Reply', [
+            'thread_id' => $thread->id
+        ]);
+
+        $this->json('GET', $this->routeIndex([$this->category->slug]))
+            ->assertStatus(200)
+            ->assertJson([
+                [
+                    'latest_post' => $reply->created_at->format('Y-m-d H:i:s')
+                ]
+            ]);
+
+        Carbon::setTestNow(now()->addMinutes(5));
+
+        $newThread = create('Thread', [
+            'channel_id' => $channel->id
+        ]);
+
+        $this->json('GET', $this->routeIndex([$this->category->slug]))
+            ->assertStatus(200)
+            ->assertJson([
+                [
+                    'latest_post' => $newThread->created_at->format('Y-m-d H:i:s')
                 ]
             ]);
     }

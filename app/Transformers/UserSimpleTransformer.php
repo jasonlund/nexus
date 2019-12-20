@@ -25,7 +25,7 @@ class UserSimpleTransformer extends TransformerAbstract
             'username' => (string) $user->username,
             'role' => $user->role,
             'avatar' => $user->avatar_path ? Storage::url($user->avatar_path) : null,
-            'signature' => $user->signature ? (string) PurifyService::simple($user->signature) : null,
+            'signature' => $user->signature ? (string) PurifyService::simple($user->signature, ['emotes', 'links', 'images']) : null,
             'thread_count' => (int) Cache::rememberForever('user-thread-count-' . $user->id, function () use ($user) {
                 return $user->threads()->count();
             }),

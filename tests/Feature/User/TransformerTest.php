@@ -25,6 +25,11 @@ class TransformerTest extends TestCase
         return route('users.index');
     }
 
+    protected function routeShow($params)
+    {
+        return route('users.show', $params);
+    }
+
     protected function routeShowSelf()
     {
         return route('self.show');
@@ -170,73 +175,57 @@ class TransformerTest extends TestCase
             ]);
     }
 
-    // /** @test */
-    // function a_user_includes_its_timezone()
-    // {
-    //     $user = create('User');
+    /** @test */
+    function a_user_includes_its_timezone()
+    {
+        $user = create('User');
 
-    //     $this->json('GET', $this->routeIndex())
-    //         ->assertStatus(200)
-    //         ->assertJson([
-    //             'data' => [
-    //                 ['timezone' => 'America/New_York']
-    //             ]
-    //         ]);
+        $this->json('GET', $this->routeShow([$user->username]))
+            ->assertStatus(200)
+            ->assertJson([
+                'timezone' => 'America/New_York'
+            ]);
 
-    //     $user->timezone = 'America/Chicago';
-    //     $user->save();
+        $user->timezone = 'America/Chicago';
+        $user->save();
 
-    //     $this->json('GET', $this->routeIndex())
-    //         ->assertStatus(200)
-    //         ->assertJson([
-    //             'data' => [
-    //                 ['timezone' => 'America/Chicago']
-    //             ]
-    //         ]);
-    // }
+        $this->json('GET', $this->routeShow([$user->username]))
+            ->assertStatus(200)
+            ->assertJson([
+                'timezone' => 'America/Chicago'
+            ]);
+    }
 
-    // /** @test */
-    // function a_user_includes_its_location_if_one_exists()
-    // {
-    //     $user = create('User');
+    /** @test */
+    function a_user_includes_its_location_if_one_exists()
+    {
+        $user = create('User');
 
-    //     $this->json('GET', $this->routeIndex())
-    //         ->assertStatus(200)
-    //         ->assertJson([
-    //             'data' => [
-    //                 ['location' => null]
-    //             ]
-    //         ]);
+        $this->json('GET', $this->routeShow([$user->username]))
+            ->assertStatus(200)
+            ->assertJson(['location' => null]);
 
-    //     $user->location = 'Somewhere';
-    //     $user->save();
+        $user->location = 'Somewhere';
+        $user->save();
 
-    //     $this->json('GET', $this->routeIndex())
-    //         ->assertStatus(200)
-    //         ->assertJson([
-    //             'data' => [
-    //                 ['location' => 'Somewhere']
-    //             ]
-    //         ]);
-    // }
+        $this->json('GET', $this->routeShow([$user->username]))
+            ->assertStatus(200)
+            ->assertJson(['location' => 'Somewhere']);
+    }
 
-    // /** @test */
-    // function a_user_includes_timestamps()
-    // {
-    //     $user = create('User');
+    /** @test */
+    function a_user_includes_timestamps()
+    {
+        $user = create('User');
 
-    //     $this->json('GET', $this->routeIndex())
-    //         ->assertStatus(200)
-    //         ->assertJson([
-    //             'data' => [
-    //                 [
-    //                     'created_at' => $user->created_at,
-    //                     'updated_at' => $user->updated_at,
-    //                     'last_active_at' => $user->last_active_at
-    //                 ]
-    //             ]
-    //         ]);
-    // }
+        $this->json('GET', $this->routeShow([$user->username]))
+            ->assertStatus(200)
+            ->assertJson([
+                'created_at' => $user->created_at,
+                'updated_at' => $user->updated_at,
+                'last_active_at' => $user->last_active_at
+            ]);
+    }
 
     /** @test */
     function a_user_includes_moderated_channels_if_they_exists()

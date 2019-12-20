@@ -25,7 +25,7 @@ class UserTransformer extends TransformerAbstract
             'name' => (string) $user->name,
             'role' => $user->role,
             'avatar' => $user->avatar_path ? Storage::url($user->avatar_path) : null,
-            'signature' => $user->signature ? (string) PurifyService::simple($user->signature) : null,
+            'signature' => $user->signature ? (string) PurifyService::simple($user->signature, ['emotes', 'links', 'images']) : null,
             'thread_count' => (int) Cache::rememberForever('user-thread-count-' . $user->id, function () use ($user) {
                 return $user->threads()->count();
             }),
@@ -37,7 +37,7 @@ class UserTransformer extends TransformerAbstract
             'created_at' => (string) $user->created_at,
             'updated_at' => (string) $user->updated_at,
             'last_active_at' => (string) $user->last_active_at->format('Y-m-d H:i:s'),
-            'verified' => (boolean) $user->hasVerifiedEmail()
+            'verified' => (bool) $user->hasVerifiedEmail()
         ];
 
         $data['moderatable_channels'] = $data['role'] !== 'moderator' ? []
